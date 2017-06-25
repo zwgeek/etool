@@ -48,6 +48,7 @@ bool CCondition::trywait(CMutexEx &mutex, long timeOut)
 		WaitForSingleObject(mutex.m_interior.mutex, INFINITE);
 		return true; 
 	}
+	//函数等待超时,指定内核对象状态为未触发.
 	WaitForSingleObject(mutex.m_interior.mutex, INFINITE);
 	m_interior.waiters--;
 	return false;

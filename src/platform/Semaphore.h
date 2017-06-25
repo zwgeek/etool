@@ -9,9 +9,14 @@
 #if defined(_windows)
 #include <windows.h>			
 #endif
-#if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
+#if defined(_linux) || defined(_android)
 #include <sys/time.h>
 #include <semaphore.h>
+#endif
+#if defined(_mac) || defined(_ios)
+#include <mach/semaphore.h>
+#include <mach/task.h>
+#include <mach/mach.h>
 #endif
 
 namespace etool {
@@ -20,8 +25,11 @@ struct SemaphoreInterior {
 #if defined(_windows)
 	HANDLE semaphore;
 #endif
-#if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
+#if defined(_linux) || defined(_android)
 	sem_t semaphore;
+#endif
+#if defined defined(_mac) || defined(_ios)
+	semaphore_t semaphore;
 #endif
 };
 
