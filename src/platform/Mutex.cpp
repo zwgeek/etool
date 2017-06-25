@@ -44,7 +44,7 @@ bool CMutex::trylock()
 #endif
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
-	pthread_mutex_trylock(&(m_interior.mutex )) == 0;
+	return pthread_mutex_trylock(&(m_interior.mutex )) == 0;
 #endif
 }
 

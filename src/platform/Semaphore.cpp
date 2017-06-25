@@ -14,7 +14,7 @@ CSemaphore::CSemaphore(int initNum)
 #endif
 
 #if defined(_mac) || defined(_ios)
-	semaphore_create(mash_task_self(), &(m_interior.semaphore), SYNC_POLICY_FIFO, nValue);
+	semaphore_create(mach_task_self(), &(m_interior.semaphore), SYNC_POLICY_FIFO, initNum);
 #endif
 }
 
@@ -29,7 +29,7 @@ CSemaphore::~CSemaphore()
 #endif
 
 #if defined(_mac) || defined(_ios)
-	semaphore_destroy(mash_task_self(), m_interior.semaphore);
+	semaphore_destroy(mach_task_self(), m_interior.semaphore);
 #endif
 }
 

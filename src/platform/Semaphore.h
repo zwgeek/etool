@@ -28,7 +28,7 @@ struct SemaphoreInterior {
 #if defined(_linux) || defined(_android)
 	sem_t semaphore;
 #endif
-#if defined defined(_mac) || defined(_ios)
+#if defined(_mac) || defined(_ios)
 	semaphore_t semaphore;
 #endif
 };

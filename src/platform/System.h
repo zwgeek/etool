@@ -9,8 +9,11 @@
 #if defined(_windows)
 #include <windows.h>		
 #endif
-#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+#if defined(_android) || defined(_linux)
 #include <system.h>	
+#endif
+#if defined(_mac) || defined(_ios)
+#include <sys/time.h>
 #endif
 
 namespace etool {

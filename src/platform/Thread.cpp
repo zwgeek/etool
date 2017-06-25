@@ -13,7 +13,7 @@ unsigned long getCurrentID()
 #endif
 
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
-	return pthread_self();
+	return (unsigned long)pthread_self();
 #endif
 }
 
@@ -30,7 +30,7 @@ void CThread::createThread()
 
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
 	//PTHREAD _CREATE_JOINABLE(state)
-	pthread_create(&m_interior.thread, NULL, threadPorc, this);
+	pthread_create(&m_interior.thread, NULL, g_threadPorc, this);
 #endif
 }
 
@@ -43,7 +43,7 @@ void CThread::destroyThread()
 #endif
 
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
-	pthread_join(&m_interior.thread, NULL);
+	pthread_join(m_interior.thread, NULL);
 #endif
 }
 
@@ -63,7 +63,7 @@ bool CThread::cancelThread()
 
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
 	//PTHREAD_CREATE_DETACHED(state)
-	pthread_detach(&m_interior.thread);
+	pthread_detach(m_interior.thread);
 	return true;
 #endif
 }
@@ -78,7 +78,7 @@ void CThread::terminateThread()
 
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
 	//PTHREAD_CANCEL_ENABLE(default)
-	pthread_cancel(&m_interior.thread);
+	pthread_cancel(m_interior.thread);
 #endif
 }
 

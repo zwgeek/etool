@@ -8,8 +8,12 @@ void CSystem::sleep(unsigned long milliseconds)
 	Sleep(milliseconds);
 #endif
 
-#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+#if defined(_linux) || defined(_android)
 	usleep(milliseconds * 1000);
+#endif
+
+#if defined(_mac) || defined(_ios)
+	sleep(milliseconds * 1000);
 #endif
 }
 
