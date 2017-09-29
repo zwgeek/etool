@@ -14,7 +14,7 @@ STRIP	= @echo strip 	$@; $(CROSS)strip
 
 #D_linux D_mac D_android D_ios D_windows
 CFLAGS = -D_windows
-CFLAGS += -Wall -O2 -Os
+CFLAGS += -Wall -O3 -Os
 CFLAGS += -D_REENTRANT
 CFLAGS += -frtti  -fexceptions
 CFLAGS_DBG := -g -ggdb

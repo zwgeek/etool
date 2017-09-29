@@ -6,14 +6,22 @@
 #ifndef ETOOL_PLATFORM_SYSTEM
 #define ETOOL_PLATFORM_SYSTEM
 
+#include <stdio.h>
+#include <string>
 #if defined(_windows)
-#include <windows.h>		
+#include <windows.h>
+#include <io.h>	//判断文件夹
+#include <direct.h>	//创建|删除文件夹
 #endif
 #if defined(_android) || defined(_linux)
-#include <system.h>	
+#include <system.h>
+#include <unistd.h>	//文件夹操作
+#include <dirent.h>	//创建|删除文件夹
 #endif
 #if defined(_mac) || defined(_ios)
 #include <sys/time.h>
+#include <unistd.h>	//文件夹操作
+#include <dirent.h>	//创建|删除文件夹
 #endif
 
 namespace etool {
@@ -29,6 +37,8 @@ class CSystem
 
 public:
 	static void sleep(unsigned long milliseconds);
+	static void mkdir(const char *filename);
+	static void rmdir(const char *filename);
 
 };
 } //etool
