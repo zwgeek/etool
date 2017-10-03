@@ -6,6 +6,7 @@
 #ifndef ETOOL_PLATFORM_SEMAPHORE
 #define ETOOL_PLATFORM_SEMAPHORE
 
+#include <stdlib.h>
 #if defined(_windows)
 #include <windows.h>			
 #endif
@@ -19,9 +20,8 @@
 #include <mach/mach.h>
 #endif
 
-namespace etool {
 
-struct SemaphoreInterior {
+typedef struct etool_semaphoreInterior {
 #if defined(_windows)
 	HANDLE semaphore;
 #endif
@@ -31,22 +31,12 @@ struct SemaphoreInterior {
 #if defined(_mac) || defined(_ios)
 	semaphore_t semaphore;
 #endif
-};
+} *etool_semaphore;
 
-class CSemaphore
-{
-	CSemaphore(const CSemaphore&) {}
-	CSemaphore& operator=(const CSemaphore&) { return *this; }
-public:
-	CSemaphore(int initNum = 1);
-	~CSemaphore();
+int etool_semaphore_create(etool_semaphore *semaphore, int initNum);
+void etool_semaphore_destroy(etool_semaphore *semaphore);
+void etool_semaphore_pend(etool_semaphore *semaphore);
+int etool_semaphore_trypend(etool_semaphore *semaphore, long timeOut);
+void etool_semaphore_post(etool_semaphore *semaphore);
 
-	void pend();
-	bool trypend(long timeOut = 0);
-	void post();
-
-private:
-	SemaphoreInterior m_interior;
-};
-} //etool
 #endif //ETOOL_PLATFORM_SEMAPHOR

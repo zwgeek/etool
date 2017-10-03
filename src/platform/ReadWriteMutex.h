@@ -6,29 +6,25 @@
 #ifndef ETOOL_PLATFORM_READWRITEMUTEX
 #define ETOOL_PLATFORM_READWRITEMUTEX
 
+#include <stdlib.h>
 #include "Mutex.h"
 #include "RecursiveMutex.h"
 
-namespace etool {
 
-class CReadWriteMutex
+typedef struct etool_readWriteMutexInterior
 {
-	CReadWriteMutex(const CReadWriteMutex&) {}
-	CReadWriteMutex& operator=(const CReadWriteMutex&) { return *this; }
-public:
-	CReadWriteMutex();
-	~CReadWriteMutex();
+	int                                               readCount;
+	etool_mutex                              readMutex;
+	etool_recursiveMutex               writeMutex;
+} *etool_readWriteMutex;
 
-	void lockRead();
-	bool trylockRead();
-	void unlockRead();
-	void lockWrite();
-	bool trylockWrite();
-	void unlockWrite();
-private:
-	int                         m_readCount;
-	CMutex                 m_readMutex;
-	CRecursiveMutex m_writeMutex;
-};
-} //etool
+int etool_readWriteMutex_create(etool_readWriteMutex *mutex);
+void etool_readWriteMutex_destroy(etool_readWriteMutex *mutex);
+void etool_readWriteMutex_lockRead(etool_readWriteMutex *mutex);
+int etool_readWriteMutex_trylockRead(etool_readWriteMutex *mutex);
+void etool_readWriteMutex_unlockRead(etool_readWriteMutex *mutex);
+void etool_readWriteMutex_lockWrite(etool_readWriteMutex *mutex);
+int etool_readWriteMutex_trylockWrite(etool_readWriteMutex *mutex);
+void etool_readWriteMutex_unlockWrite(etool_readWriteMutex *mutex);
+
 #endif //ETOOL_PLATFORM_READWRITEMUTEX

@@ -16,7 +16,7 @@ STRIP	= @echo strip 	$@; $(CROSS)strip
 CFLAGS = -D_windows
 CFLAGS += -Wall -O3 -Os
 CFLAGS += -D_REENTRANT
-CFLAGS += -frtti  -fexceptions
+#CFLAGS += -frtti  -fexceptions
 CFLAGS_DBG := -g -ggdb
 
 AFLAGS += -r

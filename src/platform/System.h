@@ -7,7 +7,8 @@
 #define ETOOL_PLATFORM_SYSTEM
 
 #include <stdio.h>
-#include <string>
+#include <stdlib.h>
+//#include <string>
 #if defined(_windows)
 #include <windows.h>
 #include <io.h>	//判断文件夹
@@ -24,22 +25,11 @@
 #include <dirent.h>	//创建|删除文件夹
 #endif
 
-namespace etool {
 
 // struct SystemInterior;
 
-class CSystem
-{
-	CSystem() {}
-	~CSystem() {}
-	CSystem(const CSystem&) {}
-	CSystem& operator=(const CSystem&) { return *this; }
+void etool_system_sleep(unsigned long milliseconds);
+// void etool_system_mkdir(const char *filename);
+// void etool_system_rmdir(const char *filename);
 
-public:
-	static void sleep(unsigned long milliseconds);
-	static void mkdir(const char *filename);
-	static void rmdir(const char *filename);
-
-};
-} //etool
 #endif //ETOOL_PLATFORM_SYSTEM

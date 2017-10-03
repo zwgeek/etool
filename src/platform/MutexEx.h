@@ -6,39 +6,29 @@
 #ifndef ETOOL_PLATFORM_MUTEXEX
 #define ETOOL_PLATFORM_MUTEXEX
 
+#include <stdlib.h>
 #if defined(_windows)
 #include <windows.h>		
 #endif
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 #include <pthread.h>	
 #endif
- 
-namespace etool {
 
-class CCondition;
-struct MutexExInterior {
+
+typedef struct etool_mutexExInterior
+{
 #if defined(_windows)
 	HANDLE mutex;
 #endif
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	pthread_mutex_t mutex;
 #endif
-};
+} *etool_mutexEx;
 
-class CMutexEx
-{
-	friend class CCondition;
-	CMutexEx(const CMutexEx&) {}
-	CMutexEx& operator=(const CMutexEx&) { return *this; }
-public:
-	CMutexEx();
-	~CMutexEx();
+int etool_mutexEx_create(etool_mutexEx *mutex);
+void etool_mutexEx_destroy(etool_mutexEx *mutex);
+void etool_mutexEx_lock(etool_mutexEx *mutex);
+int etool_mutexEx_trylock(etool_mutexEx *mutex);
+void etool_mutexEx_unlock(etool_mutexEx *mutex);
 
-	void lock();
-	bool trylock();
-	void unlock();
-private: 
-	MutexExInterior m_interior;
-};
-} //etool
 #endif //ETOOL_PLATFORM_MUTEXEX
