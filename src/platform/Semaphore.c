@@ -1,22 +1,20 @@
-#include "semaphore.h"
+#include "Semaphore.h"
 
 
 //initNum = 1
 int etool_semaphore_create(etool_semaphore *semaphore, int initNum)
 {
-	*semaphore = malloc(sizeof(struct etool_semaphoreInterior));
-	if ((*semaphore) == 0) { return -1; }	
 #if defined(_windows)
 	//default security attributes and unnamed semaphore, _maxNum = 10
-	(*semaphore)->semaphore = CreateSemaphore(0, initNum, 10, 0);
+	semaphore->semaphore = CreateSemaphore(0, initNum, 10, 0);
 #endif
 
 #if defined(_linux) || defined(_android)
-	sem_init(&((*semaphore)->semaphore), 0, initNum);
+	sem_init(&(semaphore->semaphore), 0, initNum);
 #endif
 
 #if defined(_mac) || defined(_ios)
-	semaphore_create(mach_task_self(), &((*semaphore)->semaphore), SYNC_POLICY_FIFO, initNum);
+	semaphore_create(mach_task_self(), &(semaphore->semaphore), SYNC_POLICY_FIFO, initNum);
 #endif
 	return 0;
 }
@@ -24,66 +22,67 @@ int etool_semaphore_create(etool_semaphore *semaphore, int initNum)
 void etool_semaphore_destroy(etool_semaphore *semaphore)
 {
 #if defined(_windows)
-	CloseHandle((*semaphore)->semaphore);
+	CloseHandle(semaphore->semaphore);
 #endif
 
 #if defined(_linux) || defined(_android)
-	sem_destroy(&((*semaphore)->semaphore));
+	sem_destroy(&(semaphore->semaphore));
 #endif
 
 #if defined(_mac) || defined(_ios)
-	semaphore_destroy(mach_task_self(), (*semaphore)->semaphore);
+	semaphore_destroy(mach_task_self(), semaphore->semaphore);
 #endif
-	free(*semaphore);
 }
 
 void etool_semaphore_pend(etool_semaphore *semaphore)
 {
 #if defined(_windows)
-	WaitForSingleObject((*semaphore)->semaphore, INFINITE);
+	WaitForSingleObject(semaphore->semaphore, INFINITE);
 #endif
 
 #if defined(_linux) || defined(_android)
-	sem_wait(&((*semaphore)->semaphore));
+	sem_wait(&(semaphore->semaphore));
 #endif
 
 #if defined(_mac) || defined(_ios)
-	semaphore_wait((*semaphore)->semaphore);
+	semaphore_wait(semaphore->semaphore);
 #endif
 }
 
 int etool_semaphore_trypend(etool_semaphore *semaphore, long timeOut)
 {
 #if defined(_windows)
-	return WaitForSingleObject((*semaphore)->semaphore, timeOut);
+	return WaitForSingleObject(semaphore->semaphore, timeOut);
 #endif
 
 #if defined(_linux) || defined(_android)
-	if (timeOut != 0)
+	//timeOut != 0
+	if (timeOut)
 	{ 
 		struct timespec ts;
 		clock_gettime(CLOCK_REALTIME, &ts);
 		ts.tv_nsec += timeOut * 1000000;
 		ts.tv_sec += ts.tv_nsec / 1000000000;
 		ts.tv_nsec = ts.tv_nsec % 1000000000;
-		return sem_timedwait(&((*semaphore)->semaphore), &ts);
+		return sem_timedwait(&(semaphore->semaphore), &ts);
 	} 
 	else 
 	{
-		return sem_trywait(&((*semaphore)->semaphore))0;
+		return sem_trywait(&(semaphore->semaphore))0;
 	}
 #endif
 
 #if defined(_mac) || defined(_ios)
-	// if (timeOut != 0)
+	//timeOut != 0
+	// if (timeOut)
 	// {
 	// 	mach_timespec_t wait_time = {0, timeOut * 1000000};
-	// 	return semaphore_timedwait((*semaphore)->semaphore, wait_time);
+	// 	return semaphore_timedwait(semaphore->semaphore, wait_time);
 	// }
 	// else
 	// {
 	mach_timespec_t wait_time = {0, (clock_res_t)timeOut * 1000000};
-	return semaphore_timedwait((*semaphore)->semaphore, wait_time);
+	return semaphore_timedwait(semaphore->semaphore, wait_time);
 	// }
 #endif
 }
@@ -92,14 +91,14 @@ void etool_semaphore_post(etool_semaphore *semaphore)
 {
 #if defined(_windows)
 	//can't use the lpPreviousCount
-	ReleaseSemaphore((*semaphore)->semaphore, 1, 0);
+	ReleaseSemaphore(semaphore->semaphore, 1, 0);
 #endif
 
 #if defined(_linux) || defined(_android)
-	sem_post(&((*semaphore)->semaphore));
+	sem_post(&(semaphore->semaphore));
 #endif
 
 #if defined(_mac) || defined(_ios)
-	semaphore_signal((*semaphore)->semaphore);
+	semaphore_signal(semaphore->semaphore);
 #endif
 }

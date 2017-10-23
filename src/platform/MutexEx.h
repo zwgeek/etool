@@ -14,21 +14,43 @@
 #include <pthread.h>	
 #endif
 
+#define MUTEXEX_NULL 0
 
-typedef struct etool_mutexExInterior
-{
+typedef struct {
 #if defined(_windows)
 	HANDLE mutex;
 #endif
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	pthread_mutex_t mutex;
 #endif
-} *etool_mutexEx;
+} etool_mutexEx;
 
+/**
+ * 创建
+ * @param  mutex [not null]
+ * @return       [error code]
+ */
 int etool_mutexEx_create(etool_mutexEx *mutex);
+/**
+ * 销毁
+ * @param mutex [not null]
+ */
 void etool_mutexEx_destroy(etool_mutexEx *mutex);
+/**
+ * 锁
+ * @param mutex [not null]
+ */
 void etool_mutexEx_lock(etool_mutexEx *mutex);
+/**
+ * 尝试锁
+ * @param  mutex [not null]
+ * @return       [error code]
+ */
 int etool_mutexEx_trylock(etool_mutexEx *mutex);
+/**
+ * 解锁
+ * @param mutex [not null]
+ */
 void etool_mutexEx_unlock(etool_mutexEx *mutex);
 
 #endif //ETOOL_PLATFORM_MUTEXEX

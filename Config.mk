@@ -31,8 +31,8 @@ TARGET_DEBUG_A = $(LIBDIR)/libetool.debug.a
 TARGET_DEBUG_SO = $(LIBDIR)/libetool.debug.so
 TARGET_TEST = $(BINDIR)/etool
 
-LIB_SRCS_C += $(foreach file, $(SRCS_PATH), $(wildcard $(file)/*.c))
-LIB_SRCS_CPP += $(foreach file, $(SRCS_PATH), $(wildcard $(file)/*.cpp))
+LIB_SRCS_C += $(foreach file, $(wildcard $(SRCS_PATH)/*), $(wildcard $(file)/*.c))
+LIB_SRCS_CPP += $(foreach file, $(wildcard $(SRCS_PATH)/*), $(wildcard $(file)/*.cpp))
 TEST_SRCS += $(foreach file, $(TEST_SRCS_PATH), $(wildcard $(file)/*.cpp))
 
 
@@ -45,7 +45,7 @@ TEST_OBJS += $(patsubst %.cpp, $(COMPILE_PATH)/%.o, $(TEST_SRCS))
 
 $(shell mkdir -p $(LIBDIR))
 $(shell mkdir -p $(BINDIR))
-$(foreach dir, $(SRCS_PATH), $(shell mkdir -p $(COMPILE_PATH)/$(dir)))
+$(foreach dir, $(wildcard $(SRCS_PATH)/*), $(shell mkdir -p $(COMPILE_PATH)/$(dir)))
 
 
 #compile

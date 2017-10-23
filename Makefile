@@ -10,7 +10,7 @@ ALLDONE = @make -f Config.mk SRCS_PATH=$(SRCS_PATH) INCLUDES=$(INCLUDES) TEST_SR
 CLEANDONE = @make -f Config.mk clean;
 endif
 
-SRCS_PATH = $(wildcard src/*)
+SRCS_PATH = src
 INCLUDES = -lsrc
 TEST_SRCS_PATH = test
 

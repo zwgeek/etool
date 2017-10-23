@@ -15,8 +15,6 @@
 
 // namespace etool {
 
-// // struct SystemInterior;
-
 // class CAtomicCount
 // {
 // 	CAtomicCount(const CSystem&) {}

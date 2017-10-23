@@ -20,8 +20,9 @@
 #include <mach/mach.h>
 #endif
 
+#define SEMAPHORE_NULL 0
 
-typedef struct etool_semaphoreInterior {
+typedef struct {
 #if defined(_windows)
 	HANDLE semaphore;
 #endif
@@ -31,12 +32,36 @@ typedef struct etool_semaphoreInterior {
 #if defined(_mac) || defined(_ios)
 	semaphore_t semaphore;
 #endif
-} *etool_semaphore;
+} etool_semaphore;
 
+/**
+ * 创建
+ * @param  semaphore [not null]
+ * @param  initNum   [not null]
+ * @return           [error code]
+ */
 int etool_semaphore_create(etool_semaphore *semaphore, int initNum);
+/**
+ * 销毁
+ * @param semaphore [not null]
+ */
 void etool_semaphore_destroy(etool_semaphore *semaphore);
+/**
+ * 阻塞
+ * @param semaphore [not null]
+ */
 void etool_semaphore_pend(etool_semaphore *semaphore);
+/**
+ * 尝试阻塞
+ * @param  semaphore [not null]
+ * @param  timeOut   [not null]
+ * @return           [error code]
+ */
 int etool_semaphore_trypend(etool_semaphore *semaphore, long timeOut);
+/**
+ * 通知
+ * @param semaphore [not null]
+ */
 void etool_semaphore_post(etool_semaphore *semaphore);
 
 #endif //ETOOL_PLATFORM_SEMAPHOR
