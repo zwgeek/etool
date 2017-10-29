@@ -1,7 +1,23 @@
 #include "Condition.h"
 
 
-int etool_condition_create(etool_condition *condition)
+etool_condition* etool_condition_create()
+{
+	etool_condition *condition = malloc(sizeof(etool_condition));
+	if (condition == 0) { return 0; }
+#if defined(_windows)
+	//default security attributes and unnamed semaphore, _maxNum = 10
+	condition->waiters = 0; 
+	condition->cond = CreateSemaphore(0, 0, 10, 0); 
+#endif
+
+#if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
+	pthread_cond_init(condition->cond, 0);
+#endif
+	return condition;
+}
+
+void etool_condition_load(etool_condition *condition)
 {
 #if defined(_windows)
 	//default security attributes and unnamed semaphore, _maxNum = 10
@@ -12,7 +28,17 @@ int etool_condition_create(etool_condition *condition)
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
 	pthread_cond_init(condition->cond, 0);
 #endif
-	return 0;
+}
+
+void etool_condition_unload(etool_condition *condition)
+{
+#if defined(_windows)
+	CloseHandle(condition->cond); 
+#endif
+
+#if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
+	pthread_cond_destroy(&(condition->cond));
+#endif
 }
 
 void etool_condition_destroy(etool_condition *condition)
@@ -24,6 +50,7 @@ void etool_condition_destroy(etool_condition *condition)
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
 	pthread_cond_destroy(&(condition->cond));
 #endif
+	free(condition);
 }
 
 void etool_condition_wait(etool_condition *condition, etool_mutexEx *mutex)

@@ -17,7 +17,7 @@
 
 
 typedef void etool_threadPorc();
-typedef struct {
+typedef struct _etool_thread {
 	int         loop;
 #if defined(_windows)
 	HANDLE thread;
@@ -39,39 +39,57 @@ typedef struct {
  * @return [ID]
  */
 unsigned long etool_thread_getCurrentID();
+
 /**
  * 创建线程
- * @param  thread [not null]
  * @return        [error code]
  */
-int etool_thread_create(etool_thread *thread);
+etool_thread* etool_thread_create();
+
+/**
+ * 装载
+ * @param thread [not null]
+ */
+void etool_thread_load(etool_thread *thread);
+
+/**
+ * 卸载
+ * @param thread [not null]
+ */
+void etool_thread_unload(etool_thread *thread);
+
 /**
  * 删除线程
  * @param thread [not null]
  */
 void etool_thread_destroy(etool_thread *thread);
+
 /**
  * 获取当前线程是否在运行
  * @param  thread [not null]
  * @return        [flag]
  */
 int etool_thread_loop(etool_thread *thread);
+
 /**
  * 线程开始运行
  * @param thread [not null]
  * @param proc   [not null]
  */
 void etool_thread_start(etool_thread *thread, etool_threadPorc *proc);
+
 /**
  * 线程结束运行(阻塞)
  * @param thread [not null]
  */
 void etool_thread_end(etool_thread *thread);
+
 /**
  * 线程取消运行(非阻塞)
  * @param thread [not null]
  */
 int etool_thread_cancel(etool_thread *thread);
+
 /**
  * 线程中断运行(非阻塞)
  * @param thread [not null]

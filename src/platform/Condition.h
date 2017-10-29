@@ -16,9 +16,7 @@
 #include <pthread.h>			
 #endif
 
-#define CONDITION_NULL 0
-
-typedef struct {
+typedef struct _etool_condition {
 #if defined(_windows)
 	//waiters must be eq the Semaphore count
 	int waiters;
@@ -31,21 +29,35 @@ typedef struct {
 
 /**
  * 创建
- * @param  condition [not null]
- * @return           [error code]
+ * @return           [实体]
  */
-int etool_condition_create(etool_condition *condition);
+etool_condition* etool_condition_create();
+
+/**
+ * 装载
+ * @param condition [not null]
+ */
+void etool_condition_load(etool_condition *condition);
+
+/**
+ * 卸载
+ * @param condition [not null]
+ */
+void etool_condition_unload(etool_condition *condition);
+
 /**
  * 销毁
  * @param  condition [not null]
  */
 void etool_condition_destroy(etool_condition *condition);
+
 /**
  * 等待
  * @param condition [not null]
  * @param mutex     [not null]
  */
 void etool_condition_wait(etool_condition *condition, etool_mutexEx *mutex);
+
 /**
  * 尝试等待
  * @param  condition [not null]
@@ -54,11 +66,13 @@ void etool_condition_wait(etool_condition *condition, etool_mutexEx *mutex);
  * @return           [error code]
  */
 int etool_condition_trywait(etool_condition *condition, etool_mutexEx *mutex, long timeOut);
+
 /**
  * 通知
  * @param condition [not null]
  */
 void etool_condition_signal(etool_condition *condition);
+
 /**
  * 全部通知
  * @param condition [not null]

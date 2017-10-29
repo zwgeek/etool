@@ -22,7 +22,7 @@
 
 #define SEMAPHORE_NULL 0
 
-typedef struct {
+typedef struct _etool_semaphore {
 #if defined(_windows)
 	HANDLE semaphore;
 #endif
@@ -36,21 +36,36 @@ typedef struct {
 
 /**
  * 创建
- * @param  semaphore [not null]
  * @param  initNum   [not null]
- * @return           [error code]
+ * @return           [实体]
  */
-int etool_semaphore_create(etool_semaphore *semaphore, int initNum);
+etool_semaphore* etool_semaphore_create(int initNum);
+
+/**
+ * 装载
+ * @param semaphore [not null]
+ * @param  initNum   [not null]
+ */
+void etool_semaphore_load(etool_semaphore *semaphore, int initNum);
+
+/**
+ * 卸载
+ * @param semaphore [not null]
+ */
+void etool_semaphore_unload(etool_semaphore *semaphore);
+
 /**
  * 销毁
  * @param semaphore [not null]
  */
 void etool_semaphore_destroy(etool_semaphore *semaphore);
+
 /**
  * 阻塞
  * @param semaphore [not null]
  */
 void etool_semaphore_pend(etool_semaphore *semaphore);
+
 /**
  * 尝试阻塞
  * @param  semaphore [not null]
@@ -58,6 +73,7 @@ void etool_semaphore_pend(etool_semaphore *semaphore);
  * @return           [error code]
  */
 int etool_semaphore_trypend(etool_semaphore *semaphore, long timeOut);
+
 /**
  * 通知
  * @param semaphore [not null]

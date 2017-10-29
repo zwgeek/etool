@@ -12,15 +12,28 @@ unsigned long etool_thread_getCurrentID()
 #endif
 }
 
-int etool_thread_create(etool_thread *thread)
-{ 
+etool_thread* etool_thread_create()
+{
+	etool_thread *thread = malloc(sizeof(etool_thread));
+	if (thread == 0) { return 0; }
 	thread->loop = 0;
-	return 0;
+	return thread;
+}
+
+void etool_thread_load(etool_thread *thread)
+{
+	thread->loop = 0;
+}
+
+void etool_thread_unload(etool_thread *thread)
+{
+	etool_thread_end(thread);
 }
 
 void etool_thread_destroy(etool_thread *thread)
 {
 	etool_thread_end(thread);
+	free(thread);
 }
 
 int etool_thread_loop(etool_thread *thread)

@@ -1,18 +1,34 @@
 #include "ReadWriteMutex.h"
 
 
-int etool_readWriteMutex_create(etool_readWriteMutex *mutex)
+etool_readWriteMutex* etool_readWriteMutex_create()
+{
+	etool_readWriteMutex *mutex = malloc(sizeof(etool_readWriteMutex));
+	if (mutex == 0) { return 0; }
+	mutex->readCount = 0;
+	etool_mutex_load(&(mutex->readMutex));
+	etool_recursiveMutex_load(&(mutex->writeMutex));
+	return mutex;
+}
+
+void etool_readWriteMutex_load(etool_readWriteMutex *mutex)
 {
 	mutex->readCount = 0;
-	etool_mutex_create(&(mutex->readMutex));
-	etool_recursiveMutex_create(&(mutex->writeMutex));
-	return 0;
+	etool_mutex_load(&(mutex->readMutex));
+	etool_recursiveMutex_load(&(mutex->writeMutex));
+}
+
+void etool_readWriteMutex_unload(etool_readWriteMutex *mutex)
+{
+	etool_mutex_unload(&(mutex->readMutex));
+	etool_recursiveMutex_unload(&(mutex->writeMutex));
 }
 
 void etool_readWriteMutex_destroy(etool_readWriteMutex *mutex)
 {
-	etool_mutex_destroy(&(mutex->readMutex));
-	etool_recursiveMutex_destroy(&(mutex->writeMutex));
+	etool_mutex_unload(&(mutex->readMutex));
+	etool_recursiveMutex_unload(&(mutex->writeMutex));
+	free(mutex);
 }
 
 void etool_readWriteMutex_lockRead(etool_readWriteMutex *mutex)

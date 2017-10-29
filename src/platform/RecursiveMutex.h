@@ -16,7 +16,7 @@
 
 #define RECURSIVEMUTEX_NULL 0
 
-typedef struct {
+typedef struct _etool_recursiveMutex {
 #if defined(_windows)
 	CRITICAL_SECTION  mutex;
 #endif
@@ -27,26 +27,41 @@ typedef struct {
 
 /**
  * 创建
- * @param  mutex [not null]
- * @return       [error code]
+ * @return       [实体]
  */
-int etool_recursiveMutex_create(etool_recursiveMutex *mutex);
+etool_recursiveMutex* etool_recursiveMutex_create();
+
+/**
+ * 装载
+ * @param mutex [not null]
+ */
+void etool_recursiveMutex_load(etool_recursiveMutex *mutex);
+
+/**
+ * 卸载
+ * @param mutex [not null]
+ */
+void etool_recursiveMutex_unload(etool_recursiveMutex *mutex);
+
 /**
  * 销毁
  * @param mutex [not null]
  */
 void etool_recursiveMutex_destroy(etool_recursiveMutex *mutex);
+
 /**
  * 锁
  * @param mutex [not null]
  */
 void etool_recursiveMutex_lock(etool_recursiveMutex *mutex);
+
 /**
  * 尝试锁
  * @param  mutex [not null]
  * @return       [error code]
  */
 int etool_recursiveMutex_trylock(etool_recursiveMutex *mutex);
+
 /**
  * 解锁
  * @param mutex [not null]

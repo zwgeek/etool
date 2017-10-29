@@ -1,7 +1,21 @@
 #include "MutexEx.h"
 
 
-int etool_mutexEx_create(etool_mutexEx *mutex)
+etool_mutexEx* etool_mutexEx_create()
+{
+	etool_mutexEx *mutex = malloc(sizeof(etool_mutexEx));
+	if (mutex == 0) { return 0; }
+#if defined(_windows)
+	mutex->mutex = CreateMutex(0, FALSE, 0);
+#endif
+
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	pthread_mutex_init(&(mutex->mutex), 0);
+#endif
+	return mutex;
+}
+
+void etool_mutexEx_load(etool_mutexEx *mutex)
 {
 #if defined(_windows)
 	mutex->mutex = CreateMutex(0, FALSE, 0);
@@ -10,7 +24,17 @@ int etool_mutexEx_create(etool_mutexEx *mutex)
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	pthread_mutex_init(&(mutex->mutex), 0);
 #endif
-	return 0;
+}
+
+void etool_mutexEx_unload(etool_mutexEx *mutex)
+{
+#if defined(_windows)
+	CloseHandle(mutex->mutex);
+#endif
+
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	pthread_mutex_destroy(&(mutex->mutex));
+#endif
 }
 
 void etool_mutexEx_destroy(etool_mutexEx *mutex)
@@ -22,6 +46,7 @@ void etool_mutexEx_destroy(etool_mutexEx *mutex)
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	pthread_mutex_destroy(&(mutex->mutex));
 #endif
+	free(mutex);
 }
 
 void etool_mutexEx_lock(etool_mutexEx *mutex)

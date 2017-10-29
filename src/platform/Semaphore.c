@@ -2,7 +2,26 @@
 
 
 //initNum = 1
-int etool_semaphore_create(etool_semaphore *semaphore, int initNum)
+etool_semaphore* etool_semaphore_create(int initNum)
+{
+	etool_semaphore *semaphore = malloc(sizeof(etool_semaphore));
+	if (semaphore == 0) { return 0; }
+#if defined(_windows)
+	//default security attributes and unnamed semaphore, _maxNum = 10
+	semaphore->semaphore = CreateSemaphore(0, initNum, 10, 0);
+#endif
+
+#if defined(_linux) || defined(_android)
+	sem_init(&(semaphore->semaphore), 0, initNum);
+#endif
+
+#if defined(_mac) || defined(_ios)
+	semaphore_create(mach_task_self(), &(semaphore->semaphore), SYNC_POLICY_FIFO, initNum);
+#endif
+	return semaphore;
+}
+
+void etool_semaphore_load(etool_semaphore *semaphore, int initNum)
 {
 #if defined(_windows)
 	//default security attributes and unnamed semaphore, _maxNum = 10
@@ -16,7 +35,21 @@ int etool_semaphore_create(etool_semaphore *semaphore, int initNum)
 #if defined(_mac) || defined(_ios)
 	semaphore_create(mach_task_self(), &(semaphore->semaphore), SYNC_POLICY_FIFO, initNum);
 #endif
-	return 0;
+}
+
+void etool_semaphore_unload(etool_semaphore *semaphore)
+{
+#if defined(_windows)
+	CloseHandle(semaphore->semaphore);
+#endif
+
+#if defined(_linux) || defined(_android)
+	sem_destroy(&(semaphore->semaphore));
+#endif
+
+#if defined(_mac) || defined(_ios)
+	semaphore_destroy(mach_task_self(), semaphore->semaphore);
+#endif
 }
 
 void etool_semaphore_destroy(etool_semaphore *semaphore)
@@ -32,6 +65,7 @@ void etool_semaphore_destroy(etool_semaphore *semaphore)
 #if defined(_mac) || defined(_ios)
 	semaphore_destroy(mach_task_self(), semaphore->semaphore);
 #endif
+	free(semaphore);
 }
 
 void etool_semaphore_pend(etool_semaphore *semaphore)
