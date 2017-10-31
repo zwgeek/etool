@@ -1,7 +1,7 @@
 #include "SeqList.h"
 
 
-etool_seqList* etool_seqList_create(unsigned int typeSize, unsigned int size)
+etool_seqList* etool_seqList_create(const unsigned int typeSize, const unsigned int size)
 {
 	etool_seqList *list = malloc(sizeof(etool_seqList));
 	if (list == 0) { return 0; }
@@ -20,12 +20,12 @@ void etool_seqList_destroy(etool_seqList *list)
 	free(list);
 }
 
-int etool_seqList_size(unsigned int typeSize, unsigned int size)
+int etool_seqList_size(const unsigned int typeSize, const unsigned int size)
 {
 	return sizeof(etool_seqList) + typeSize * size;
 }
 
-etool_seqList* etool_seqList_init(void *block, unsigned int typeSize, unsigned int size)
+etool_seqList* etool_seqList_init(void *block, const unsigned int typeSize, const unsigned int size)
 {
 	if (block == 0) { return 0; }
 	etool_seqList *list = block;
@@ -59,7 +59,7 @@ int etool_seqList_full(etool_seqList *list)
 	return (list->length == list->size) ? 1 : 0;
 }
 
-void* etool_seqList_find(etool_seqList *list, int index)
+void* etool_seqList_find(etool_seqList *list, const unsigned int index)
 {
 	int offset = index * list->typeSize;
 	return list->data + offset;
@@ -88,7 +88,7 @@ int etool_seqList_locate(etool_seqList *list, void *value)
 	return -1;
 }
 
-int etool_seqList_insert(etool_seqList *list, unsigned int index, void *value)
+int etool_seqList_insert(etool_seqList *list, const unsigned int index, void *value)
 {
 	if (index < 0 || index > list->length) {
 		return -1;
@@ -139,7 +139,7 @@ int etool_seqList_insertEx(etool_seqList *list, void *value)
 	return 0;
 }
 
-int etool_seqList_erase(etool_seqList *list, unsigned int index, void *value)
+int etool_seqList_erase(etool_seqList *list, const unsigned int index, void *value)
 {
 	if (index < 0 || index >= list->length) {
 		return -1;
@@ -158,7 +158,7 @@ int etool_seqList_erase(etool_seqList *list, unsigned int index, void *value)
 	return 0;
 }
 
-int etool_seqList_eraseEx(etool_seqList *list, unsigned int index, void *value)
+int etool_seqList_eraseEx(etool_seqList *list, const unsigned int index, void *value)
 {
 	if (index < 0 || index >= list->length) {
 		return -1;

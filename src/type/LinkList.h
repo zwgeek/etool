@@ -25,7 +25,7 @@ struct _etool_node{
  * @param  size   [not null]
  * @return          [实体]
  */
-etool_linkList* etool_linkList_create(unsigned int typeSize, unsigned int size);
+etool_linkList* etool_linkList_create(const unsigned int typeSize, const unsigned int size);
 
 /**
  *  销毁list(动态存储表示)
@@ -33,6 +33,14 @@ etool_linkList* etool_linkList_create(unsigned int typeSize, unsigned int size);
  * @return      [error code]
  */
 void etool_linkList_destroy(etool_linkList *list);
+
+/**
+ * 获取一个list的总的大小
+ * @param  typeSize [not null]
+ * @param  size     [not null]
+ * @return          [实体]
+ */
+int etool_linkList_size(const unsigned int typeSize, const unsigned int size);
 
 /**
  * 初始化一个list, 并且将一个数据源设入list(静态/动态存储表示),容器数据由开发者创建销毁
@@ -43,8 +51,7 @@ etool_linkList* etool_linkList_init(void *block);
 
 /**
  * 清空list
- * @param  list [description]
- * @return      [description]
+ * @param  list [not null]
  */
 void etool_linkList_clear(etool_linkList *list);
 
@@ -75,7 +82,7 @@ int etool_linkList_full(etool_linkList *list);
  * @param  index [description]
  * @return      [description]
  */
-void* etool_linkList_find(etool_linkList *list, int index);
+void* etool_linkList_find(etool_linkList *list, unsigned int index);
 
 /**
  * 定位list中的节点,O((n+1)/2)

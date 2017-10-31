@@ -43,7 +43,7 @@ typedef struct _etool_memory {
  * @param  size   [not null]
  * @return          [实体]
  */
-etool_memory* etool_memory_create(unsigned int typeSize, unsigned int size);
+etool_memory* etool_memory_create(const unsigned int typeSize, const unsigned int size);
 
 /**
  * 销毁memory(动态存储表示)
@@ -58,7 +58,7 @@ void etool_memory_destroy(etool_memory *memory);
  * @param  size     [description]
  * @return          [description]
  */
-int etool_memory_size(unsigned int typeSize, unsigned int size);
+int etool_memory_size(const unsigned int typeSize, const unsigned int size);
 
 /**
  * 初始化一个memory 并且将一个内存块设入memory模块(静态/动态存储表示),内存块由开发者创建销毁
@@ -67,7 +67,7 @@ int etool_memory_size(unsigned int typeSize, unsigned int size);
  * @param  size     [description]
  * @return          [实体]
  */
-etool_memory* etool_memory_init(void *block, unsigned int typeSize, unsigned int size);
+etool_memory* etool_memory_init(void *block, const unsigned int typeSize, const unsigned int size);
 
 /**
  * 清空memory

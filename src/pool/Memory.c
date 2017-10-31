@@ -1,7 +1,7 @@
 #include "Memory.h"
 
 
-etool_memory* etool_memory_create(unsigned int typeSize, unsigned int size)
+etool_memory* etool_memory_create(const unsigned int typeSize, const unsigned int size)
 {
 	etool_memory *memory = malloc(sizeof(etool_memory));
 	if (memory == 0) { return 0; }
@@ -24,12 +24,12 @@ void etool_memory_destroy(etool_memory *memory)
 	free(memory);
 }
 
-int etool_memory_size(unsigned int typeSize, unsigned int size)
+int etool_memory_size(const unsigned int typeSize, const unsigned int size)
 {
 	return sizeof(etool_memory) + typeSize * size + sizeof(void*) * size;
 }
 
-etool_memory* etool_memory_init(void *block, unsigned int typeSize, unsigned int size)
+etool_memory* etool_memory_init(void *block, const unsigned int typeSize, const unsigned int size)
 {
 	if (block == 0) { return 0; }
 	etool_memory *memory = block;

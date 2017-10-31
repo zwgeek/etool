@@ -2,7 +2,7 @@
 
 
 //initNum = 1
-etool_semaphore* etool_semaphore_create(int initNum)
+etool_semaphore* etool_semaphore_create(const int initNum)
 {
 	etool_semaphore *semaphore = malloc(sizeof(etool_semaphore));
 	if (semaphore == 0) { return 0; }
@@ -21,7 +21,7 @@ etool_semaphore* etool_semaphore_create(int initNum)
 	return semaphore;
 }
 
-void etool_semaphore_load(etool_semaphore *semaphore, int initNum)
+void etool_semaphore_load(etool_semaphore *semaphore, const int initNum)
 {
 #if defined(_windows)
 	//default security attributes and unnamed semaphore, _maxNum = 10
@@ -83,7 +83,7 @@ void etool_semaphore_pend(etool_semaphore *semaphore)
 #endif
 }
 
-int etool_semaphore_trypend(etool_semaphore *semaphore, long timeOut)
+int etool_semaphore_trypend(etool_semaphore *semaphore, const long timeOut)
 {
 #if defined(_windows)
 	return WaitForSingleObject(semaphore->semaphore, timeOut);

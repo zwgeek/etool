@@ -39,14 +39,14 @@ typedef struct _etool_semaphore {
  * @param  initNum   [not null]
  * @return           [实体]
  */
-etool_semaphore* etool_semaphore_create(int initNum);
+etool_semaphore* etool_semaphore_create(const int initNum);
 
 /**
  * 装载
  * @param semaphore [not null]
  * @param  initNum   [not null]
  */
-void etool_semaphore_load(etool_semaphore *semaphore, int initNum);
+void etool_semaphore_load(etool_semaphore *semaphore, const int initNum);
 
 /**
  * 卸载
@@ -72,7 +72,7 @@ void etool_semaphore_pend(etool_semaphore *semaphore);
  * @param  timeOut   [not null]
  * @return           [error code]
  */
-int etool_semaphore_trypend(etool_semaphore *semaphore, long timeOut);
+int etool_semaphore_trypend(etool_semaphore *semaphore, const long timeOut);
 
 /**
  * 通知

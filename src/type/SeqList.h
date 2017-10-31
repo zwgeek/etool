@@ -33,7 +33,7 @@ typedef struct _etool_seqList {
  * @param  size   [not null]
  * @return      [实体]
  */
-etool_seqList* etool_seqList_create(unsigned int typeSize, unsigned int size);
+etool_seqList* etool_seqList_create(const unsigned int typeSize, const unsigned int size);
 
 /**
  * 销毁list(动态存储表示)
@@ -48,7 +48,7 @@ void etool_seqList_destroy(etool_seqList *list);
  * @param  size     [description]
  * @return          [description]
  */
-int etool_seqList_size(unsigned int typeSize, unsigned int size);
+int etool_seqList_size(const unsigned int typeSize, const unsigned int size);
 
 /**
  * 初始化一个list, 并且将一个数据源设入list(静态/动态存储表示),容器数据由开发者创建销毁
@@ -57,7 +57,7 @@ int etool_seqList_size(unsigned int typeSize, unsigned int size);
  * @param  size   [not null]
  * @return      [实体]
  */
-etool_seqList* etool_seqList_init(void *block, unsigned int typeSize, unsigned int size);
+etool_seqList* etool_seqList_init(void *block, const unsigned int typeSize, const unsigned int size);
 
 /**
  * 清空list
@@ -92,7 +92,7 @@ int etool_seqList_full(etool_seqList *list);
  * @param  list [description]
  * @return      [description]
  */
-void* etool_seqList_find(etool_seqList *list, int index);
+void* etool_seqList_find(etool_seqList *list, const unsigned int index);
 
 /**
  * 定位list中的节点,O((n+1)/2)
@@ -107,7 +107,7 @@ int etool_seqList_locate(etool_seqList *list, void *value);
  * @param  value [input data]
  * @return      [description]
  */
-int etool_seqList_insert(etool_seqList *list, unsigned int index, void *value);
+int etool_seqList_insert(etool_seqList *list, const unsigned int index, void *value);
 
 /**
  * 插入节点,插到最后一个O(1)
@@ -123,7 +123,7 @@ int etool_seqList_insertEx(etool_seqList *list, void *value);
  * @param  value [output data]
  * @return      [description]
  */
-int etool_seqList_erase(etool_seqList *list, unsigned int index, void *value);
+int etool_seqList_erase(etool_seqList *list, const unsigned int index, void *value);
 
 /**
  * 删除节点,不讲究顺序O(1)
@@ -131,6 +131,6 @@ int etool_seqList_erase(etool_seqList *list, unsigned int index, void *value);
  * @param  value [output data]
  * @return      [description]
  */
-int etool_seqList_eraseEx(etool_seqList *list, unsigned int index, void *value);
+int etool_seqList_eraseEx(etool_seqList *list, const unsigned int index, void *value);
 
 #endif //ETOOL_TYPE_SEQLIST

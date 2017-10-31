@@ -49,7 +49,7 @@
  * 睡眠
  * @param milliseconds [not null]
  */
-void etool_os_sleep(unsigned long milliseconds);
+void etool_os_sleep(const unsigned long milliseconds);
 /**
  * 判断文件夹是否存在
  * @param  path [not null]

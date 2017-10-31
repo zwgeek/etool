@@ -1,7 +1,7 @@
 #include "System.h"
 
 
-void etool_os_sleep(unsigned long milliseconds)
+void etool_os_sleep(const unsigned long milliseconds)
 {
 #if defined(_windows)
 	Sleep(milliseconds);

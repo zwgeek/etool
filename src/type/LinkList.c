@@ -1,7 +1,7 @@
 #include "Linklist.h"
 
 
-etool_linkList* etool_linkList_create(unsigned int typeSize, unsigned int size)
+etool_linkList* etool_linkList_create(const unsigned int typeSize, const unsigned int size)
 {
 	etool_linkList *list = malloc(sizeof(etool_linkList));
 	if (list == 0) { return 0; }
@@ -17,7 +17,7 @@ void etool_linkList_destroy(etool_linkList *list)
 	free(list);
 }
 
-int etool_linkList_size(unsigned int typeSize, unsigned int size)
+int etool_linkList_size(const unsigned int typeSize, const unsigned int size)
 {
 	return sizeof(etool_linkList) + etool_memory_size(sizeof(struct _etool_node) + typeSize, size);
 }
@@ -52,7 +52,7 @@ int etool_linkList_full(etool_linkList *list)
 	return (list->memory->length == list->memory->size) ? 1 : 0;
 }
 
-void* etool_linkList_find(etool_linkList *list, int index)
+void* etool_linkList_find(etool_linkList *list, unsigned int index)
 {
 	if (index < 0 || index >= list->memory->length) { return 0; }
 	struct _etool_node *node = list->next;
