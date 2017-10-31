@@ -92,6 +92,7 @@ int etool_linkList_insert(etool_linkList *list, unsigned int index, void *value)
 		return -1;
 	}
 	void *offset = etool_memory_malloc(list->memory);
+	if (offset == 0) { return -1; }
 	struct _etool_node *newNode = offset;
 	if (newNode == 0) { return -1; }
 	newNode->data = offset + sizeof(struct _etool_node);
