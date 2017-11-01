@@ -22,7 +22,8 @@ for (int n = 0; n < memory->size; n++) { \
 		_data[offset] = memory->data[offset]; \
 		offset++; \
 	} \
-	_freeAddr[n] = memory->freeAddr[n]; \
+	_freeAddr[n] = memory->freeAddr[n] -  memory->data + _data; \
+	_freeAddr[memory->size + n] = _data + (memory->size + n) * memory->typeSize; \
 } \
 free(memory->data); \
 memory->data = _data; \

@@ -90,7 +90,7 @@ int etool_seqList_locate(etool_seqList *list, void *value)
 
 int etool_seqList_insert(etool_seqList *list, const unsigned int index, void *value)
 {
-	if (index < 0 || index > list->length) {
+	if (index > list->length) {
 		return -1;
 	}
 	if (list->length == list->size) {
@@ -131,9 +131,9 @@ int etool_seqList_insertEx(etool_seqList *list, void *value)
 			return -1;
 		}
 	}
-	int m_offset = (list->length - 1) * list->typeSize;
+	int offset = (list->length - 1) * list->typeSize;
 	for (int n = 0; n < list->typeSize; n++) {
-		list->data[m_offset + n] = ((unsigned char*)value)[n];
+		list->data[offset + n] = ((unsigned char*)value)[n];
 	}
 	list->length++;
 	return 0;
@@ -141,7 +141,7 @@ int etool_seqList_insertEx(etool_seqList *list, void *value)
 
 int etool_seqList_erase(etool_seqList *list, const unsigned int index, void *value)
 {
-	if (index < 0 || index >= list->length) {
+	if (index >= list->length) {
 		return -1;
 	}
 	int offset = index * list->typeSize;
@@ -160,19 +160,19 @@ int etool_seqList_erase(etool_seqList *list, const unsigned int index, void *val
 
 int etool_seqList_eraseEx(etool_seqList *list, const unsigned int index, void *value)
 {
-	if (index < 0 || index >= list->length) {
+	if (index >= list->length) {
 		return -1;
 	}
 	int offset = index * list->typeSize;
-	int m_offset = (list->length - 1) * list->typeSize;
+	int _offset = (list->length - 1) * list->typeSize;
 	if (value != 0) {
 		for (int n = 0; n < list->typeSize; n++) {
 			((unsigned char*)value)[n] = list->data[offset + n];
-			list->data[offset + n] = list->data[m_offset + n];
+			list->data[offset + n] = list->data[_offset + n];
 		}
 	} else {
 		for (int n = 0; n < list->typeSize; n++) {
-			list->data[offset + n] = list->data[m_offset + n];
+			list->data[offset + n] = list->data[_offset + n];
 		}
 	}
 	return 0;

@@ -54,7 +54,7 @@ int etool_linkList_full(etool_linkList *list)
 
 void* etool_linkList_find(etool_linkList *list, unsigned int index)
 {
-	if (index < 0 || index >= list->memory->length) { return 0; }
+	if (index >= list->memory->length) { return 0; }
 	struct _etool_node *node = list->next;
 	while(index > 0) {
 		index--;
@@ -88,14 +88,12 @@ int etool_linkList_locate(etool_linkList *list, void *value)
 
 int etool_linkList_insert(etool_linkList *list, unsigned int index, void *value)
 {
-	if (index < 0 || index > list->memory->length) {
+	if (index > list->memory->length) {
 		return -1;
 	}
-	void *offset = etool_memory_malloc(list->memory);
-	if (offset == 0) { return -1; }
-	struct _etool_node *newNode = offset;
+	struct _etool_node *newNode = etool_memory_malloc(list->memory);
 	if (newNode == 0) { return -1; }
-	newNode->data = offset + sizeof(struct _etool_node);
+	newNode->data = (void*)newNode + sizeof(struct _etool_node);
 	for (int n = 0; n < list->memory->typeSize; n++) {
 		newNode->data[n] = ((unsigned char*)value)[n];
 	}
@@ -115,7 +113,7 @@ int etool_linkList_insert(etool_linkList *list, unsigned int index, void *value)
 
 int etool_linkList_erase(etool_linkList *list, unsigned int index, void *value)
 {
-	if (index < 0 || index >= list->memory->length) {
+	if (index >= list->memory->length) {
 		return -1;
 	}
 	//建立在list可以和node互转
@@ -131,5 +129,30 @@ int etool_linkList_erase(etool_linkList *list, unsigned int index, void *value)
 		((unsigned char*)value)[n] = _node->data[n];
 	}
 	etool_memory_free(list->memory, _node);
+	return 0;
+}
+
+int etool_linkList_copy(etool_linkList *srcList, etool_linkList *dstList)
+{
+	if (srcList->memory->typeSize != dstList->memory->typeSize) {
+		return -1;
+	}
+	struct _etool_node *srcNode = (struct _etool_node*)srcList;
+	struct _etool_node *dstNode = (struct _etool_node*)dstList;
+	etool_memory_clear(dstList->memory);
+	//开始拷贝
+	struct _etool_node *newNode = 0;
+	while (srcNode->next != 0) {
+		newNode = etool_memory_malloc(dstList->memory);
+		if (newNode == 0) { return -1; }
+		newNode->data = (void*)newNode + sizeof(struct _etool_node);
+		for (int n = 0; n < srcList->memory->typeSize; n++) {
+			newNode->data[n] = srcNode->data[n];
+		}
+		dstNode->next = newNode;
+		dstNode = newNode;
+		srcNode = srcNode->next;
+	}
+	dstNode->next = 0;
 	return 0;
 }

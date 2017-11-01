@@ -100,14 +100,6 @@ int etool_linkList_locate(etool_linkList *list, void *value);
  */
 int etool_linkList_insert(etool_linkList *list, unsigned int index, void *value);
 
-/*
- * 插入节点,插到最后一个O(1)
- * @param  list [description]
- * @param  value [input data]
- * @return      [description]
- */
-// int etool_linkList_insertEx(etool_linkList *list, void *value);
-
 /**
  * 删除节点,O((n-1)/2)
  * @param  list [description]
@@ -117,17 +109,10 @@ int etool_linkList_insert(etool_linkList *list, unsigned int index, void *value)
 int etool_linkList_erase(etool_linkList *list, unsigned int index, void *value);
 
 /**
- * 删除节点,不讲究顺序O(1)
- * @param  list [description]
- * @param  value [output data]
- * @return      [description]
+ * 拷贝数据,O(n)
+ * @param srclist [description]
+ * @param dstlist [description]
  */
-// int etool_linkList_eraseEx(etool_linkList *list, unsigned int index, void *value);
-
-/**
- * 扩容(只针对调用create函数使用),O(n)
- * @return      [description]
- */
-// int etool_linkList_extend(etool_linkList *list);
+int etool_linkList_copy(etool_linkList *srcList, etool_linkList *dstList);
 
 #endif //ETOOL_TYPE_LINKLIST
