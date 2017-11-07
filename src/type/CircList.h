@@ -1,22 +1,23 @@
 /**
  * Copyright 2017, Geeks Road.  All rights reserved.
- * 基于链表方式的线性表
+ * 基于单循环链表方式的线性表
  * 使用unsigned char(byte)来处理所有的数据类型
  */
 
-#ifndef ETOOL_TYPE_LINKLIST
-#define ETOOL_TYPE_LINKLIST
+#ifndef ETOOL_TYPE_CIRCLIST
+#define ETOOL_TYPE_CIRCLIST
 
 #include <stdlib.h>
 #include "../pool/Memory.h"
 
-typedef struct _etool_linkList {
+typedef struct _etool_circList {
 	etool_memory *memory;
-	struct _etool_linkNode *next;
-} etool_linkList;
-struct _etool_linkNode{
+	struct _etool_circNode *next;
+} etool_circList;
+
+struct _etool_circNode {
 	unsigned char *data;
-	struct _etool_linkNode *next;
+	struct _etool_circNode *next;
 };
 
 /**
@@ -25,14 +26,14 @@ struct _etool_linkNode{
  * @param  size   [not null]
  * @return          [实体]
  */
-etool_linkList* etool_linkList_create(const unsigned int typeSize, const unsigned int size);
+etool_circList* etool_circList_create(const unsigned int typeSize, const unsigned int size);
 
 /**
  * 销毁list(动态存储表示)
  * @param  list [not null]
  * @return      [error code]
  */
-void etool_linkList_destroy(etool_linkList *list);
+void etool_circList_destroy(etool_circList *list);
 
 /**
  * 获取一个list的总的大小
@@ -40,41 +41,41 @@ void etool_linkList_destroy(etool_linkList *list);
  * @param  size     [not null]
  * @return          [实体]
  */
-int etool_linkList_size(const unsigned int typeSize, const unsigned int size);
+int etool_circList_size(const unsigned int typeSize, const unsigned int size);
 
 /**
  * 初始化一个list, 并且将一个数据源设入list(静态/动态存储表示),容器数据由开发者创建销毁
  * @param  block     [not null]
  * @return          [实体]
  */
-etool_linkList* etool_linkList_init(void *block, const unsigned int typeSize, const unsigned int size);
+etool_circList* etool_circList_init(void *block, const unsigned int typeSize, const unsigned int size);
 
 /**
  * 清空list
  * @param  list [not null]
  */
-void etool_linkList_clear(etool_linkList *list);
+void etool_circList_clear(etool_circList *list);
 
 /**
  * 获得list的有效长度
  * @param  list [description]
  * @return      [description]
  */
-int etool_linkList_length(etool_linkList *list);
+int etool_circList_length(etool_circList *list);
 
 /**
  * list是否为空
  * @param  list [description]
  * @return      [bool code]
  */
-int etool_linkList_empty(etool_linkList *list);
+int etool_circList_empty(etool_circList *list);
 
 /**
  * list是否已满
  * @param  list [description]
  * @return      [bool code]
  */
-int etool_linkList_full(etool_linkList *list);
+int etool_circList_full(etool_circList *list);
 
 /**
  * 查找list中的节点,O((n+1)/2)
@@ -82,7 +83,7 @@ int etool_linkList_full(etool_linkList *list);
  * @param  index [description]
  * @return      [description]
  */
-void* etool_linkList_find(etool_linkList *list, unsigned int index);
+void* etool_circList_find(etool_circList *list, unsigned int index);
 
 /**
  * 定位list中的节点,O((n+1)/2)
@@ -90,7 +91,7 @@ void* etool_linkList_find(etool_linkList *list, unsigned int index);
  * @param  value [description]
  * @return      [description]
  */
-int etool_linkList_locate(etool_linkList *list, void *value);
+int etool_circList_locate(etool_circList *list, void *value);
 
 /*
  * 插入节点,O(n/2)
@@ -98,7 +99,7 @@ int etool_linkList_locate(etool_linkList *list, void *value);
  * @param  value [input data]
  * @return      [description]
  */
-int etool_linkList_insert(etool_linkList *list, unsigned int index, void *value);
+int etool_circList_insert(etool_circList *list, unsigned int index, void *value);
 
 /**
  * 删除节点,O((n-1)/2)
@@ -106,13 +107,13 @@ int etool_linkList_insert(etool_linkList *list, unsigned int index, void *value)
  * @param  value [output data]
  * @return      [description]
  */
-int etool_linkList_erase(etool_linkList *list, unsigned int index, void *value);
+int etool_circList_erase(etool_circList *list, unsigned int index, void *value);
 
 /**
  * 拷贝数据,O(n)
  * @param srclist [description]
  * @param dstlist [description]
  */
-int etool_linkList_copy(etool_linkList *srcList, etool_linkList *dstList);
+int etool_circList_copy(etool_circList *srcList, etool_circList *dstList);
 
-#endif //ETOOL_TYPE_LINKLIST
+#endif //ETOOL_TYPE_CIRCLIST

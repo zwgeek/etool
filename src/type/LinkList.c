@@ -1,11 +1,11 @@
-#include "Linklist.h"
+#include "LinkList.h"
 
 
 etool_linkList* etool_linkList_create(const unsigned int typeSize, const unsigned int size)
 {
 	etool_linkList *list = malloc(sizeof(etool_linkList));
 	if (list == 0) { return 0; }
-	list->memory = etool_memory_create(sizeof(struct _etool_node) + typeSize, size);
+	list->memory = etool_memory_create(sizeof(struct _etool_linkNode) + typeSize, size);
 	if (list->memory == 0) { return 0; }
 	list->next = 0;
 	return list;
@@ -19,14 +19,14 @@ void etool_linkList_destroy(etool_linkList *list)
 
 int etool_linkList_size(const unsigned int typeSize, const unsigned int size)
 {
-	return sizeof(etool_linkList) + etool_memory_size(sizeof(struct _etool_node) + typeSize, size);
+	return sizeof(etool_linkList) + etool_memory_size(sizeof(struct _etool_linkNode) + typeSize, size);
 }
 
-etool_linkList* etool_linkList_init(void *block)
+etool_linkList* etool_linkList_init(void *block, const unsigned int typeSize, const unsigned int size)
 {
 	if (block == 0) { return 0; }
 	etool_linkList *list = block;
-	list->memory = block + sizeof(etool_linkList);
+	list->memory = etool_memory_init(block + sizeof(etool_linkList), typeSize, size);
 	list->next = 0;
 	return list;
 }
@@ -55,7 +55,7 @@ int etool_linkList_full(etool_linkList *list)
 void* etool_linkList_find(etool_linkList *list, unsigned int index)
 {
 	if (index >= list->memory->length) { return 0; }
-	struct _etool_node *node = list->next;
+	struct _etool_linkNode *node = list->next;
 	while(index > 0) {
 		index--;
 		node = node->next;
@@ -65,7 +65,7 @@ void* etool_linkList_find(etool_linkList *list, unsigned int index)
 
 int etool_linkList_locate(etool_linkList *list, void *value)
 {
-	struct _etool_node *node = list->next;
+	struct _etool_linkNode *node = list->next;
 	int index = 0, isFind = 0;
 	while(node != 0) {
 		if (node->data[0] == ((unsigned char*)value)[0]) {
@@ -91,16 +91,15 @@ int etool_linkList_insert(etool_linkList *list, unsigned int index, void *value)
 	if (index > list->memory->length) {
 		return -1;
 	}
-	struct _etool_node *newNode = etool_memory_malloc(list->memory);
+	struct _etool_linkNode *newNode = etool_memory_malloc(list->memory);
 	if (newNode == 0) { return -1; }
-	newNode->data = (void*)newNode + sizeof(struct _etool_node);
+	newNode->data = (void*)newNode + sizeof(struct _etool_linkNode);
 	for (int n = 0; n < list->memory->typeSize; n++) {
 		newNode->data[n] = ((unsigned char*)value)[n];
 	}
-	newNode->next = 0;
 
 	//建立在list可以和node互转
-	struct _etool_node *node = (struct _etool_node*)list;
+	struct _etool_linkNode *node = (struct _etool_linkNode*)list;
 	index--;
 	while(index > 0) {
 		index--;
@@ -117,13 +116,13 @@ int etool_linkList_erase(etool_linkList *list, unsigned int index, void *value)
 		return -1;
 	}
 	//建立在list可以和node互转
-	struct _etool_node *node = (struct _etool_node*)list;
+	struct _etool_linkNode *node = (struct _etool_linkNode*)list;
 	index--;
 	while(index > 0) {
 		index--;
 		node = node->next;
 	}
-	struct _etool_node *_node = node->next;
+	struct _etool_linkNode *_node = node->next;
 	node->next = _node->next;
 	for (int n = 0; n < list->memory->typeSize; n++) {
 		((unsigned char*)value)[n] = _node->data[n];
@@ -137,15 +136,15 @@ int etool_linkList_copy(etool_linkList *srcList, etool_linkList *dstList)
 	if (srcList->memory->typeSize != dstList->memory->typeSize) {
 		return -1;
 	}
-	struct _etool_node *srcNode = (struct _etool_node*)srcList;
-	struct _etool_node *dstNode = (struct _etool_node*)dstList;
+	struct _etool_linkNode *srcNode = (struct _etool_linkNode*)srcList;
+	struct _etool_linkNode *dstNode = (struct _etool_linkNode*)dstList;
 	etool_memory_clear(dstList->memory);
 	//开始拷贝
-	struct _etool_node *newNode = 0;
+	struct _etool_linkNode *newNode = 0;
 	while (srcNode->next != 0) {
 		newNode = etool_memory_malloc(dstList->memory);
 		if (newNode == 0) { return -1; }
-		newNode->data = (void*)newNode + sizeof(struct _etool_node);
+		newNode->data = (void*)newNode + sizeof(struct _etool_linkNode);
 		for (int n = 0; n < srcList->memory->typeSize; n++) {
 			newNode->data[n] = srcNode->data[n];
 		}
