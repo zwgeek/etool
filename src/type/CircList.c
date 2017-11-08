@@ -34,7 +34,7 @@ etool_circList* etool_circList_init(void *block, const unsigned int typeSize, co
 void etool_circList_clear(etool_circList *list)
 {
 	etool_memory_clear(list->memory);
-	list->next = 0;
+	list->next = (struct _etool_circNode*)list;
 }
 
 int etool_circList_length(etool_circList *list)
