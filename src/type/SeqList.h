@@ -90,6 +90,7 @@ int etool_seqList_full(etool_seqList *list);
 /**
  * 查找list中的节点,O(1)
  * @param  list [description]
+ * @param  index [description]
  * @return      [description]
  */
 void* etool_seqList_find(etool_seqList *list, const unsigned int index);
@@ -104,6 +105,7 @@ int etool_seqList_locate(etool_seqList *list, void *value);
 /**
  * 插入节点,O(n/2)
  * @param  list [description]
+ * @param  index [description]
  * @param  value [input data]
  * @return      [description]
  */
@@ -120,14 +122,16 @@ int etool_seqList_insertEx(etool_seqList *list, void *value);
 /**
  * 删除节点,O((n-1)/2)
  * @param  list [description]
+ * @param  index [description]
  * @param  value [output data]
  * @return      [description]
  */
 int etool_seqList_erase(etool_seqList *list, const unsigned int index, void *value);
 
 /**
- * 删除节点,不讲究顺序O(1)
+ * 删除节点,用最后一个填充删除的位置,不讲究顺序O(1)
  * @param  list [description]
+ * @param  index [description]
  * @param  value [output data]
  * @return      [description]
  */

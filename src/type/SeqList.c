@@ -131,7 +131,7 @@ int etool_seqList_insertEx(etool_seqList *list, void *value)
 			return -1;
 		}
 	}
-	int offset = (list->length - 1) * list->typeSize;
+	int offset = list->length * list->typeSize;
 	for (int n = 0; n < list->typeSize; n++) {
 		list->data[offset + n] = ((unsigned char*)value)[n];
 	}
@@ -175,6 +175,7 @@ int etool_seqList_eraseEx(etool_seqList *list, const unsigned int index, void *v
 			list->data[offset + n] = list->data[_offset + n];
 		}
 	}
+	list->length--;
 	return 0;
 }
 
