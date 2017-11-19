@@ -17,7 +17,8 @@ for (int n = 0; n < list->typeSize * list->size; n++) { \
 	_data[n] = list->data[n]; \
 } \
 free(list->data); \
-list->data = _data \
+list->data = _data; \
+list->size = list->size * 2 \
 
 typedef struct _etool_seqList {
 	unsigned char *data;

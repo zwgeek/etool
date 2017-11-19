@@ -5,7 +5,7 @@
 
 #CROSS : Makefile define
 
-CPP 	= @echo g++	$@; $(CROSS)g++
+CPP	= @echo g++	$@; $(CROSS)g++
 CC	= @echo gcc	$@; $(CROSS)gcc
 LD	= @echo ld 	$@; $(CROSS)ld
 AR	= @echo ar 	$@; $(CROSS)ar

@@ -14,6 +14,7 @@ typedef struct _etool_linkList {
 	etool_memory *memory;
 	struct _etool_linkNode *next;
 } etool_linkList;
+
 struct _etool_linkNode{
 	unsigned char *data;
 	struct _etool_linkNode *next;
