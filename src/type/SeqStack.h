@@ -1,5 +1,5 @@
 /**
- * Copyright 2017, Geeks Road.  All rights reserved.
+ * Copyright 2017, PaPa.  All rights reserved.
  * 基于数组方式的(支持双栈)栈
  * 使用unsigned char(byte)来处理所有的数据类型
  */
@@ -28,7 +28,7 @@ stack->size = stack->size * 2 \
 /**
  * 所有的数据结构里面都是当前指向的指针未被使用,只有bottom这一个特例(当前被使用)
  */
-typedef struct {
+typedef struct _etool_seqStack {
 	unsigned char *data;
 	unsigned int typeSize;
 	unsigned int top;

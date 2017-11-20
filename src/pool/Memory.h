@@ -1,5 +1,5 @@
 /**
- * Copyright 2017, Geeks Road.  All rights reserved.
+ * Copyright 2017, PaPa.  All rights reserved.
  * 基于块分配的内存(管理)模块
  * 使用unsigned char(byte)来处理所有的数据类型
  */

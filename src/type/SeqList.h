@@ -1,5 +1,5 @@
 /**
- * Copyright 2017, Geeks Road.  All rights reserved.
+ * Copyright 2017, PaPa.  All rights reserved.
  * 基于数组方式的线性表
  * 使用unsigned char(byte)来处理所有的数据类型
  */

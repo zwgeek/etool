@@ -1,10 +1,10 @@
 /**
- * Copyright 2017, Geeks Road.  All rights reserved.
+ * Copyright 2017, PaPa.  All rights reserved.
  * 系统类: 一些常用的工具使用
- * #define F_OK		//只判断是否存在
- * #define R_OK		//判断写入权限
- * #define W_OK		//判断读取权限
- * #define X_OK		//判断执行权限
+ * #define F_OK			//只判断是否存在
+ * #define R_OK			//判断写入权限
+ * #define W_OK			//判断读取权限
+ * #define X_OK			//判断执行权限
  * #define EACCESS		//所指定的文件不符合所要求测试的权限
  * #define EROFS		//欲测试写入权限的文件存在于只读文件系统内
  * #define EFAULT		//参数pathname指针超出可存取内存空间

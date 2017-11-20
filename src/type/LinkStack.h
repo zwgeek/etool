@@ -1,5 +1,5 @@
 /**
- * Copyright 2017, Geeks Road.  All rights reserved.
+ * Copyright 2017, PaPa.  All rights reserved.
  * 基于链表方式的栈(不使用Memory模块)
  * 使用unsigned char(byte)来处理所有的数据类型
  */
@@ -9,7 +9,7 @@
 
 #include <stdlib.h>
 
-typedef struct {
+typedef struct _etool_linkStack {
 	unsigned int typeSize;
 	unsigned int length;
 	struct _etool_linkNode *top;

@@ -31,7 +31,6 @@ void etool_linkStack_clear(etool_linkStack *stack)
 		free(node);
 	}
 	stack->length = 0;
-	stack->top = 0;
 }
 
 int etool_linkStack_length(etool_linkStack *stack)
@@ -42,7 +41,7 @@ int etool_linkStack_length(etool_linkStack *stack)
 int etool_linkStack_empty(etool_linkStack *stack)
 {
 	//1为真, 0为假
-	return (stack->top == 0) ? 1 : 0;
+	return (stack->length == 0) ? 1 : 0;
 }
 
 int etool_linkStack_get(etool_linkStack *stack, void *value)
@@ -75,6 +74,7 @@ int etool_linkStack_pop(etool_linkStack *stack, void *value)
 	if (stack->top == 0) { return -1; }
 	struct _etool_linkNode *node = stack->top;
 	stack->top = node->next;
+	stack->length--;
 	if (value != 0) {
 		for (int n = 0; n < stack->typeSize; n++) {
 			((unsigned char*)value)[n] = node->data[n];
