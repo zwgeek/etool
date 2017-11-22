@@ -1,6 +1,6 @@
 /**
  * Copyright 2017, PaPa.  All rights reserved.
- * 基于循环数组方式的(支持双队列)队列
+ * 基于循环数组方式的(支持双端队列)队列
  * 使用unsigned char(byte)来处理所有的数据类型
  */
 
@@ -107,7 +107,7 @@ int etool_circQueue_get(etool_circQueue *queue, void *value);
  * @param  value [input data]
  * @return      [description]
  */
-int etool_circQueue_other_get(etool_circQueue *queue, void *value);
+int etool_circQueue_peer_get(etool_circQueue *queue, void *value);
 
 /**
  * 进入队列,O(1)
@@ -125,7 +125,7 @@ int etool_circQueue_enter(etool_circQueue *queue, void *value);
  * @param  value [input data]
  * @return      [description]
  */
-int etool_circQueue_other_enter(etool_circQueue *queue, void *value);
+int etool_circQueue_peer_enter(etool_circQueue *queue, void *value);
 
 /**
  * 退出队列,O(1)
@@ -143,6 +143,6 @@ int etool_circQueue_exit(etool_circQueue *queue, void *value);
  * @param  value [output data]
  * @return      [description]
  */
-int etool_circQueue_other_exit(etool_circQueue *queue, void *value);
+int etool_circQueue_peer_exit(etool_circQueue *queue, void *value);
 
 #endif //ETOOL_TYPE_CIRCQUEUE

@@ -67,7 +67,7 @@ int etool_circQueue_get(etool_circQueue *queue, void *value)
 	if (queue->rear == queue->front) {
 		return -1;
 	}
-	int offset = queue->front * queue->typeSize;
+	int offset = (queue->front + 1) % queue->size * queue->typeSize;
 	if (value != 0) {
 		for (int n = 0; n < queue->typeSize; n++) {
 			((unsigned char*)value)[n] = queue->data[offset + n];
@@ -76,12 +76,12 @@ int etool_circQueue_get(etool_circQueue *queue, void *value)
 	return 0;
 }
 
-int etool_circQueue_other_get(etool_circQueue *queue, void *value)
+int etool_circQueue_peer_get(etool_circQueue *queue, void *value)
 {
 	if (queue->rear == queue->front) {
 		return -1;
 	}
-	int offset = (queue->rear - 1) % queue->size * queue->typeSize;
+	int offset = queue->rear * queue->typeSize;
 	if (value != 0) {
 		for (int n = 0; n < queue->typeSize; n++) {
 			((unsigned char*)value)[n] = queue->data[offset + n];
@@ -102,15 +102,15 @@ int etool_circQueue_enter(etool_circQueue *queue, void *value)
 			return -1;
 		}
 	}
+	queue->rear = (queue->rear + 1) % queue->size;
 	int offset = queue->rear * queue->typeSize;
 	for (int n = 0; n < queue->typeSize; n++) {
 		queue->data[offset + n] = ((unsigned char*)value)[n];
 	}
-	queue->rear = (queue->rear + 1) % queue->size;
 	return 0;
 }
 
-int etool_circQueue_other_enter(etool_circQueue *queue, void *value)
+int etool_circQueue_peer_enter(etool_circQueue *queue, void *value)
 {
 	if ((queue->rear + 1) % queue->size == queue->front) {
 		switch (queue->mode) {
@@ -122,11 +122,11 @@ int etool_circQueue_other_enter(etool_circQueue *queue, void *value)
 			return -1;
 		}
 	}
-	queue->front = (queue->front - 1 + queue->size) % queue->size;
 	int offset = queue->front * queue->typeSize;
 	for (int n = 0; n < queue->typeSize; n++) {
 		queue->data[offset + n] = ((unsigned char*)value)[n];
 	}
+	queue->front = (queue->front - 1 + queue->size) % queue->size;
 	return 0;
 }
 
@@ -135,27 +135,27 @@ int etool_circQueue_exit(etool_circQueue *queue, void *value)
 	if (queue->rear == queue->front) {
 		return -1;
 	}
+	queue->front = (queue->front + 1) % queue->size;
 	int offset = queue->front * queue->typeSize;
 	if (value != 0) {
 		for (int n = 0; n < queue->typeSize; n++) {
 			((unsigned char*)value)[n] = queue->data[offset + n];
 		}
 	}
-	queue->front = (queue->front + 1) % queue->size;
 	return 0;
 }
 
-int etool_circQueue_other_exit(etool_circQueue *queue, void *value)
+int etool_circQueue_peer_exit(etool_circQueue *queue, void *value)
 {
 	if (queue->rear == queue->front) {
 		return -1;
 	}
-	queue->rear = (queue->rear - 1 + queue->size) % queue->size;
 	int offset = queue->rear * queue->typeSize;
 	if (value != 0) {
 		for (int n = 0; n < queue->typeSize; n++) {
 			((unsigned char*)value)[n] = queue->data[offset + n];
 		}
 	}
+	queue->rear = (queue->rear - 1 + queue->size) % queue->size;
 	return 0;	
 }

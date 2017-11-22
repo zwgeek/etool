@@ -5,34 +5,38 @@ etool_linkQueue* etool_linkQueue_create(const unsigned int typeSize)
 {
 	etool_linkQueue *queue = malloc(sizeof(etool_linkQueue));
 	if (queue == 0) { return 0; }
+	struct _etool_linkNode *node = malloc(sizeof(struct _etool_linkNode));
+	if (node == 0) { free(queue); return 0; }
+	node->next = 0;
 	queue->typeSize = typeSize;
 	queue->length = 0;
-	queue->front = 0;
-	queue->rear = 0;
+	queue->front = node;
+	queue->rear = node;
 	return queue;
 }
 
 void etool_linkQueue_destroy(etool_linkQueue *queue)
 {
 	struct _etool_linkNode *node;
-	while (queue->front != 0) {
-		node = queue->front;
-		queue->front = node->next;
+	while (queue->front->next != 0) {
+		node = queue->front->next;
+		queue->front->next = node->next;
 		free(node);
 	}
+	free(queue->front);
 	free(queue);
 }
 
 void etool_linkQueue_clear(etool_linkQueue *queue)
 {
 	struct _etool_linkNode *node;
-	while (queue->front != 0) {
-		node = queue->front;
-		queue->front = node->next;
+	while (queue->front->next != 0) {
+		node = queue->front->next;
+		queue->front->next = node->next;
 		free(node);
 	}
 	queue->length = 0;
-	queue->rear = 0;	
+	queue->rear = queue->front;	
 }
 
 int etool_linkQueue_length(etool_linkQueue *queue)
@@ -48,11 +52,21 @@ int etool_linkQueue_empty(etool_linkQueue *queue)
 
 int etool_linkQueue_get(etool_linkQueue *queue, void *value)
 {
-	if (queue->front == 0) { return -1; }
-	struct _etool_linkNode *node = queue->front;
+	if (queue->length == 0) { return -1; }
 	if (value != 0) {
 		for (int n = 0; n < queue->typeSize; n++) {
-			((unsigned char*)value)[n] = node->data[n];
+			((unsigned char*)value)[n] = queue->front->next->data[n];
+		}
+	}
+	return 0;
+}
+
+int etool_linkQueue_peer_get(etool_linkQueue *queue, void *value)
+{
+	if (queue->length == 0) { return -1; }
+	if (value != 0) {
+		for (int n = 0; n < queue->typeSize; n++) {
+			((unsigned char*)value)[n] = queue->rear->data[n];
 		}
 	}
 	return 0;
@@ -65,24 +79,55 @@ int etool_linkQueue_enter(etool_linkQueue *queue, void *value)
 	for (int n = 0; n < queue->typeSize; n++) {
 		node->data[n] = ((unsigned char*)value)[n];
 	}
+	node->next = 0;
 	queue->rear->next = node;
 	queue->rear = node;
-	node->next = 0;
+	queue->length++;
+	return 0;
+}
+
+int etool_linkQueue_peer_enter(etool_linkQueue *queue, void *value)
+{
+	struct _etool_linkNode *node = malloc(sizeof(struct _etool_linkNode));
+	if (node == 0) { return -1; }
+	for (int n = 0; n < queue->typeSize; n++) {
+		node->data[n] = ((unsigned char*)value)[n];
+	}
+	node->next = queue->front->next;
+	queue->front->next = node;
 	queue->length++;
 	return 0;
 }
 
 int etool_linkQueue_exit(etool_linkQueue *queue, void *value)
 {
-	if (queue->front == 0) { return -1; }
-	struct _etool_linkNode *node = queue->front;
-	queue->front = node->next;
-	queue->length--;
+	if (queue->length == 0) { return -1; }
+	struct _etool_linkNode *node = queue->front->next;	
 	if (value != 0) {
 		for (int n = 0; n < queue->typeSize; n++) {
 			((unsigned char*)value)[n] = node->data[n];
 		}
 	}
+	queue->front->next = node->next;
+	queue->length--;
 	free(node);
+	return 0;
+}
+
+int etool_linkQueue_peer_exit(etool_linkQueue *queue, void *value)
+{
+	if (queue->length == 0) { return -1; }
+	struct _etool_linkNode *node = queue->front->next;
+	for (int n = 2; n < queue->length; n++) {
+		node = node->next;
+	}
+	if (value != 0) {
+		for (int n = 0; n < queue->typeSize; n++) {
+			((unsigned char*)value)[n] = queue->rear->data[n];
+		}
+	}
+	free(queue->rear);
+	queue->rear = node;
+	queue->length--;
 	return 0;
 }

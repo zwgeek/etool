@@ -1,6 +1,6 @@
 /**
  * Copyright 2017, PaPa.  All rights reserved.
- * 基于链表方式的队列(不使用Memory模块)
+ * 基于链表方式的(支持双端队列)队列(不使用Memory模块)
  * 使用unsigned char(byte)来处理所有的数据类型
  */
 
@@ -66,6 +66,15 @@ int etool_linkQueue_empty(etool_linkQueue *queue);
 int etool_linkQueue_get(etool_linkQueue *queue, void *value);
 
 /**
+ * 获取队尾元素,O(1)
+ * @param  queue [description]
+ * @param  index [description]
+ * @param  value [input data]
+ * @return      [description]
+ */
+int etool_linkQueue_peer_get(etool_linkQueue *queue, void *value);
+
+/**
  * 进入队列,O(1)
  * @param  queue [description]
  * @param  index [description]
@@ -75,6 +84,15 @@ int etool_linkQueue_get(etool_linkQueue *queue, void *value);
 int etool_linkQueue_enter(etool_linkQueue *queue, void *value);
 
 /**
+ * 进入队列(从队头进入),O(1)
+ * @param  queue [description]
+ * @param  index [description]
+ * @param  value [input data]
+ * @return      [description]
+ */
+int etool_linkQueue_peer_enter(etool_linkQueue *queue, void *value);
+
+/**
  * 退出队列,O(1)
  * @param  queue [description]
  * @param  index [description]
@@ -82,5 +100,14 @@ int etool_linkQueue_enter(etool_linkQueue *queue, void *value);
  * @return      [description]
  */
 int etool_linkQueue_exit(etool_linkQueue *queue, void *value);
+
+/**
+ * 退出队列(从队尾退出),O(1)
+ * @param  queue [description]
+ * @param  index [description]
+ * @param  value [output data]
+ * @return      [description]
+ */
+int etool_linkQueue_peer_exit(etool_linkQueue *queue, void *value);
 
 #endif //ETOOL_TYPE_LINKQUEUE
