@@ -57,7 +57,7 @@ int etool_linkQueue_length(etool_linkQueue *queue);
 int etool_linkQueue_empty(etool_linkQueue *queue);
 
 /**
- * 获取对头元素,O(1)
+ * 获取队头元素,O(1)
  * @param  queue [description]
  * @param  index [description]
  * @param  value [input data]

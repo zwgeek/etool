@@ -1,6 +1,6 @@
 /**
  * Copyright 2017, PaPa.  All rights reserved.
- * 基于循环数组方式的队列
+ * 基于循环数组方式的(支持双队列)队列
  * 使用unsigned char(byte)来处理所有的数据类型
  */
 
@@ -92,13 +92,22 @@ int etool_circQueue_empty(etool_circQueue *queue);
 int etool_circQueue_full(etool_circQueue *queue);
 
 /**
- * 获取对头元素,O(1)
+ * 获取队头元素,O(1)
  * @param  queue [description]
  * @param  index [description]
  * @param  value [input data]
  * @return      [description]
  */
 int etool_circQueue_get(etool_circQueue *queue, void *value);
+
+/**
+ * 获取队尾元素,O(1)
+ * @param  queue [description]
+ * @param  index [description]
+ * @param  value [input data]
+ * @return      [description]
+ */
+int etool_circQueue_other_get(etool_circQueue *queue, void *value);
 
 /**
  * 进入队列,O(1)
@@ -110,6 +119,15 @@ int etool_circQueue_get(etool_circQueue *queue, void *value);
 int etool_circQueue_enter(etool_circQueue *queue, void *value);
 
 /**
+ * 进入队列(从队头进入),O(1)
+ * @param  queue [description]
+ * @param  index [description]
+ * @param  value [input data]
+ * @return      [description]
+ */
+int etool_circQueue_other_enter(etool_circQueue *queue, void *value);
+
+/**
  * 退出队列,O(1)
  * @param  queue [description]
  * @param  index [description]
@@ -117,5 +135,14 @@ int etool_circQueue_enter(etool_circQueue *queue, void *value);
  * @return      [description]
  */
 int etool_circQueue_exit(etool_circQueue *queue, void *value);
+
+/**
+ * 退出队列(从队尾退出),O(1)
+ * @param  queue [description]
+ * @param  index [description]
+ * @param  value [output data]
+ * @return      [description]
+ */
+int etool_circQueue_other_exit(etool_circQueue *queue, void *value);
 
 #endif //ETOOL_TYPE_CIRCQUEUE
