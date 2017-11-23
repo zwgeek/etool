@@ -1,6 +1,21 @@
 #include "Thread.h"
 
 
+#if defined(_windows)
+	unsigned int __stdcall g_threadPorc(void *thread) {
+		etool_threadPorc *porc = ((etool_thread*)thread)->porc;
+		while(((etool_thread*)thread)->loop)((etool_threadPorc*)porc)();
+		return 0;
+	}
+#endif
+#if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
+	void* g_threadPorc(void *thread) {
+		etool_threadPorc *porc = ((etool_thread*)thread)->porc;
+		while(((etool_thread*)thread)->loop)((etool_threadPorc*)thread->porc)();
+		return 0;
+	}
+#endif
+
 unsigned long etool_thread_getCurrentID()
 {
 #if defined(_windows)
@@ -16,13 +31,13 @@ etool_thread* etool_thread_create()
 {
 	etool_thread *thread = malloc(sizeof(etool_thread));
 	if (thread == 0) { return 0; }
-	thread->loop = 0;
+	thread->loop = 1;
 	return thread;
 }
 
 void etool_thread_load(etool_thread *thread)
 {
-	thread->loop = 0;
+	thread->loop = 1;
 }
 
 void etool_thread_unload(etool_thread *thread)
@@ -43,19 +58,20 @@ int etool_thread_loop(etool_thread *thread)
 
 void etool_thread_start(etool_thread *thread, etool_threadPorc *porc)
 {
+	thread->porc = porc;
 #if defined(_windows)
-	thread->thread = (HANDLE)_beginthreadex(0, 0, g_threadPorc, porc, 0, 0);
+	thread->thread = (HANDLE)_beginthreadex(0, 0, g_threadPorc, thread, 0, 0);
 #endif
 
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
 	//PTHREAD _CREATE_JOINABLE(state)
-	pthread_create(&(thread->thread), 0, g_threadPorc, porc);
+	pthread_create(&(thread->thread), 0, g_threadPorc, thread);
 #endif
 }
 
 void etool_thread_end(etool_thread *thread)
 {
-	thread->loop = -1;
+	thread->loop = 0;
 #if defined(_windows)
 	WaitForSingleObject(thread->thread, INFINITE);
 	CloseHandle(thread->thread);
@@ -68,7 +84,7 @@ void etool_thread_end(etool_thread *thread)
 
 int etool_thread_cancel(etool_thread *thread)
 {
-	thread->loop = -1;
+	thread->loop = 0;
 #if defined(_windows)
 	CloseHandle(thread->thread);
 	return 0;
@@ -83,10 +99,11 @@ int etool_thread_cancel(etool_thread *thread)
 
 void etool_thread_terminate(etool_thread *thread)
 {
-	thread->loop = -1;
+	thread->loop = 0;
 #if defined(_windows)
 	//the function is asyn, dwExitCode = 0
 	TerminateThread(thread->thread, 0);
+	CloseHandle(thread->thread);
 #endif
 
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)

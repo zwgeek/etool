@@ -18,7 +18,8 @@
 
 typedef void etool_threadPorc();
 typedef struct _etool_thread {
-	int         loop;
+	int              loop;
+	etool_threadPorc *porc;
 #if defined(_windows)
 	HANDLE thread;
 #endif
@@ -26,13 +27,6 @@ typedef struct _etool_thread {
 	pthread_t thread;
 #endif
 } etool_thread;
-
-#if defined(_windows)
-	unsigned int __stdcall g_threadPorc(void *proc) { ((etool_threadPorc*)proc)(); return 0; }
-#endif
-#if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
-	void* g_threadPorc(void *proc) { ((etool_threadPorc*)proc)(); return 0; }
-#endif
 
 /**
  * 获取线程ID
