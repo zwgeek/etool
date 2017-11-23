@@ -18,7 +18,7 @@
 
 typedef void etool_threadPorc();
 typedef struct _etool_thread {
-	int              loop;
+	int loop;
 #if defined(_windows)
 	HANDLE thread;
 #endif
