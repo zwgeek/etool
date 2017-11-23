@@ -12,8 +12,13 @@ AR	= @echo ar 	$@; $(CROSS)ar
 RM	= @echo rm 	$@; rm -rf
 STRIP	= @echo strip 	$@; $(CROSS)strip
 
-#D_linux D_mac D_android D_ios D_windows
-CFLAGS = -D_windows
+D_linux = -D_linux
+D_mac = -D_mac
+D_android = -D_android
+D_ios = -D_ios
+D_windows = -D_windows -lws2_32
+
+CFLAGS = $(D_windows)
 CFLAGS += -Wall -O3 -Os -fPIC
 CFLAGS += -D_REENTRANT
 #CFLAGS += -frtti  -fexceptions

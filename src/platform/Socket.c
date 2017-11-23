@@ -7,7 +7,7 @@ etool_socket* etool_socket_create(int type)
 	if (sockfd == 0) { return 0; }
 #if defined(_windows)
 	WSADATA  wsaData;
-	if (WSAStartup(sockVersion, &wsaData) != 0) {
+	if (WSAStartup(MAKEWORD(2,2), &wsaData) != 0) {
 		return 0;
 	}
 #endif
@@ -25,7 +25,7 @@ etool_socket* etool_socket_create(int type)
 		{ sockfd->fd = socket(AF_INET, SOCK_RAW, IPPROTO_IP);
 		const int on;
 		//开启IP_HDRINCL特性
-		if (sockfd->fd == INVALID_SOCKET || setsockopt(sockfd->fd, SOL_SOCKET, IP_HDRINCL, &on, sizeof(on)) == SOCKET_ERROR) {
+		if (sockfd->fd == INVALID_SOCKET || setsockopt(sockfd->fd, IPPROTO_IP, IP_HDRINCL, (const char*)&on, sizeof(on)) == SOCKET_ERROR) {
 			free(sockfd);
 			return 0;
 		}
@@ -61,6 +61,7 @@ void etool_socket_destroy(etool_socket *sockfd)
 	closesocket(sockfd->fd);
 	WSACleanup();
 #endif
+
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	close(sockfd->fd);
 #endif
@@ -75,6 +76,7 @@ int etool_socket_bind(etool_socket *sockfd, const char *ip, const short port)
 #if defined(_windows)
 	addr.sin_addr.S_un.S_addr = ip == 0 ? htonl(INADDR_ANY) : inet_addr(ip);
 #endif
+
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	addr.sin_addr.s_addr = ip == 0 ? htonl(INADDR_ANY) : inet_addr(ip);
 #endif
@@ -89,9 +91,17 @@ int etool_socket_connect(etool_socket *sockfd, const char *host, const short por
 	struct sockaddr_in addr;
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(port);
-	struct hostent *ent;
-	if (inet_aton(host, &addr.sin_addr) == 0) {
-		ent = gethostbyname(host);
+#if defined(_windows)
+	addr.sin_addr.S_un.S_addr = host == 0 ? htonl(INADDR_ANY) : inet_addr(host);
+	if (addr.sin_addr.S_un.S_addr != INADDR_NONE) {
+#endif
+
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	addr.sin_addr.s_addr = host == 0 ? htonl(INADDR_ANY) : inet_addr(host);
+	if (addr.sin_addr.s_addr != INADDR_NONE) {
+#endif
+	} else {
+		struct hostent *ent = gethostbyname(host);
 		if (!ent) {
 			return -1;
 		}
@@ -142,9 +152,17 @@ int etool_socket_sendto(etool_socket *sockfd, void *data, int length, const char
 	struct sockaddr_in addr;
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(port);
-	struct hostent *ent;
-	if (inet_aton(host, &addr.sin_addr) == 0) {
-		ent = gethostbyname(host);
+#if defined(_windows)
+	addr.sin_addr.S_un.S_addr = host == 0 ? htonl(INADDR_ANY) : inet_addr(host);
+	if (addr.sin_addr.S_un.S_addr != INADDR_NONE || strcmp(host, "255.255.225.225") == 0) {
+#endif
+
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	addr.sin_addr.s_addr = host == 0 ? htonl(INADDR_ANY) : inet_addr(host);
+	if (addr.sin_addr.s_addr != INADDR_NONE || strcmp(host, "255.255.225.225") == 0) {
+#endif
+	} else {
+		struct hostent *ent = gethostbyname(host);
 		if (!ent) {
 			return -1;
 		}
@@ -158,9 +176,17 @@ int etool_socket_recvfrom(etool_socket *sockfd, void *data, int length, const ch
 	struct sockaddr_in addr;
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(port);
-	struct hostent *ent;
-	if (inet_aton(host, &addr.sin_addr) == 0) {
-		ent = gethostbyname(host);
+#if defined(_windows)
+	addr.sin_addr.S_un.S_addr = host == 0 ? htonl(INADDR_ANY) : inet_addr(host);
+	if (addr.sin_addr.S_un.S_addr != INADDR_NONE) {
+#endif
+
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	addr.sin_addr.s_addr = host == 0 ? htonl(INADDR_ANY) : inet_addr(host);
+	if (addr.sin_addr.s_addr != INADDR_NONE) {
+#endif
+	} else {
+		struct hostent *ent = gethostbyname(host);
 		if (!ent) {
 			return -1;
 		}

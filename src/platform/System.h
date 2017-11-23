@@ -1,6 +1,6 @@
 /**
  * Copyright 2017, PaPa.  All rights reserved.
- * 系统类: 一些常用的工具使用
+ * 系统模块: 一些常用的工具使用
  * #define F_OK			//只判断是否存在
  * #define R_OK			//判断写入权限
  * #define W_OK			//判断读取权限
@@ -28,7 +28,6 @@
 #include <direct.h>	//创建|删除文件夹
 #endif
 #if defined(_android) || defined(_linux)
-//#include <system.h>
 #include <unistd.h>	//判断文件夹
 #include <sys/types.h>//创建文件夹
 #include <sys/stat.h>   //创建文件夹

@@ -7,16 +7,18 @@
 #define ETOOL_PLATFORM_SOCKET
 
 #include <stdlib.h>
-#include <netdb.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
+#include <string.h>
 #if defined(_windows)
 #include <winsock2.h>
+#include <ws2tcpip.h>
 #endif
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+#include <netdb.h>
 #include <unistd.h>
+#include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
 #endif
 
 /**

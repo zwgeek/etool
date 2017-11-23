@@ -70,14 +70,8 @@ int etool_thread_cancel(etool_thread *thread)
 {
 	thread->loop = -1;
 #if defined(_windows)
-	if (WaitForSingleObject(thread->thread, 0) == 0)
-	{
-		CloseHandle(thread->thread);
-		return 0;
-	}
-	else
-		return -1;
-
+	CloseHandle(thread->thread);
+	return 0;
 #endif
 
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
