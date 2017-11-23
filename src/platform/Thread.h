@@ -19,7 +19,6 @@
 typedef void etool_threadPorc();
 typedef struct _etool_thread {
 	int              loop;
-	etool_threadPorc *porc;
 #if defined(_windows)
 	HANDLE thread;
 #endif
@@ -59,7 +58,7 @@ void etool_thread_unload(etool_thread *thread);
 void etool_thread_destroy(etool_thread *thread);
 
 /**
- * 获取当前线程是否在运行
+ * 获取当前线程运行标志(循环时一定要加上这个判断)
  * @param  thread [not null]
  * @return        [flag]
  */
