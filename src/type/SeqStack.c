@@ -72,9 +72,9 @@ int etool_seqStack_get(etool_seqStack *stack, void *value)
 	if (stack->top == 0) {
 		return -1;
 	}
-	int offset = (stack->top - 1) * stack->typeSize;
 	if (value != 0) {
-		for (int n = 0; n < stack->typeSize; n++) {
+		int n, offset = (stack->top - 1) * stack->typeSize;
+		for (n = 0; n < stack->typeSize; n++) {
 			((unsigned char*)value)[n] = stack->data[offset + n];
 		}
 	}
@@ -86,9 +86,9 @@ int etool_seqStack_other_get(etool_seqStack *stack, void *value)
 	if (stack->bottom == stack->size) {
 		return -1;
 	}
-	int offset = stack->bottom * stack->typeSize;
 	if (value != 0) {
-		for (int n = 0; n < stack->typeSize; n++) {
+		int n, offset = stack->bottom * stack->typeSize;
+		for (n = 0; n < stack->typeSize; n++) {
 			((unsigned char*)value)[n] = stack->data[offset + n];
 		}
 	}
@@ -107,8 +107,8 @@ int etool_seqStack_push(etool_seqStack *stack, void *value)
 			return -1;
 		}
 	}
-	int offset = stack->top * stack->typeSize;
-	for (int n = 0; n < stack->typeSize; n++) {
+	int n, offset = stack->top * stack->typeSize;
+	for (n = 0; n < stack->typeSize; n++) {
 		stack->data[offset + n] = ((unsigned char*)value)[n];
 	}
 	stack->top++;
@@ -128,8 +128,8 @@ int etool_seqStack_other_push(etool_seqStack *stack, void *value)
 		}
 	}
 	stack->bottom--;
-	int offset = stack->bottom * stack->typeSize;
-	for (int n = 0; n < stack->typeSize; n++) {
+	int n, offset = stack->bottom * stack->typeSize;
+	for (n = 0; n < stack->typeSize; n++) {
 		stack->data[offset + n] = ((unsigned char*)value)[n];
 	}
 	return 0;
@@ -141,9 +141,9 @@ int etool_seqStack_pop(etool_seqStack *stack, void *value)
 		return -1;
 	}
 	stack->top--;
-	int offset = stack->top * stack->typeSize;
 	if (value != 0) {
-		for (int n = 0; n < stack->typeSize; n++) {
+		int n, offset = stack->top * stack->typeSize;
+		for (n = 0; n < stack->typeSize; n++) {
 			((unsigned char*)value)[n] = stack->data[offset + n];
 		}
 	}
@@ -155,9 +155,9 @@ int etool_seqStack_other_pop(etool_seqStack *stack, void *value)
 	if (stack->bottom == stack->size) {
 		return -1;
 	}
-	int offset = stack->bottom * stack->typeSize;
 	if (value != 0) {
-		for (int n = 0; n < stack->typeSize; n++) {
+		int n, offset = stack->bottom * stack->typeSize;
+		for (n = 0; n < stack->typeSize; n++) {
 			((unsigned char*)value)[n] = stack->data[offset + n];
 		}
 	}

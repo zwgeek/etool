@@ -12,7 +12,7 @@ etool_condition* etool_condition_create()
 #endif
 
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
-	pthread_cond_init(condition->cond, 0);
+	pthread_cond_init(&(condition->cond), 0);
 #endif
 	return condition;
 }
@@ -26,7 +26,7 @@ void etool_condition_load(etool_condition *condition)
 #endif
 
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
-	pthread_cond_init(condition->cond, 0);
+	pthread_cond_init(&(condition->cond), 0);
 #endif
 }
 
@@ -62,7 +62,7 @@ void etool_condition_wait(etool_condition *condition, etool_mutexEx *mutex)
 #endif
 
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
-	pthread_cond_wait(&(condition->cond), &((*mutex)->mutex));
+	pthread_cond_wait(&(condition->cond), &(mutex->mutex));
 #endif
 }
 

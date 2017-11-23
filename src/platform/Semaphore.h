@@ -11,7 +11,7 @@
 #include <windows.h>			
 #endif
 #if defined(_linux) || defined(_android)
-#include <sys/time.h>
+#include <time.h>
 #include <semaphore.h>
 #endif
 #if defined(_mac) || defined(_ios)

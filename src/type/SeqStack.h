@@ -12,12 +12,12 @@
 #define ETOOL_MODE_CREATE 0
 #define ETOOL_MODE_INIT   1
 #define ETOOL_SEQSTACK_EXTEND(stack) \
-int unitSize = stack->typeSize * stack->size; \
+int n, unitSize = stack->typeSize * stack->size; \
 unsigned char *_data = malloc(unitSize * 2); \
-for (int n = 0; n < stack->typeSize * stack->top; n++) { \
+for (n = 0; n < stack->typeSize * stack->top; n++) { \
 	_data[n] = stack->data[n]; \
 } \
-for (int n = unitSize - 1; n >= stack->typeSize * stack->bottom; n--) { \
+for (n = unitSize - 1; n >= stack->typeSize * stack->bottom; n--) { \
 	_data[unitSize + n] = stack->data[n]; \
 } \
 free(stack->data); \

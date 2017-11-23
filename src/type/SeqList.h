@@ -12,8 +12,9 @@
 #define ETOOL_MODE_CREATE	0
 #define ETOOL_MODE_INIT		1
 #define ETOOL_SEQLIST_EXTEND(list) \
+int n; \
 unsigned char *_data = malloc(list->typeSize * list->size * 2); \
-for (int n = 0; n < list->typeSize * list->size; n++) { \
+for (n = 0; n < list->typeSize * list->size; n++) { \
 	_data[n] = list->data[n]; \
 } \
 free(list->data); \

@@ -28,7 +28,7 @@
 #include <direct.h>	//创建|删除文件夹
 #endif
 #if defined(_android) || defined(_linux)
-#include <system.h>
+//#include <system.h>
 #include <unistd.h>	//判断文件夹
 #include <sys/types.h>//创建文件夹
 #include <sys/stat.h>   //创建文件夹

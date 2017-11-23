@@ -14,7 +14,7 @@ STRIP	= @echo strip 	$@; $(CROSS)strip
 
 #D_linux D_mac D_android D_ios D_windows
 CFLAGS = -D_windows
-CFLAGS += -Wall -O3 -Os
+CFLAGS += -Wall -O3 -Os -fPIC
 CFLAGS += -D_REENTRANT
 #CFLAGS += -frtti  -fexceptions
 CFLAGS_DBG := -g -ggdb
@@ -60,7 +60,7 @@ $(TARGET_A) : $(VERSION) $(LIB_OBJS)
 
 $(TARGET_SO) : $(VERSION) $(LIB_OBJS)
 	$(RM) $@;
-	$(CPP) -o $@ $(LIB_OBJS) $(LDFLAGS) $(CFLAGS) -fPIC -shared
+	$(CPP) -o $@ $(LIB_OBJS) $(LDFLAGS) $(CFLAGS) -shared
 
 $(TARGET_DEBUG_A) : $(VERSION) $(LIB_DEBUG_OBJS)
 	$(RM) $@;
@@ -68,7 +68,7 @@ $(TARGET_DEBUG_A) : $(VERSION) $(LIB_DEBUG_OBJS)
 
 $(TARGET_DEBUG_SO) : $(VERSION) $(LIB_DEBUG_OBJS)
 	$(RM) $@;
-	$(CPP) -o $@ $(LIB_DEBUG_OBJS) $(LDFLAGS) $(CFLAGS) -fPIC -shared
+	$(CPP) -o $@ $(LIB_DEBUG_OBJS) $(LDFLAGS) $(CFLAGS) -shared
 
 $(TARGET_TEST) : $(TEST_OBJS) $(LIB_OBJS)
 	$(RM) $@;

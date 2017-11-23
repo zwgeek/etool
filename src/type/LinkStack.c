@@ -49,7 +49,8 @@ int etool_linkStack_get(etool_linkStack *stack, void *value)
 	if (stack->top == 0) { return -1; }
 	struct _etool_linkNode *node = stack->top;
 	if (value != 0) {
-		for (int n = 0; n < stack->typeSize; n++) {
+		int n;
+		for (n = 0; n < stack->typeSize; n++) {
 			((unsigned char*)value)[n] = node->data[n];
 		}
 	}
@@ -60,7 +61,8 @@ int etool_linkStack_push(etool_linkStack *stack, void *value)
 {
 	struct _etool_linkNode *node = malloc(sizeof(struct _etool_linkNode));
 	if (node == 0) { return -1; }
-	for (int n = 0; n < stack->typeSize; n++) {
+	int n;
+	for (n = 0; n < stack->typeSize; n++) {
 		node->data[n] = ((unsigned char*)value)[n];
 	}
 	node->next = stack->top;
@@ -76,7 +78,8 @@ int etool_linkStack_pop(etool_linkStack *stack, void *value)
 	stack->top = node->next;
 	stack->length--;
 	if (value != 0) {
-		for (int n = 0; n < stack->typeSize; n++) {
+		int n;
+		for (n = 0; n < stack->typeSize; n++) {
 			((unsigned char*)value)[n] = node->data[n];
 		}
 	}

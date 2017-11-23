@@ -8,7 +8,8 @@ etool_memory* etool_memory_create(const unsigned int typeSize, const unsigned in
 	memory->data = malloc(typeSize * size + sizeof(void*) * size);
 	if (memory->data == 0) { return 0; }
 	memory->freeAddr = (unsigned char**)(memory->data + typeSize * size);
-	for (int n = 0; n < size; n++) {
+	int n;
+	for (n = 0; n < size; n++) {
 		memory->freeAddr[n] = memory->data + n * typeSize;
 	}
 	memory->typeSize = typeSize;
@@ -32,10 +33,11 @@ int etool_memory_size(const unsigned int typeSize, const unsigned int size)
 etool_memory* etool_memory_init(void *block, const unsigned int typeSize, const unsigned int size)
 {
 	if (block == 0) { return 0; }
+	int n;
 	etool_memory *memory = block;
 	memory->data = block + sizeof(etool_memory);
 	memory->freeAddr = block + sizeof(etool_memory) + typeSize * size;
-	for (int n = 0; n < size; n++) {
+	for (n = 0; n < size; n++) {
 		memory->freeAddr[n] = memory->data + n * typeSize;
 	}
 	memory->typeSize = typeSize;
@@ -47,8 +49,9 @@ etool_memory* etool_memory_init(void *block, const unsigned int typeSize, const 
 
 void etool_memory_clear(etool_memory *memory)
 {
+	int n;
 	memory->length = 0;
-	for (int n = 0; n < memory->size; n++) {
+	for (n = 0; n < memory->size; n++) {
 		memory->freeAddr[n] = memory->data + n * memory->typeSize;
 	}
 }

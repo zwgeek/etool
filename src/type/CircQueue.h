@@ -12,8 +12,9 @@
 #define ETOOL_MODE_CREATE	0
 #define ETOOL_MODE_INIT		1
 #define ETOOL_CIRCQUEUE_EXTEND(queue) \
+int n; \
 unsigned char *_data = malloc(queue->typeSize * queue->size * 2); \
-for (int n = 0; n < queue->typeSize * queue->size; n++) { \
+for (n = 0; n < queue->typeSize * queue->size; n++) { \
 	_data[n] = queue->data[(queue->front + n) % queue->size]; \
 } \
 free(queue->data); \

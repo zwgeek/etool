@@ -29,6 +29,7 @@ int etool_dir_exist(const char *path)
 #endif
 int etool_dir_create(const char *path)
 {
+	int index;
 	char _path[128];
 	strcpy(_path, path);
 	int length = strlen(_path);
@@ -38,7 +39,7 @@ int etool_dir_create(const char *path)
 		length++;
 	}
 
-	for (int index = 1; index < length; index++) {
+	for (index = 1; index < length; index++) {
 		if (_path[index] == '/') {
 			_path[index] = 0;
 			//access(_path, F_OK) != 0

@@ -66,11 +66,11 @@ void* etool_linkList_find(etool_linkList *list, unsigned int index)
 int etool_linkList_locate(etool_linkList *list, void *value)
 {
 	struct _etool_linkNode *node = list->next;
-	int index = 0, isFind = 0;
+	int n, index = 0, isFind = 0;
 	while(node != 0) {
 		if (node->data[0] == ((unsigned char*)value)[0]) {
 			isFind = 1;
-			for (int n = 1; n <= list->memory->typeSize; n++) {
+			for (n = 1; n <= list->memory->typeSize; n++) {
 				if (node->data[n] != ((unsigned char*)value)[n]) {
 					isFind = 0;
 					break;
@@ -93,8 +93,9 @@ int etool_linkList_insert(etool_linkList *list, unsigned int index, void *value)
 	}
 	struct _etool_linkNode *newNode = etool_memory_malloc(list->memory);
 	if (newNode == 0) { return -1; }
+	int n;
 	newNode->data = (void*)newNode + sizeof(struct _etool_linkNode);
-	for (int n = 0; n < list->memory->typeSize; n++) {
+	for (n = 0; n < list->memory->typeSize; n++) {
 		newNode->data[n] = ((unsigned char*)value)[n];
 	}
 
@@ -116,6 +117,7 @@ int etool_linkList_erase(etool_linkList *list, unsigned int index, void *value)
 		return -1;
 	}
 	//建立在list可以和node互转
+	int n;
 	struct _etool_linkNode *node = (struct _etool_linkNode*)list;
 	index--;
 	while(index > 0) {
@@ -124,7 +126,7 @@ int etool_linkList_erase(etool_linkList *list, unsigned int index, void *value)
 	}
 	struct _etool_linkNode *_node = node->next;
 	node->next = _node->next;
-	for (int n = 0; n < list->memory->typeSize; n++) {
+	for (n = 0; n < list->memory->typeSize; n++) {
 		((unsigned char*)value)[n] = _node->data[n];
 	}
 	etool_memory_free(list->memory, _node);
@@ -140,12 +142,13 @@ int etool_linkList_copy(etool_linkList *srcList, etool_linkList *dstList)
 	struct _etool_linkNode *dstNode = (struct _etool_linkNode*)dstList;
 	etool_memory_clear(dstList->memory);
 	//开始拷贝
+	int n;
 	struct _etool_linkNode *newNode = 0;
 	while (srcNode->next != 0) {
 		newNode = etool_memory_malloc(dstList->memory);
 		if (newNode == 0) { return -1; }
 		newNode->data = (void*)newNode + sizeof(struct _etool_linkNode);
-		for (int n = 0; n < srcList->memory->typeSize; n++) {
+		for (n = 0; n < srcList->memory->typeSize; n++) {
 			newNode->data[n] = srcNode->data[n];
 		}
 		dstNode->next = newNode;

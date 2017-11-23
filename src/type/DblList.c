@@ -66,11 +66,11 @@ void* etool_dblList_find(etool_dblList *list, unsigned int index, int direction)
 int etool_dblList_locate(etool_dblList *list, void *value)
 {
 	struct _etool_dblNode *node = list->next;
-	int index = 0, isFind = 0;
+	int n, index = 0, isFind = 0;
 	while(node != 0) {
 		if (node->data[0] == ((unsigned char*)value)[0]) {
 			isFind = 1;
-			for (int n = 1; n <= list->memory->typeSize; n++) {
+			for (n = 1; n <= list->memory->typeSize; n++) {
 				if (node->data[n] != ((unsigned char*)value)[n]) {
 					isFind = 0;
 					break;
@@ -93,8 +93,9 @@ int etool_dblList_insert(etool_dblList *list, unsigned int index, void *value, i
 	}
 	struct _etool_dblNode *newNode = etool_memory_malloc(list->memory);
 	if (newNode == 0) { return -1; }
+	int n;
 	newNode->data = (void*)newNode + sizeof(struct _etool_dblNode);
-	for (int n = 0; n < list->memory->typeSize; n++) {
+	for (n = 0; n < list->memory->typeSize; n++) {
 		newNode->data[n] = ((unsigned char*)value)[n];
 	}
 
@@ -125,6 +126,7 @@ int etool_dblList_erase(etool_dblList *list, unsigned int index, void *value, in
 		return -1;
 	}
 	//建立在list可以和node互转
+	int n;
 	struct _etool_dblNode *node = (direction == -1) ? list->previous : list->next;
 	index--;
 	while(index > 0) {
@@ -133,7 +135,7 @@ int etool_dblList_erase(etool_dblList *list, unsigned int index, void *value, in
 	}
 	node->previous->next = node->next;
 	node->next->previous = node->previous;
-	for (int n = 0; n < list->memory->typeSize; n++) {
+	for (n = 0; n < list->memory->typeSize; n++) {
 		((unsigned char*)value)[n] = node->data[n];
 	}
 	etool_memory_free(list->memory, node);
@@ -145,6 +147,7 @@ int etool_dblList_copy(etool_dblList *srcList, etool_dblList *dstList)
 	if (srcList->memory->typeSize != dstList->memory->typeSize) {
 		return -1;
 	}
+	int n;
 	struct _etool_dblNode *srcNode = (struct _etool_dblNode*)srcList;
 	struct _etool_dblNode *dstNode = (struct _etool_dblNode*)dstList;
 	etool_memory_clear(dstList->memory);
@@ -154,7 +157,7 @@ int etool_dblList_copy(etool_dblList *srcList, etool_dblList *dstList)
 		newNode = etool_memory_malloc(dstList->memory);
 		if (newNode == 0) { return -1; }
 		newNode->data = (void*)newNode + sizeof(struct _etool_dblNode);
-		for (int n = 0; n < srcList->memory->typeSize; n++) {
+		for (n = 0; n < srcList->memory->typeSize; n++) {
 			newNode->data[n] = srcNode->data[n];
 		}
 		newNode->previous = dstNode;

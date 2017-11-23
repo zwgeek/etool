@@ -12,13 +12,13 @@
 #define ETOOL_MODE_CREATE	0
 #define ETOOL_MODE_INIT		1
 #define ETOOL_MEMORY_EXTEND(memory) \
+int n, m, offset = 0; \
 unsigned char *_data = malloc(memory->typeSize * memory->size * 2 + sizeof(void*) * memory->size * 2); \
 unsigned char **_freeAddr = (unsigned char**)(_data + memory->typeSize * memory->size * 2); \
-int offset = 0; \
-for (int n = 0; n < memory->size; n++) { \
+for (n = 0; n < memory->size; n++) { \
 	_data[offset] = memory->data[offset]; \
 	offset++; \
-	for (int m = 1; m < memory->typeSize; m++) { \
+	for (m = 1; m < memory->typeSize; m++) { \
 		_data[offset] = memory->data[offset]; \
 		offset++; \
 	} \

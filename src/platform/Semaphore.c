@@ -102,7 +102,7 @@ int etool_semaphore_trypend(etool_semaphore *semaphore, const long timeOut)
 	} 
 	else 
 	{
-		return sem_trywait(&(semaphore->semaphore))0;
+		return sem_trywait(&(semaphore->semaphore));
 	}
 #endif
 

@@ -65,12 +65,12 @@ void* etool_circList_find(etool_circList *list, unsigned int index)
 
 int etool_circList_locate(etool_circList *list, void *value)
 {
+	int n, index = 0, isFind = 0;
 	struct _etool_circNode *node = list->next;
-	int index = 0, isFind = 0;
 	while(node != 0) {
 		if (node->data[0] == ((unsigned char*)value)[0]) {
 			isFind = 1;
-			for (int n = 1; n <= list->memory->typeSize; n++) {
+			for (n = 1; n <= list->memory->typeSize; n++) {
 				if (node->data[n] != ((unsigned char*)value)[n]) {
 					isFind = 0;
 					break;
@@ -94,7 +94,8 @@ int etool_circList_insert(etool_circList *list, unsigned int index, void *value)
 	struct _etool_circNode *newNode = etool_memory_malloc(list->memory);
 	if (newNode == 0) { return -1; }
 	newNode->data = (void*)newNode + sizeof(struct _etool_circNode);
-	for (int n = 0; n < list->memory->typeSize; n++) {
+	int n;
+	for (n = 0; n < list->memory->typeSize; n++) {
 		newNode->data[n] = ((unsigned char*)value)[n];
 	}
 
@@ -115,6 +116,7 @@ int etool_circList_erase(etool_circList *list, unsigned int index, void *value)
 	if (index >= list->memory->length) {
 		return -1;
 	}
+	int n;
 	//建立在list可以和node互转
 	struct _etool_circNode *node = (struct _etool_circNode*)list;
 	index--;
@@ -124,7 +126,7 @@ int etool_circList_erase(etool_circList *list, unsigned int index, void *value)
 	}
 	struct _etool_circNode *_node = node->next;
 	node->next = _node->next;
-	for (int n = 0; n < list->memory->typeSize; n++) {
+	for (n = 0; n < list->memory->typeSize; n++) {
 		((unsigned char*)value)[n] = _node->data[n];
 	}
 	etool_memory_free(list->memory, _node);
@@ -140,12 +142,13 @@ int etool_circList_copy(etool_circList *srcList, etool_circList *dstList)
 	struct _etool_circNode *dstNode = (struct _etool_circNode*)dstList;
 	etool_memory_clear(dstList->memory);
 	//开始拷贝
+	int n;
 	struct _etool_circNode *newNode = 0;
 	while (srcNode->next != 0) {
 		newNode = etool_memory_malloc(dstList->memory);
 		if (newNode == 0) { return -1; }
 		newNode->data = (void*)newNode + sizeof(struct _etool_circNode);
-		for (int n = 0; n < srcList->memory->typeSize; n++) {
+		for (n = 0; n < srcList->memory->typeSize; n++) {
 			newNode->data[n] = srcNode->data[n];
 		}
 		dstNode->next = newNode;

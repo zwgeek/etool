@@ -67,11 +67,11 @@ void* etool_seqList_find(etool_seqList *list, const unsigned int index)
 
 int etool_seqList_locate(etool_seqList *list, void *value)
 {
-	int offset = 0, isFind = 0;
+	int n, offset = 0, isFind = 0;
 	while (offset < list->length * list->typeSize) {
 		if (list->data[offset] == ((unsigned char*)value)[0]) {
 			isFind = 1;
-			for (int n = 1; n < list->typeSize; n++) {
+			for (n = 1; n < list->typeSize; n++) {
 				offset++;
 				if (list->data[offset] != ((unsigned char*)value)[n]) {
 					isFind = 0;
@@ -105,13 +105,13 @@ int etool_seqList_insert(etool_seqList *list, const unsigned int index, void *va
 		}	
 	}
 	//依次后移,空出第index位置
-	int offset = list->length * list->typeSize - 1;
+	int n, offset = list->length * list->typeSize - 1;
 	while (offset >= index * list->typeSize) {
 		list->data[offset + list->typeSize] = list->data[offset];
 		offset--;
 	}
 	offset++;
-	for (int n = 0; n < list->typeSize; n++) {
+	for (n = 0; n < list->typeSize; n++) {
 		list->data[offset + n] = ((unsigned char*)value)[n];
 	}
 	list->length++;
@@ -131,8 +131,8 @@ int etool_seqList_insertEx(etool_seqList *list, void *value)
 			return -1;
 		}
 	}
-	int offset = list->length * list->typeSize;
-	for (int n = 0; n < list->typeSize; n++) {
+	int n, offset = list->length * list->typeSize;
+	for (n = 0; n < list->typeSize; n++) {
 		list->data[offset + n] = ((unsigned char*)value)[n];
 	}
 	list->length++;
@@ -146,7 +146,8 @@ int etool_seqList_erase(etool_seqList *list, const unsigned int index, void *val
 	}
 	int offset = index * list->typeSize;
 	if (value != 0) {
-		for (int n = 0; n < list->typeSize; n++) {
+		int n;
+		for (n = 0; n < list->typeSize; n++) {
 			((unsigned char*)value)[n] = list->data[offset + n];
 		}
 	}
@@ -163,15 +164,15 @@ int etool_seqList_eraseEx(etool_seqList *list, const unsigned int index, void *v
 	if (index >= list->length) {
 		return -1;
 	}
-	int offset = index * list->typeSize;
+	int n, offset = index * list->typeSize;
 	int _offset = (list->length - 1) * list->typeSize;
 	if (value != 0) {
-		for (int n = 0; n < list->typeSize; n++) {
+		for (n = 0; n < list->typeSize; n++) {
 			((unsigned char*)value)[n] = list->data[offset + n];
 			list->data[offset + n] = list->data[_offset + n];
 		}
 	} else {
-		for (int n = 0; n < list->typeSize; n++) {
+		for (n = 0; n < list->typeSize; n++) {
 			list->data[offset + n] = list->data[_offset + n];
 		}
 	}
