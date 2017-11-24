@@ -98,9 +98,8 @@ int etool_socket_connect(etool_socket *sockfd, const char *host, const short por
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	addr.sin_addr.s_addr = host == 0 ? htonl(INADDR_ANY) : inet_addr(host);
-	if (addr.sin_addr.s_addr != INADDR_NONE) {
+	if (addr.sin_addr.s_addr == INADDR_NONE) {
 #endif
-	} else {
 		struct hostent *ent = gethostbyname(host);
 		if (!ent) {
 			return -1;
@@ -154,14 +153,13 @@ int etool_socket_sendto(etool_socket *sockfd, void *data, int length, const char
 	addr.sin_port = htons(port);
 #if defined(_windows)
 	addr.sin_addr.S_un.S_addr = host == 0 ? htonl(INADDR_ANY) : inet_addr(host);
-	if (addr.sin_addr.S_un.S_addr != INADDR_NONE || strcmp(host, "255.255.225.225") == 0) {
+	if (addr.sin_addr.S_un.S_addr == INADDR_NONE && strcmp(host, "255.255.225.225") != 0) {
 #endif
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	addr.sin_addr.s_addr = host == 0 ? htonl(INADDR_ANY) : inet_addr(host);
-	if (addr.sin_addr.s_addr != INADDR_NONE || strcmp(host, "255.255.225.225") == 0) {
+	if (addr.sin_addr.s_addr == INADDR_NONE && strcmp(host, "255.255.225.225") != 0) {
 #endif
-	} else {
 		struct hostent *ent = gethostbyname(host);
 		if (!ent) {
 			return -1;
@@ -178,14 +176,13 @@ int etool_socket_recvfrom(etool_socket *sockfd, void *data, int length, const ch
 	addr.sin_port = htons(port);
 #if defined(_windows)
 	addr.sin_addr.S_un.S_addr = host == 0 ? htonl(INADDR_ANY) : inet_addr(host);
-	if (addr.sin_addr.S_un.S_addr != INADDR_NONE) {
+	if (addr.sin_addr.S_un.S_addr == INADDR_NONE) {
 #endif
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	addr.sin_addr.s_addr = host == 0 ? htonl(INADDR_ANY) : inet_addr(host);
-	if (addr.sin_addr.s_addr != INADDR_NONE) {
+	if (addr.sin_addr.s_addr == INADDR_NONE) {
 #endif
-	} else {
 		struct hostent *ent = gethostbyname(host);
 		if (!ent) {
 			return -1;
@@ -249,6 +246,27 @@ int etool_socket_broadCast(etool_socket *sockfd)
 {
 	const int on = 1;
 	return setsockopt(sockfd->fd, SOL_SOCKET, SO_BROADCAST, (const char*)&on, sizeof(const char));
+}
+
+int etool_socket_timeout(etool_socket *sockfd, const int sendTimeout, const int recvTimeout)
+{
+#if defined(_windows)
+	sendTimeout *= 1000;
+	if (setsockopt(sockfd->fd, SOL_SOCKET, SO_SNDTIMEO, &sendTimeout, sizeof(const int)) == 0) {
+		return -1;
+	}
+	recvTimeout *= 1000;
+	return setsockopt(sockfd->fd, SOL_SOCKET, SO_RCVTIMEO, &recvTimeout, sizeof(const int));
+#endif
+
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	struct timeval _sendTimeout = {sendTimeout, 0};
+	if (setsockopt(sockfd->fd, SOL_SOCKET, SO_SNDTIMEO, &_sendTimeout, sizeof(struct timeval)) == 0) {
+		return -1;
+	}
+	struct timeval _recvTimeout = {recvTimeout, 0};
+	return setsockopt(sockfd->fd, SOL_SOCKET, SO_RCVTIMEO, &_recvTimeout, sizeof(struct timeval));
+#endif
 }
 
 int etool_socket_setsockopt(etool_socket *sockfd, int level, int optname, const char* optval, int optlen)

@@ -1,0 +1,12 @@
+#Built application files
+*.json
+ 
+# Generated files
+*/bin/
+*/lib/
+ 
+# Local configuration file (sdk path, etc)
+#local.properties
+
+# Log Files
+*.log

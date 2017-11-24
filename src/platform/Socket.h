@@ -166,6 +166,7 @@ int etool_socket_peername(etool_socket *sockfd, char **ip, short *port);
  * @param sockfd [description]
  * @param ip     [要加入的组播源ip]
  * @param isLoop [用于控制数据是否回送到本地的回环接口,0 禁止回送,1 允许回送]
+ * @return       [description]
  */
 int etool_socket_multiCast(etool_socket *sockfd, const char *ip, const char isLoop);
 
@@ -176,8 +177,18 @@ int etool_socket_multiCast(etool_socket *sockfd, const char *ip, const char isLo
  * 受限广播:255.255.255.255
  * 直接广播:[指向网络(主机号为全1的地址)\指向子网(主机号为全1且有特定子网号的地址)\指向所有子网(主机号及子网号为全1)]
  * @param sockfd [description]
+ * @return       [description]
  */
 int etool_socket_broadCast(etool_socket *sockfd);
+
+/**
+ * 设置超时机制
+ * @param  sockfd      [description]
+ * @param  sendTimeout [发送超时]
+ * @param  recvTimeout [接收超时]
+ * @return             [description]
+ */
+int etool_socket_timeout(etool_socket *sockfd, const int sendTimeout, const int recvTimeout);
 
 /**
  * 原生socket选项封装,除非本模块不支持的功能,不推荐使用
@@ -186,6 +197,7 @@ int etool_socket_broadCast(etool_socket *sockfd);
  * @param optname [description]
  * @param optval  [description]
  * @param optlen  [description]
+ * @return        [description]
  */
 int etool_socket_setsockopt(etool_socket *sockfd, int level, int optname, const char* optval, int optlen);
 
