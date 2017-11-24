@@ -83,7 +83,7 @@ void etool_semaphore_pend(etool_semaphore *semaphore)
 #endif
 }
 
-int etool_semaphore_trypend(etool_semaphore *semaphore, const long timeOut)
+int etool_semaphore_trypend(etool_semaphore *semaphore, int timeOut)
 {
 #if defined(_windows)
 	return WaitForSingleObject(semaphore->semaphore, timeOut);

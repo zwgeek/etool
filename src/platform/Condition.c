@@ -66,7 +66,7 @@ void etool_condition_wait(etool_condition *condition, etool_mutexEx *mutex)
 #endif
 }
 
-int etool_condition_trywait(etool_condition*condition, etool_mutexEx *mutex, const long timeOut)
+int etool_condition_trywait(etool_condition*condition, etool_mutexEx *mutex, int timeOut)
 {
 #if defined(_windows)
 	condition->waiters++; 

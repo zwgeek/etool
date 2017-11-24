@@ -62,10 +62,10 @@ void etool_condition_wait(etool_condition *condition, etool_mutexEx *mutex);
  * 尝试等待
  * @param  condition [not null]
  * @param  mutex     [not nul]
- * @param  timeOut   [not nul]
+ * @param  timeOut   [ms,not nul]
  * @return           [error code]
  */
-int etool_condition_trywait(etool_condition *condition, etool_mutexEx *mutex, const long timeOut);
+int etool_condition_trywait(etool_condition *condition, etool_mutexEx *mutex, int timeOut);
 
 /**
  * 通知

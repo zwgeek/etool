@@ -69,10 +69,10 @@ void etool_semaphore_pend(etool_semaphore *semaphore);
 /**
  * 尝试阻塞
  * @param  semaphore [not null]
- * @param  timeOut   [not null]
+ * @param  timeOut   [ms,not null]
  * @return           [error code]
  */
-int etool_semaphore_trypend(etool_semaphore *semaphore, const long timeOut);
+int etool_semaphore_trypend(etool_semaphore *semaphore, int timeOut);
 
 /**
  * 通知

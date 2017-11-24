@@ -248,23 +248,21 @@ int etool_socket_broadCast(etool_socket *sockfd)
 	return setsockopt(sockfd->fd, SOL_SOCKET, SO_BROADCAST, (const char*)&on, sizeof(const char));
 }
 
-int etool_socket_timeout(etool_socket *sockfd, const int sendTimeout, const int recvTimeout)
+int etool_socket_timeout(etool_socket *sockfd, int sendTimeout, int recvTimeout)
 {
 #if defined(_windows)
-	sendTimeout *= 1000;
-	if (setsockopt(sockfd->fd, SOL_SOCKET, SO_SNDTIMEO, &sendTimeout, sizeof(const int)) == 0) {
+	if (setsockopt(sockfd->fd, SOL_SOCKET, SO_SNDTIMEO, &sendTimeout, sizeof(int)) == 0) {
 		return -1;
 	}
-	recvTimeout *= 1000;
-	return setsockopt(sockfd->fd, SOL_SOCKET, SO_RCVTIMEO, &recvTimeout, sizeof(const int));
+	return setsockopt(sockfd->fd, SOL_SOCKET, SO_RCVTIMEO, &recvTimeout, sizeof(int));
 #endif
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
-	struct timeval _sendTimeout = {sendTimeout, 0};
+	struct timeval _sendTimeout = {0, sendTimeout * 1000};
 	if (setsockopt(sockfd->fd, SOL_SOCKET, SO_SNDTIMEO, &_sendTimeout, sizeof(struct timeval)) == 0) {
 		return -1;
 	}
-	struct timeval _recvTimeout = {recvTimeout, 0};
+	struct timeval _recvTimeout = {0, recvTimeout * 1000};
 	return setsockopt(sockfd->fd, SOL_SOCKET, SO_RCVTIMEO, &_recvTimeout, sizeof(struct timeval));
 #endif
 }

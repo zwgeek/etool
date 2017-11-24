@@ -18,7 +18,7 @@ public:
 	~CSemaphore();
 
 	void pend();
-	void trypend(long timeOut = 0);
+	void trypend(int timeOut = 0);
 	void post();
 
 private:
