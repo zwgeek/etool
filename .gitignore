@@ -2,8 +2,8 @@
 *.json
  
 # Generated files
-*/bin/
-*/lib/
+bin/*
+lib/*
  
 # Local configuration file (sdk path, etc)
 #local.properties

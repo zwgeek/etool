@@ -248,13 +248,13 @@ int etool_socket_broadCast(etool_socket *sockfd)
 	return setsockopt(sockfd->fd, SOL_SOCKET, SO_BROADCAST, (const char*)&on, sizeof(const char));
 }
 
-int etool_socket_timeout(etool_socket *sockfd, int sendTimeout, int recvTimeout)
+int etool_socket_timeout(etool_socket *sockfd, const int sendTimeout, const int recvTimeout)
 {
 #if defined(_windows)
-	if (setsockopt(sockfd->fd, SOL_SOCKET, SO_SNDTIMEO, &sendTimeout, sizeof(int)) == 0) {
+	if (setsockopt(sockfd->fd, SOL_SOCKET, SO_SNDTIMEO, (const char*)&sendTimeout, sizeof(const int)) == 0) {
 		return -1;
 	}
-	return setsockopt(sockfd->fd, SOL_SOCKET, SO_RCVTIMEO, &recvTimeout, sizeof(int));
+	return setsockopt(sockfd->fd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&recvTimeout, sizeof(const int));
 #endif
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)

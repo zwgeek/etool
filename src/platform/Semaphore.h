@@ -72,7 +72,7 @@ void etool_semaphore_pend(etool_semaphore *semaphore);
  * @param  timeOut   [ms,not null]
  * @return           [error code]
  */
-int etool_semaphore_trypend(etool_semaphore *semaphore, int timeOut);
+int etool_semaphore_trypend(etool_semaphore *semaphore, const int timeOut);
 
 /**
  * 通知

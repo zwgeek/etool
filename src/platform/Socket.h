@@ -188,7 +188,7 @@ int etool_socket_broadCast(etool_socket *sockfd);
  * @param  recvTimeout [ms,接收超时]
  * @return             [description]
  */
-int etool_socket_timeout(etool_socket *sockfd, int sendTimeout, int recvTimeout);
+int etool_socket_timeout(etool_socket *sockfd, const int sendTimeout, const int recvTimeout);
 
 /**
  * 原生socket选项封装,除非本模块不支持的功能,不推荐使用
