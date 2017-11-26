@@ -7,10 +7,10 @@
 // #define ETOOL_PLATFORM_ATOMICCOUNT
 
 // #if defined(_windows)
-// #include <windows.h>		
+// #include <windows.h>
 // #endif
 // #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
-// #include <system.h>	
+// #include <system.h>
 // #endif
 
 // namespace etool {

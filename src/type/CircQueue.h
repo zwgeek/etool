@@ -20,8 +20,8 @@ for (n = 0; n < queue->typeSize * queue->size; n++) { \
 free(queue->data); \
 queue->data = _data; \
 queue->front = 0; \
-queue->rear = queue->size;\
-queue->size = queue->size * 2 \
+queue->rear = queue->size; \
+queue->size = queue->size * 2
 
 typedef struct _etool_circQueue {
 	unsigned char *data;

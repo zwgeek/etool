@@ -10,12 +10,10 @@
 #include "Mutex.h"
 #include "RecursiveMutex.h"
 
-#define READWRITEMUTEX_NULL 0
-
 typedef struct _etool_readWriteMutex {
-	int                                               readCount;
-	etool_mutex                              readMutex;
-	etool_recursiveMutex               writeMutex;
+	int                     readCount;
+	etool_mutex             readMutex;
+	etool_recursiveMutex    writeMutex;
 } etool_readWriteMutex;
 
 /**

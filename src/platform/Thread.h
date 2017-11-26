@@ -9,14 +9,13 @@
 #include <stdlib.h>
 #if defined(_windows)
 #include <windows.h>
-#include <process.h> 
+#include <process.h>
 #endif
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
 #include <pthread.h>
 #endif
 
-
-typedef void etool_threadPorc();
+typedef void etool_threadPorc(void *param);
 typedef struct _etool_thread {
 	int loop;
 #if defined(_windows)
@@ -26,6 +25,12 @@ typedef struct _etool_thread {
 	pthread_t thread;
 #endif
 } etool_thread;
+
+struct _etool_threadAttr
+{
+	etool_threadPorc *porc;
+	void *param;
+};
 
 /**
  * 获取线程ID
@@ -68,8 +73,9 @@ int etool_thread_loop(etool_thread *thread);
  * 线程开始运行
  * @param thread [not null]
  * @param proc   [not null]
+ * @param param  [not null]
  */
-void etool_thread_start(etool_thread *thread, etool_threadPorc *proc);
+void etool_thread_start(etool_thread *thread, etool_threadPorc *proc, void *param);
 
 /**
  * 线程结束运行(阻塞)

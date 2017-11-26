@@ -28,7 +28,7 @@ for (n = 0; n < memory->size; n++) { \
 free(memory->data); \
 memory->data = _data; \
 memory->freeAddr = _freeAddr; \
-memory->size = memory->size * 2 \
+memory->size = memory->size * 2
 
 typedef struct _etool_memory {
 	unsigned char *data;

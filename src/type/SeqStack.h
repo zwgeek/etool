@@ -23,7 +23,7 @@ for (n = unitSize - 1; n >= stack->typeSize * stack->bottom; n--) { \
 free(stack->data); \
 stack->data = _data; \
 stack->bottom = stack->bottom + stack->size; \
-stack->size = stack->size * 2 \
+stack->size = stack->size * 2
 
 /**
  * 所有的数据结构里面都是当前指向的指针未被使用,只有bottom这一个特例(当前被使用)

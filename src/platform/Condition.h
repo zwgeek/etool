@@ -9,11 +9,11 @@
 #include <stdlib.h>
 #include "MutexEx.h"
 #if defined(_windows)
-#include <windows.h>				
+#include <windows.h>
 #endif
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
 #include <sys/time.h>
-#include <pthread.h>			
+#include <pthread.h>
 #endif
 
 typedef struct _etool_condition {

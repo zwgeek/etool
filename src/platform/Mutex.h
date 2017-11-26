@@ -11,10 +11,8 @@
 #include <windows.h>
 #endif
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
-#include <pthread.h>		
+#include <pthread.h>
 #endif
-
-#define MUTEX_NULL 0
 
 typedef struct _etool_mutex {
 #if defined(_windows)

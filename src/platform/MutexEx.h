@@ -8,13 +8,11 @@
 
 #include <stdlib.h>
 #if defined(_windows)
-#include <windows.h>		
+#include <windows.h>
 #endif
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
-#include <pthread.h>	
+#include <pthread.h>
 #endif
-
-#define MUTEXEX_NULL 0
 
 typedef struct _etool_mutexEx {
 #if defined(_windows)

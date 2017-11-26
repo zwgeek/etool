@@ -7,8 +7,8 @@ etool_condition* etool_condition_create()
 	if (condition == 0) { return 0; }
 #if defined(_windows)
 	//default security attributes and unnamed semaphore, _maxNum = 10
-	condition->waiters = 0; 
-	condition->cond = CreateSemaphore(0, 0, 10, 0); 
+	condition->waiters = 0;
+	condition->cond = CreateSemaphore(0, 0, 10, 0);
 #endif
 
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
@@ -21,8 +21,8 @@ void etool_condition_load(etool_condition *condition)
 {
 #if defined(_windows)
 	//default security attributes and unnamed semaphore, _maxNum = 10
-	condition->waiters = 0; 
-	condition->cond = CreateSemaphore(0, 0, 10, 0); 
+	condition->waiters = 0;
+	condition->cond = CreateSemaphore(0, 0, 10, 0);
 #endif
 
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
@@ -33,7 +33,7 @@ void etool_condition_load(etool_condition *condition)
 void etool_condition_unload(etool_condition *condition)
 {
 #if defined(_windows)
-	CloseHandle(condition->cond); 
+	CloseHandle(condition->cond);
 #endif
 
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
@@ -44,7 +44,7 @@ void etool_condition_unload(etool_condition *condition)
 void etool_condition_destroy(etool_condition *condition)
 {
 #if defined(_windows)
-	CloseHandle(condition->cond); 
+	CloseHandle(condition->cond);
 #endif
 
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
@@ -69,11 +69,11 @@ void etool_condition_wait(etool_condition *condition, etool_mutexEx *mutex)
 int etool_condition_trywait(etool_condition*condition, etool_mutexEx *mutex, const int timeOut)
 {
 #if defined(_windows)
-	condition->waiters++; 
+	condition->waiters++;
 	if (SignalObjectAndWait(mutex->mutex, condition->cond, timeOut, FALSE) == 0)
 	{
 		WaitForSingleObject(mutex->mutex, INFINITE);
-		return 0; 
+		return 0;
 	}
 	//函数等待超时,指定内核对象状态为未触发.
 	WaitForSingleObject(mutex->mutex, INFINITE);
@@ -105,8 +105,8 @@ void etool_condition_signal(etool_condition*condition)
 	//can't use the lpPreviousCount
 	if (condition->waiters > 0)
 	{
-		condition->waiters--;
 		ReleaseSemaphore(condition->cond, 1, 0);
+		condition->waiters--;
 	}
 #endif
 
@@ -118,7 +118,7 @@ void etool_condition_signal(etool_condition*condition)
 void etool_condition_broadcast(etool_condition*condition)
 {
 #if defined(_windows)
-	//can't use the lpPreviousCount; 
+	//can't use the lpPreviousCount;
 	if (condition->waiters > 0)
 	{
 		ReleaseSemaphore(condition->cond, condition->waiters, 0);

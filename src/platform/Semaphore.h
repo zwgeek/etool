@@ -8,7 +8,7 @@
 
 #include <stdlib.h>
 #if defined(_windows)
-#include <windows.h>			
+#include <windows.h>
 #endif
 #if defined(_linux) || defined(_android)
 #include <time.h>
@@ -19,8 +19,6 @@
 #include <mach/task.h>
 #include <mach/mach.h>
 #endif
-
-#define SEMAPHORE_NULL 0
 
 typedef struct _etool_semaphore {
 #if defined(_windows)

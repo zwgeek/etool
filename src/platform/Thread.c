@@ -2,10 +2,10 @@
 
 
 #if defined(_windows)
-	unsigned int __stdcall g_threadPorc(void *porc) { ((etool_threadPorc*)porc)(); return 0; }
+	unsigned int __stdcall g_threadPorc(void *attr) { (((struct _etool_threadAttr*)attr)->porc)(((struct _etool_threadAttr*)attr)->param); return 0; }
 #endif
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
-	void* g_threadPorc(void *porc) { ((etool_threadPorc*)porc)(); return 0; }
+	void* g_threadPorc(void *attr) { (((struct _etool_threadAttr*)attr)->porc)(((struct _etool_threadAttr*)attr)->param); return 0; }
 #endif
 
 unsigned long etool_thread_getCurrentID()
@@ -48,15 +48,16 @@ int etool_thread_loop(etool_thread *thread)
 	return thread->loop;
 }
 
-void etool_thread_start(etool_thread *thread, etool_threadPorc *porc)
+void etool_thread_start(etool_thread *thread, etool_threadPorc *porc, void *param)
 {
+	struct _etool_threadAttr attr = {param, porc};
 #if defined(_windows)
-	thread->thread = (HANDLE)_beginthreadex(0, 0, g_threadPorc, porc, 0, 0);
+	thread->thread = (HANDLE)_beginthreadex(0, 0, g_threadPorc, &attr, 0, 0);
 #endif
 
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
 	//PTHREAD _CREATE_JOINABLE(state)
-	pthread_create(&(thread->thread), 0, g_threadPorc, porc);
+	pthread_create(&(thread->thread), 0, g_threadPorc, &attr);
 #endif
 }
 

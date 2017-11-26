@@ -49,18 +49,21 @@
  * @param milliseconds [not null]
  */
 void etool_os_sleep(const unsigned long milliseconds);
+
 /**
  * 判断文件夹是否存在
  * @param  path [not null]
  * @return      [error code]
  */
 int etool_dir_exist(const char *path);
+
 /**
  * 创建文件夹
  * @param  path [not null]
  * @return      [error code]
  */
 int etool_dir_create(const char *path);
+
 /**
  * 删除文件夹
  * @param  path [not null]
