@@ -52,9 +52,17 @@ void etool_log_destroy(etool_log *log)
 	free(log);
 }
 
-void etool_log_path(etool_log *log, const char *path)
-{
+int etool_log_path(etool_log *log, const char *path)
+{	
+	FILE *file = fopen(path, "rw+");
+	if (file == 0) {
+		return -1;
+	}
 	strcpy(log->path, path);
+	FILE *tmpFile = log->file;
+	log->file = file;
+	fclose(tmpFile);
+	return 0;
 }
 
 void etool_log_level(etool_log *log, const etool_logLevel level)

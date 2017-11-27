@@ -42,7 +42,7 @@ typedef struct _etool_log {
  * @param path  [not null]
  * @param mode  [null/default 0]
  * @param level [null/default VERBOSE]
- * @return       [error code]
+ * @return      [error code]
  */
 etool_log* etool_log_create(const char *path, const etool_logLevel level);
 
@@ -53,10 +53,11 @@ void etool_log_destroy();
 
 /**
  * 设置日志模块输出路径
- * @param log [not null]
+ * @param log  [not null]
  * @param path [not null]
+ * @return     [error code]
  */
-void etool_log_path(etool_log *log, const char *path);
+int etool_log_path(etool_log *log, const char *path);
 
 /**
  * 设置日志模块等级

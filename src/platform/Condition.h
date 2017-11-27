@@ -20,7 +20,7 @@ typedef struct _etool_condition {
 #if defined(_windows)
 	//waiters must be eq the Semaphore count
 	int waiters;
-	HANDLE cond; 
+	HANDLE cond;
 #endif
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
 	pthread_cond_t cond;
