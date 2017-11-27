@@ -14,7 +14,7 @@ void etool_log_threadPorc(void *this)
 		ETOOL_LOG_STDOUT(msg);
 #endif
 #ifdef USE_LOG_COLOR_STDOUT
-		ETOOL_LOG_COLOR_STDOUT(msg);
+		ETOOL_LOG_COLOR_STDOUT(msg, log->level);
 #endif
 		fwrite(msg, sizeof(char), strlen(msg), log->file);
 		etool_mutexEx_unlock(&(log->mutex));
@@ -90,7 +90,7 @@ void etool_log_printf(etool_log *log, etool_logLevel level, const char *fmt, ...
 	ETOOL_LOG_STDOUT(msg);
 #endif
 #ifdef USE_LOG_COLOR_STDOUT
-	ETOOL_LOG_COLOR_STDOUT(msg);
+	ETOOL_LOG_COLOR_STDOUT(msg, level);
 #endif
 	fwrite(msg, sizeof(char), strlen(msg), log->file);
 }
