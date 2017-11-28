@@ -12,7 +12,7 @@ const WORD colors[6] = { CYAN, CYAN, WHITE | BOLD, YELLOW | BOLD, RED | BOLD , M
 #define ETOOL_LOG_STDOUT(msg) \
 fwrite(msg, sizeof(char), strlen(msg), stdout)
 
-#define ETOOL_LOG_COLOR_STDOUT(msg, level) \
+#define ETOOL_LOG_COLOR_STDOUT(level, msg) \
 CONSOLE_SCREEN_BUFFER_INFO origBufferInfo; \
 HANDLE outHandle = GetStdHandle(STD_OUTPUT_HANDLE); \
 GetConsoleScreenBufferInfo(outHandle, &origBufferInfo); \
@@ -39,7 +39,7 @@ const char *colors[6] = { CYAN, CYAN, WHITE_BOLD, YELLOW_BOLD, RED_BOLD,  MAGENT
 #define ETOOL_LOG_STDOUT(msg) \
 fwrite(msg, sizeof(char), strlen(msg), stdout)
 
-#define ETOOL_LOG_COLOR_STDOUT(msg, level) \
+#define ETOOL_LOG_COLOR_STDOUT(level, msg) \
 fwrite(colors[level], sizeof(char), strlen(colors[level]), stdout); \
 fwrite(msg, sizeof(char), strlen(msg), stdout); \
 fwrite(RESET, sizeof(char), strlen(RESET), stdout)
@@ -52,6 +52,6 @@ const android_LogPriority colors[6] = { ANDROID_LOG_VERBOSE, ANDROID_LOG_DEBUG, 
 #define ETOOL_LOG_STDOUT(msg) \
 __android_log_write(colors[0], "etool", msg)
 
-#define ETOOL_LOG_COLOR_STDOUT(msg, level) \
+#define ETOOL_LOG_COLOR_STDOUT(level, msg) \
 __android_log_write(colors[level], "etool", msg)
 #endif
