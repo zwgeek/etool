@@ -21,17 +21,6 @@
 #include <netinet/in.h>
 #endif
 
-/**
- * linux可以支持PF_PACKET协议地址族,对数链层以太网帧头进行维护(sockaddr_ll)
- * Windows Sockets无法支持数链层以太网帧头填充,只能使用winpcap或者ddk里的ndisprot驱动模版
- * 故此,本模块不提供二层数据帧头的封装api(物理层维度)
- * 注意:在使用ETOOL_SOCKET_ETHER类型时,需要获取管理员权限
- */
-#define ETOOL_SOCKET_TCP   0
-#define ETOOL_SOCKET_UDP   1
-#define ETOOL_SOCKET_IP    2
-#define ETOOL_SOCKET_ETHER 3
-
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	#define INVALID_SOCKET -1
 	#define SOCKET_ERROR   -1
@@ -49,11 +38,24 @@ typedef struct _etool_socket {
 } etool_socket;
 
 /**
+ * linux可以支持PF_PACKET协议地址族,对数链层以太网帧头进行维护(sockaddr_ll)
+ * Windows Sockets无法支持数链层以太网帧头填充,只能使用winpcap或者ddk里的ndisprot驱动模版
+ * 故此,本模块不提供二层数据帧头的封装api(物理层维度)
+ * 注意:在使用ETOOL_SOCKET_ETHER类型时,需要获取管理员权限
+ */
+typedef enum {
+	ETOOL_SOCKET_TCP = 0,
+	ETOOL_SOCKET_UDP,
+	ETOOL_SOCKET_IP,
+	ETOOL_SOCKET_ETHER
+} etool_socketType;
+
+/**
  * 创建socket
  * @param  type [description]
  * @return      [description]
  */
-etool_socket* etool_socket_create(int type);
+etool_socket* etool_socket_create(etool_socketType type);
 
 /**
  * 装载
@@ -61,7 +63,7 @@ etool_socket* etool_socket_create(int type);
  * @param  type   [description]
  * @return        [description]
  */
-int etool_socket_load(etool_socket *sockfd, int type);
+int etool_socket_load(etool_socket *sockfd, etool_socketType type);
 
 /**
  * 卸载

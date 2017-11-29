@@ -20,6 +20,7 @@
 
 typedef struct _etool_select {
 #if defined(_windows)
+	HANDLE fd;
 #endif
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	int fd;
@@ -27,10 +28,10 @@ typedef struct _etool_select {
 } etool_select;
 
 typedef enum {
-	RECV = 0,
-	SEND,
-	LISTEN,
-	ALL
+	ETOOL_SELECT_RECV = 0,
+	ETOOL_SELECT_SEND,
+	ETOOL_SELECT_LISTEN,
+	ETOOL_SELECT_ALL
 } etool_selectType;
 typedef void etool_selectCallback(etool_socket *socketfd, etool_selectType type);
 

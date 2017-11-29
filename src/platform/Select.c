@@ -48,30 +48,36 @@ void etool_select_destroy(etool_select *selectfd)
 
 int etool_select_add(etool_select *selectfd, etool_socket *socketfd, etool_selectType type)
 {
+#if defined(_windows)
+	//首先将这个socketfd设置为非阻塞
+	unsigned long on = 1;
+	if (ioctlsocket(socketfd->fd, FIONBIO, &on) != 0) {
+		return -1;
+	}
+	return 0;
+#endif
+
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	//首先将这个socketfd设置为非阻塞
 	int opts = fcntl(socketfd->fd, F_GETFL);
 	if (opts != 0) { return -1; }
 	if (fcntl(socketfd->fd, F_SETFL, opts | O_NONBLOCK) != 0) {
 		return -1;
 	}
-#if defined(_windows)
-#endif
-
-#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	struct epoll_event ev;
 	ev.data.ptr = socketfd;
 	ev.data.fd = socketfd->fd;
 	switch (type) {
-	case RECV :
+	case ETOOL_SELECT_RECV :
 		ev.events = EPOLLIN;
 		break;
-	case SEND :
+	case ETOOL_SELECT_SEND :
 		ev.events = EPOLLOUT;
 		break;
-	case LISTEN :
+	case ETOOL_SELECT_LISTEN :
 		ev.events = EPOLLIN | EPOLLET;
 		break;
-	case ALL :
+	case ETOOL_SELECT_ALL :
 		ev.events = EPOLLIN | EPOLLOUT;
 		break;
 	default :
@@ -84,6 +90,7 @@ int etool_select_add(etool_select *selectfd, etool_socket *socketfd, etool_selec
 int etool_select_mod(etool_select *selectfd, etool_socket *socketfd, etool_selectType type)
 {
 #if defined(_windows)
+	return 0;
 #endif
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
@@ -91,16 +98,16 @@ int etool_select_mod(etool_select *selectfd, etool_socket *socketfd, etool_selec
 	ev.data.ptr = socketfd;
 	ev.data.fd = socketfd->fd;
 	switch (type) {
-	case RECV :
+	case ETOOL_SELECT_RECV :
 		ev.events = EPOLLIN;
 		break;
-	case SEND :
+	case ETOOL_SELECT_SEND :
 		ev.events = EPOLLOUT;
 		break;
-	case LISTEN :
+	case ETOOL_SELECT_LISTEN :
 		ev.events = EPOLLIN | EPOLLET;
 		break;
-	case ALL :
+	case ETOOL_SELECT_ALL :
 		ev.events = EPOLLIN | EPOLLOUT;
 		break;
 	default :
@@ -113,6 +120,7 @@ int etool_select_mod(etool_select *selectfd, etool_socket *socketfd, etool_selec
 int etool_select_del(etool_select *selectfd, etool_socket *socketfd, etool_selectType type)
 {
 #if defined(_windows)
+	return 0;
 #endif
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
@@ -120,16 +128,16 @@ int etool_select_del(etool_select *selectfd, etool_socket *socketfd, etool_selec
 	ev.data.ptr = socketfd;
 	ev.data.fd = socketfd->fd;
 	switch (type) {
-	case RECV :
+	case ETOOL_SELECT_RECV :
 		ev.events = EPOLLIN;
 		break;
-	case SEND :
+	case ETOOL_SELECT_SEND :
 		ev.events = EPOLLOUT;
 		break;
-	case LISTEN :
+	case ETOOL_SELECT_LISTEN :
 		ev.events = EPOLLIN | EPOLLET;
 		break;
-	case ALL :
+	case ETOOL_SELECT_ALL :
 		ev.events = EPOLLIN | EPOLLOUT;
 		break;
 	default :
@@ -150,16 +158,16 @@ void etool_select_wait(etool_select *selectfd, etool_selectCallback *callback, c
 	for (n = 0; n < nfds; n++) {
 		switch (events[n].events) {
 		case EPOLLIN :
-			callback(events[n].data.ptr, RECV);
+			callback(events[n].data.ptr, ETOOL_SELECT_RECV);
 			break;
 		case EPOLLOUT :
-			callback(events[n].data.ptr, SEND);
+			callback(events[n].data.ptr, ETOOL_SELECT_SEND);
 			break;
 		case EPOLLIN | EPOLLET :
-			callback(events[n].data.ptr, LISTEN);
+			callback(events[n].data.ptr, ETOOL_SELECT_LISTEN);
 			break;
 		case EPOLLIN | EPOLLOUT :
-			callback(events[n].data.ptr, ALL);
+			callback(events[n].data.ptr, ETOOL_SELECT_ALL);
 			break;
 		default :
 			epoll_ctl(selectfd->fd, EPOLL_CTL_DEL, events[n].data.fd, events + n);

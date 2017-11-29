@@ -1,7 +1,7 @@
 #include "Socket.h"
 
 
-etool_socket* etool_socket_create(int type)
+etool_socket* etool_socket_create(etool_socketType type)
 {
 	etool_socket *sockfd = malloc(sizeof(etool_socket));
 	if (sockfd == 0) { return 0; }
@@ -55,7 +55,7 @@ etool_socket* etool_socket_create(int type)
 // #endif
 }
 
-int etool_socket_load(etool_socket *sockfd, int type)
+int etool_socket_load(etool_socket *sockfd, etool_socketType type)
 {
 #if defined(_windows)
 	WSADATA  wsaData;
