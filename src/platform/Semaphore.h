@@ -43,8 +43,9 @@ etool_semaphore* etool_semaphore_create(const int initNum);
  * 装载
  * @param semaphore [not null]
  * @param  initNum   [not null]
+ * @return
  */
-void etool_semaphore_load(etool_semaphore *semaphore, const int initNum);
+int etool_semaphore_load(etool_semaphore *semaphore, const int initNum);
 
 /**
  * 卸载

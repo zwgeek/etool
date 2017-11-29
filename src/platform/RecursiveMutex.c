@@ -20,7 +20,7 @@ etool_recursiveMutex* etool_recursiveMutex_create()
 	return mutex;
 }
 
-void etool_recursiveMutex_load(etool_recursiveMutex *mutex)
+int etool_recursiveMutex_load(etool_recursiveMutex *mutex)
 {
 #if defined(_windows)
 	//旋转锁，单cpu不起作用
@@ -34,6 +34,7 @@ void etool_recursiveMutex_load(etool_recursiveMutex *mutex)
 	pthread_mutex_init(&(mutex->mutex), &attr); 
 	pthread_mutexattr_destroy(&attr);
 #endif
+	return 0;
 }
 
 void etool_recursiveMutex_unload(etool_recursiveMutex *mutex)

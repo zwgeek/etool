@@ -32,8 +32,9 @@ etool_mutexEx* etool_mutexEx_create();
 /**
  * 装载
  * @param mutex [not null]
+ * @return
  */
-void etool_mutexEx_load(etool_mutexEx *mutex);
+int etool_mutexEx_load(etool_mutexEx *mutex);
 
 /**
  * 卸载

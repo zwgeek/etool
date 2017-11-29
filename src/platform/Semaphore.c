@@ -21,7 +21,7 @@ etool_semaphore* etool_semaphore_create(const int initNum)
 	return semaphore;
 }
 
-void etool_semaphore_load(etool_semaphore *semaphore, const int initNum)
+int etool_semaphore_load(etool_semaphore *semaphore, const int initNum)
 {
 #if defined(_windows)
 	//default security attributes and unnamed semaphore, _maxNum = 10
@@ -35,6 +35,7 @@ void etool_semaphore_load(etool_semaphore *semaphore, const int initNum)
 #if defined(_mac) || defined(_ios)
 	semaphore_create(mach_task_self(), &(semaphore->semaphore), SYNC_POLICY_FIFO, initNum);
 #endif
+	return 0;
 }
 
 void etool_semaphore_unload(etool_semaphore *semaphore)

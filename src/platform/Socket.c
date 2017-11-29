@@ -55,6 +55,53 @@ etool_socket* etool_socket_create(int type)
 // #endif
 }
 
+int etool_socket_load(etool_socket *sockfd, int type)
+{
+#if defined(_windows)
+	WSADATA  wsaData;
+	if (WSAStartup(MAKEWORD(2,2), &wsaData) != 0) {
+		return -1;
+	}
+#endif
+	switch (type) {
+	case ETOOL_SOCKET_TCP   :
+		sockfd->fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+		break;
+	case ETOOL_SOCKET_UDP   :
+		sockfd->fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+		break;
+	case ETOOL_SOCKET_IP    :
+		sockfd->fd = socket(AF_INET, SOCK_RAW, IPPROTO_IP);
+		break;
+	case ETOOL_SOCKET_ETHER :
+		{ sockfd->fd = socket(AF_INET, SOCK_RAW, IPPROTO_IP);
+		const int on;
+		//开启IP_HDRINCL特性
+		if (sockfd->fd == INVALID_SOCKET || setsockopt(sockfd->fd, IPPROTO_IP, IP_HDRINCL, (const char*)&on, sizeof(on)) == SOCKET_ERROR) {
+			return -1;
+		}
+		break; }
+	default :
+		return -1;
+	}
+	if (sockfd->fd == INVALID_SOCKET) {
+		return -1;
+	}
+	return 0;
+}
+
+void etool_socket_unload(etool_socket *sockfd)
+{
+#if defined(_windows)
+	closesocket(sockfd->fd);
+	WSACleanup();
+#endif
+
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	close(sockfd->fd);
+#endif	
+}
+
 void etool_socket_destroy(etool_socket *sockfd)
 {
 #if defined(_windows)

@@ -29,6 +29,20 @@ typedef struct _etool_atomic {
 etool_atomic* etool_atomic_create(const int count);
 
 /**
+ * 装载
+ * @param atomic [not null]
+ * @param count  [not null]
+ * @return
+ */
+int etool_atomic_load(etool_atomic *atomic, const int count);
+
+/**
+ * 卸载
+ * @param atomic [not null]
+ */
+void etool_atomic_unload(etool_atomic *atomic);
+
+/**
  * 销毁
  * @param atomic [not null]
  */

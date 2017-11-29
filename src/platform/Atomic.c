@@ -9,6 +9,15 @@ etool_atomic* etool_atomic_create(const int count)
 	return atomic;
 }
 
+int etool_atomic_load(etool_atomic *atomic, const int count)
+{
+	atomic->count = count;
+	return 0;
+}
+
+void etool_atomic_unload(etool_atomic *atomic)
+{}
+
 void etool_atomic_destroy(etool_atomic *atomic)
 {
 	free(atomic);

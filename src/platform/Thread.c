@@ -27,9 +27,10 @@ etool_thread* etool_thread_create()
 	return thread;
 }
 
-void etool_thread_load(etool_thread *thread)
+int etool_thread_load(etool_thread *thread)
 {
 	thread->loop = 1;
+	return 0;
 }
 
 void etool_thread_unload(etool_thread *thread)

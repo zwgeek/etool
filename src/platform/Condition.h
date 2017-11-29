@@ -36,8 +36,9 @@ etool_condition* etool_condition_create();
 /**
  * 装载
  * @param condition [not null]
+ * @return
  */
-void etool_condition_load(etool_condition *condition);
+int etool_condition_load(etool_condition *condition);
 
 /**
  * 卸载

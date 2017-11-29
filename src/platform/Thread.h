@@ -47,8 +47,9 @@ etool_thread* etool_thread_create();
 /**
  * 装载
  * @param thread [not null]
+ * @return
  */
-void etool_thread_load(etool_thread *thread);
+int etool_thread_load(etool_thread *thread);
 
 /**
  * 卸载

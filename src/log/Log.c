@@ -34,9 +34,32 @@ etool_log* etool_log_create(const char *path, const etool_logLevel level)
 	strcpy(log->path, path);
 	log->level = level;
 	log->queue = etool_circQueue_create(sizeof(char*), ETOOL_LOG_QUEUE_SIZE);
-	etool_mutexEx_load(&(log->mutex));
-	etool_condition_load(&(log->condition));
-	etool_thread_load(&(log->thread));
+	if (log->queue == 0) {
+		fclose(log->file);
+		free(log);
+		return 0;		
+	}
+	if (etool_mutexEx_load(&(log->mutex)) != 0) {
+		fclose(log->file);
+		etool_circQueue_destroy(log->queue);
+		free(log);
+		return 0;
+	}
+	if (etool_condition_load(&(log->condition)) != 0) {
+		fclose(log->file);
+		etool_circQueue_destroy(log->queue);
+		etool_mutexEx_unload(&(log->mutex));
+		free(log);
+		return 0;
+	}
+	if (etool_thread_load(&(log->thread)) != 0) {
+		fclose(log->file);
+		etool_circQueue_destroy(log->queue);
+		etool_mutexEx_unload(&(log->mutex));
+		etool_condition_unload(&(log->condition));
+		free(log);
+		return 0;		
+	}
 	etool_thread_start(&(log->thread), etool_log_threadPorc, log);
 	return log;
 }

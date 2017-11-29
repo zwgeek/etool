@@ -56,6 +56,20 @@ typedef struct _etool_socket {
 etool_socket* etool_socket_create(int type);
 
 /**
+ * 装载
+ * @param  sockfd [description]
+ * @param  type   [description]
+ * @return        [description]
+ */
+int etool_socket_load(etool_socket *sockfd, int type);
+
+/**
+ * 卸载
+ * @param  sockfd [description]
+ */
+void etool_socket_unload(etool_socket *sockfd);
+
+/**
  * 销毁socket
  * @param  sockfd   [description]
  * @return         [description]

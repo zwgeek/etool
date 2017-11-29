@@ -33,11 +33,12 @@ etool_recursiveMutex* etool_recursiveMutex_create();
  * 装载
  * @param mutex [not null]
  */
-void etool_recursiveMutex_load(etool_recursiveMutex *mutex);
+int etool_recursiveMutex_load(etool_recursiveMutex *mutex);
 
 /**
  * 卸载
  * @param mutex [not null]
+ * @return
  */
 void etool_recursiveMutex_unload(etool_recursiveMutex *mutex);
 

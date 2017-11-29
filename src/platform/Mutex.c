@@ -16,7 +16,7 @@ etool_mutex* etool_mutex_create()
 	return mutex;
 }
 
-void etool_mutex_load(etool_mutex *mutex)
+int etool_mutex_load(etool_mutex *mutex)
 {
 #if defined(_windows)
 	//旋转锁，单cpu不起作用
@@ -26,6 +26,7 @@ void etool_mutex_load(etool_mutex *mutex)
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	pthread_mutex_init(&(mutex->mutex), 0);
 #endif
+	return 0;
 }
 
 void etool_mutex_unload(etool_mutex *mutex)

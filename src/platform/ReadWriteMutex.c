@@ -6,16 +6,27 @@ etool_readWriteMutex* etool_readWriteMutex_create()
 	etool_readWriteMutex *mutex = malloc(sizeof(etool_readWriteMutex));
 	if (mutex == 0) { return 0; }
 	mutex->readCount = 0;
-	etool_mutex_load(&(mutex->readMutex));
-	etool_recursiveMutex_load(&(mutex->writeMutex));
+	if (etool_mutex_load(&(mutex->readMutex)) != 0) {
+		return 0;
+	}
+	if (etool_recursiveMutex_load(&(mutex->writeMutex)) != 0) {
+		etool_mutex_unload(&(mutex->readMutex));
+		return 0;
+	}
 	return mutex;
 }
 
-void etool_readWriteMutex_load(etool_readWriteMutex *mutex)
+int etool_readWriteMutex_load(etool_readWriteMutex *mutex)
 {
 	mutex->readCount = 0;
-	etool_mutex_load(&(mutex->readMutex));
-	etool_recursiveMutex_load(&(mutex->writeMutex));
+	if (etool_mutex_load(&(mutex->readMutex)) != 0) {
+		return -1;
+	}
+	if (etool_recursiveMutex_load(&(mutex->writeMutex)) != 0) {
+		etool_mutex_unload(&(mutex->readMutex));
+		return -1;
+	}
+	return 0;
 }
 
 void etool_readWriteMutex_unload(etool_readWriteMutex *mutex)

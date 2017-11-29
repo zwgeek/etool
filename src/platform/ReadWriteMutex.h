@@ -25,8 +25,9 @@ etool_readWriteMutex* etool_readWriteMutex_create();
 /**
  * 装载
  * @param mutex [not null]
+ * @return
  */
-void etool_readWriteMutex_load(etool_readWriteMutex *mutex);
+int etool_readWriteMutex_load(etool_readWriteMutex *mutex);
 
 /**
  * 卸载

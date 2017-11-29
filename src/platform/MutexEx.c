@@ -15,7 +15,7 @@ etool_mutexEx* etool_mutexEx_create()
 	return mutex;
 }
 
-void etool_mutexEx_load(etool_mutexEx *mutex)
+int etool_mutexEx_load(etool_mutexEx *mutex)
 {
 #if defined(_windows)
 	mutex->mutex = CreateMutex(0, FALSE, 0);
@@ -24,6 +24,7 @@ void etool_mutexEx_load(etool_mutexEx *mutex)
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	pthread_mutex_init(&(mutex->mutex), 0);
 #endif
+	return 0;
 }
 
 void etool_mutexEx_unload(etool_mutexEx *mutex)

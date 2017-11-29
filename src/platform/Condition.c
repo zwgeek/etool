@@ -17,7 +17,7 @@ etool_condition* etool_condition_create()
 	return condition;
 }
 
-void etool_condition_load(etool_condition *condition)
+int etool_condition_load(etool_condition *condition)
 {
 #if defined(_windows)
 	//default security attributes and unnamed semaphore, _maxNum = 10
@@ -28,6 +28,7 @@ void etool_condition_load(etool_condition *condition)
 #if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
 	pthread_cond_init(&(condition->cond), 0);
 #endif
+	return 0;
 }
 
 void etool_condition_unload(etool_condition *condition)
