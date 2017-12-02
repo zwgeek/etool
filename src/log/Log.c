@@ -1,7 +1,7 @@
 #include "Log.h"
 
 
-void etool_log_threadPorc(void *this)
+void etool_log_threadProc(void *this)
 {
 	etool_log *log = (etool_log*)this;
 	char *msg;
@@ -60,7 +60,7 @@ etool_log* etool_log_create(const char *path, const etool_logLevel level)
 		free(log);
 		return 0;		
 	}
-	etool_thread_start(&(log->thread), etool_log_threadPorc, log);
+	etool_thread_start(&(log->thread), etool_log_threadProc, log);
 	return log;
 }
 

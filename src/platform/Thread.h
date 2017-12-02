@@ -15,7 +15,7 @@
 #include <pthread.h>
 #endif
 
-typedef void etool_threadPorc(void *param);
+typedef void etool_threadProc(void *param);
 typedef struct _etool_thread {
 	int loop;
 #if defined(_windows)
@@ -28,7 +28,7 @@ typedef struct _etool_thread {
 
 struct _etool_threadAttr
 {
-	etool_threadPorc *porc;
+	etool_threadProc *proc;
 	void *param;
 };
 
@@ -76,7 +76,7 @@ int etool_thread_loop(etool_thread *thread);
  * @param proc   [not null]
  * @param param  [not null]
  */
-void etool_thread_start(etool_thread *thread, etool_threadPorc *proc, void *param);
+void etool_thread_start(etool_thread *thread, etool_threadProc *proc, void *param);
 
 /**
  * 线程结束运行(阻塞)
