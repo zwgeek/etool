@@ -11,6 +11,7 @@ etool_socket* etool_socket_create(etool_socketType type)
 		return 0;
 	}
 #endif
+	//windows:A socket created by the socket function will have the overlapped attribute as the default
 	switch (type) {
 	case ETOOL_SOCKET_TCP   :
 		sockfd->fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -37,22 +38,8 @@ etool_socket* etool_socket_create(etool_socketType type)
 		free(sockfd);
 		return 0;
 	}
+	sockfd->buffer = 0;
 	return sockfd;
-
-// #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
-// 	switch (type) {
-// 	case ETOOL_SOCKET_TCP :
-// 		sockfd->fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-// 		break;
-// 	case ETOOL_SOCKET_UDP :
-// 		sockfd->fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-// 		break;
-// 	case ETOOL_SOCKET_IP  :
-// 		sockfd->fd = socket(AF_INET, SOCK_RAW, IPPROTO_IP);
-// 	default :
-// 		return 0;
-// 	}
-// #endif
 }
 
 int etool_socket_load(etool_socket *sockfd, etool_socketType type)
@@ -63,6 +50,7 @@ int etool_socket_load(etool_socket *sockfd, etool_socketType type)
 		return -1;
 	}
 #endif
+	//windows:A socket created by the socket function will have the overlapped attribute as the default
 	switch (type) {
 	case ETOOL_SOCKET_TCP   :
 		sockfd->fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -87,6 +75,7 @@ int etool_socket_load(etool_socket *sockfd, etool_socketType type)
 	if (sockfd->fd == INVALID_SOCKET) {
 		return -1;
 	}
+	sockfd->buffer = 0;
 	return 0;
 }
 
@@ -183,17 +172,45 @@ etool_socket* etool_socket_accept(etool_socket *sockfd, char **ip, short *port)
 	return client;
 }
 
-int etool_socket_send(etool_socket *sockfd, void *data, int length)
+int etool_socket_send(etool_socket *sockfd, char *data, int length)
 {
+#if defined(_windows)
+	if (sockfd->buffer != 0) {
+		DWORD sendBytes;
+		sockfd->buffer->len = length;
+		sockfd->buffer->buf = data;
+		if (WSASend(sockfd->fd, sockfd->buffer, 1, &sendBytes, 0, &(sockfd->overlapped), 0) == SOCKET_ERROR) {
+			if (WSAGetLastError() != ERROR_IO_PENDING) {
+				return -1;
+			}
+			return 0;
+		}
+		return sendBytes;
+	}
+#endif
 	return send(sockfd->fd, data, length, 0);
 }
 
-int etool_socket_recv(etool_socket *sockfd, void *data, int length)
+int etool_socket_recv(etool_socket *sockfd, char *data, int length)
 {
+#if defined(_windows)
+	if (sockfd->buffer != 0) {
+		DWORD recvBytes;
+		sockfd->buffer->len = length;
+		sockfd->buffer->buf = data;
+		if (WSARecv(sockfd->fd, sockfd->buffer, 1, &recvBytes, 0, &(sockfd->overlapped), 0) == SOCKET_ERROR) {
+			if (WSAGetLastError() != ERROR_IO_PENDING) {
+				return -1;
+			}
+			return 0;
+		}
+		return recvBytes;
+	}
+#endif
 	return recv(sockfd->fd, data, length, 0);
 }
 
-int etool_socket_sendto(etool_socket *sockfd, void *data, int length, const char *host, const short port)
+int etool_socket_sendto(etool_socket *sockfd, char *data, int length, const char *host, const short port)
 {
 	struct sockaddr_in addr;
 	addr.sin_family = AF_INET;
@@ -213,10 +230,24 @@ int etool_socket_sendto(etool_socket *sockfd, void *data, int length, const char
 		}
 		addr.sin_addr = *(struct in_addr*)(ent->h_addr_list[0]);
 	}
+#if defined(_windows)
+	if (sockfd->buffer != 0) {
+		DWORD sendBytes;
+		sockfd->buffer->len = length;
+		sockfd->buffer->buf = data;
+		if (WSASendTo(sockfd->fd, sockfd->buffer, 1, &sendBytes, 0, (void*)&addr, sizeof(struct sockaddr), &(sockfd->overlapped), 0) == SOCKET_ERROR) {
+			if (WSAGetLastError() != ERROR_IO_PENDING) {
+				return -1;
+			}
+			return 0;
+		}
+		return sendBytes;
+	}
+#endif
 	return sendto(sockfd->fd, data, length, 0, (struct sockaddr*)&addr, sizeof(struct sockaddr));
 }
 
-int etool_socket_recvfrom(etool_socket *sockfd, void *data, int length, const char *host, const short port)
+int etool_socket_recvfrom(etool_socket *sockfd, char *data, int length, const char *host, const short port)
 {
 	struct sockaddr_in addr;
 	addr.sin_family = AF_INET;
@@ -237,6 +268,20 @@ int etool_socket_recvfrom(etool_socket *sockfd, void *data, int length, const ch
 		addr.sin_addr = *(struct in_addr*)(ent->h_addr_list[0]);
 	}
 	size_t addrlen = sizeof(struct sockaddr);
+#if defined(_windows)
+	if (sockfd->buffer != 0) {
+		DWORD recvBytes;
+		sockfd->buffer->len = length;
+		sockfd->buffer->buf = data;
+		if (WSARecvFrom(sockfd->fd, sockfd->buffer, 1, &recvBytes, 0, (struct sockaddr*)&addr, (socklen_t*)&addrlen, &(sockfd->overlapped), 0) == SOCKET_ERROR) {
+			if (WSAGetLastError() != ERROR_IO_PENDING) {
+				return -1;
+			}
+			return 0;
+		}
+		return recvBytes;
+	}
+#endif
 	return recvfrom(sockfd->fd, data, length, 0, (struct sockaddr*)&addr, (socklen_t*)&addrlen);
 }
 
@@ -324,3 +369,28 @@ int etool_socket_shutdown(etool_socket *sockfd, const int how)
 	return shutdown(sockfd->fd, how);
 }
 
+int etool_socket_errno()
+{
+#if defined(_windows)
+	return WSAGetLastError();
+#endif
+
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	return errno;
+#endif
+}
+
+// #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+// 	switch (type) {
+// 	case ETOOL_SOCKET_TCP :
+// 		sockfd->fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+// 		break;
+// 	case ETOOL_SOCKET_UDP :
+// 		sockfd->fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+// 		break;
+// 	case ETOOL_SOCKET_IP  :
+// 		sockfd->fd = socket(AF_INET, SOCK_RAW, IPPROTO_IP);
+// 	default :
+// 		return 0;
+// 	}
+// #endif

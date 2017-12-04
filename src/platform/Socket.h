@@ -8,9 +8,11 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include "Select.h"
 #if defined(_windows)
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <mswsock.h>
 #endif
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 #include <netdb.h>
@@ -19,6 +21,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <errno.h>
+#include "../type/CircQueue.h"
 #endif
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
@@ -30,11 +34,15 @@
 
 typedef struct _etool_socket {
 #if defined(_windows)
+	OVERLAPPED overlapped;
+	WSABUF *buffer;
 	SOCKET fd;
 #endif
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	etool_circQueue *buffer;
 	int fd;
 #endif
+	etool_select *selectfd;
 } etool_socket;
 
 /**
@@ -119,7 +127,7 @@ etool_socket* etool_socket_accept(etool_socket *sockfd, char **ip, short *port);
  * @param  length [description]
  * @return        [description]
  */
-int etool_socket_send(etool_socket *sockfd, void *data, int length);
+int etool_socket_send(etool_socket *sockfd, char *data, int length);
 
 /**
  * 接收数据(socket必须绑定了源地址和目标地址)
@@ -128,7 +136,7 @@ int etool_socket_send(etool_socket *sockfd, void *data, int length);
  * @param  length [description]
  * @return        [description]
  */
-int etool_socket_recv(etool_socket *sockfd, void *data, int length);
+int etool_socket_recv(etool_socket *sockfd, char *data, int length);
 
 /**
  * 发送数据(空socket)
@@ -139,7 +147,7 @@ int etool_socket_recv(etool_socket *sockfd, void *data, int length);
  * @param  port   [description]
  * @return        [description]
  */
-int etool_socket_sendto(etool_socket *sockfd, void *data, int length, const char *host, const short port);
+int etool_socket_sendto(etool_socket *sockfd, char *data, int length, const char *host, const short port);
 
 /**
  * 接收数据(空socket)
@@ -150,7 +158,7 @@ int etool_socket_sendto(etool_socket *sockfd, void *data, int length, const char
  * @param  port   [description]
  * @return        [description]
  */
-int etool_socket_recvfrom(etool_socket *sockfd, void *data, int length, const char *host, const short port);
+int etool_socket_recvfrom(etool_socket *sockfd, char *data, int length, const char *host, const short port);
 
 /**
  * 获取与套接口关联的本地协议地址
@@ -218,13 +226,17 @@ int etool_socket_timeout(etool_socket *sockfd, const int sendTimeout, const int 
 int etool_socket_setsockopt(etool_socket *sockfd, int level, int optname, const char* optval, int optlen);
 
 /**
- * socket连接单向关闭
+ * socket连接单向关闭(能唤醒阻塞函数)
  * @param  sockfd [description]
  * @param  how    [0-不允许接受, 1-不允许发送, 2-不允许发送和接受]
  * @return        [description]
  */
 int etool_socket_shutdown(etool_socket *sockfd, const int how);
 
-
+/**
+ * 获取错误码
+ * @return [description]
+ */
+int etool_socket_errno();
 
 #endif //ETOOL_PLATFORM_SOCKET

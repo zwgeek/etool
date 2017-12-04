@@ -30,8 +30,7 @@ typedef struct _etool_select {
 typedef enum {
 	ETOOL_SELECT_RECV = 0,
 	ETOOL_SELECT_SEND,
-	ETOOL_SELECT_LISTEN,
-	ETOOL_SELECT_ALL
+	ETOOL_SELECT_ACCEPT
 } etool_selectType;
 typedef void etool_selectCallback(etool_socket *socketfd, etool_selectType type);
 

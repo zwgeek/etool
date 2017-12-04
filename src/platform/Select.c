@@ -6,6 +6,7 @@ etool_select* etool_select_create(int size)
 	etool_select *selectfd = malloc(sizeof(etool_select));
 	if (selectfd == 0) { return 0; }
 #if defined(_windows)
+	
 #endif
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
@@ -50,8 +51,8 @@ int etool_select_add(etool_select *selectfd, etool_socket *socketfd, etool_selec
 {
 #if defined(_windows)
 	//首先将这个socketfd设置为非阻塞
-	unsigned long on = 1;
-	if (ioctlsocket(socketfd->fd, FIONBIO, &on) != 0) {
+	unsigned long mode = 1;
+	if (ioctlsocket(socketfd->fd, FIONBIO, &mode) != 0) {
 		return -1;
 	}
 	return 0;
@@ -72,13 +73,10 @@ int etool_select_add(etool_select *selectfd, etool_socket *socketfd, etool_selec
 		ev.events = EPOLLIN;
 		break;
 	case ETOOL_SELECT_SEND :
-		ev.events = EPOLLOUT;
-		break;
-	case ETOOL_SELECT_LISTEN :
-		ev.events = EPOLLIN | EPOLLET;
-		break;
-	case ETOOL_SELECT_ALL :
 		ev.events = EPOLLIN | EPOLLOUT;
+		break;
+	case ETOOL_SELECT_ACCEPT :
+		ev.events = EPOLLIN | EPOLLET;
 		break;
 	default :
 		return -1;
@@ -102,13 +100,10 @@ int etool_select_mod(etool_select *selectfd, etool_socket *socketfd, etool_selec
 		ev.events = EPOLLIN;
 		break;
 	case ETOOL_SELECT_SEND :
-		ev.events = EPOLLOUT;
-		break;
-	case ETOOL_SELECT_LISTEN :
-		ev.events = EPOLLIN | EPOLLET;
-		break;
-	case ETOOL_SELECT_ALL :
 		ev.events = EPOLLIN | EPOLLOUT;
+		break;
+	case ETOOL_SELECT_ACCEPT :
+		ev.events = EPOLLIN | EPOLLET;
 		break;
 	default :
 		return -1;
@@ -132,13 +127,10 @@ int etool_select_del(etool_select *selectfd, etool_socket *socketfd, etool_selec
 		ev.events = EPOLLIN;
 		break;
 	case ETOOL_SELECT_SEND :
-		ev.events = EPOLLOUT;
-		break;
-	case ETOOL_SELECT_LISTEN :
-		ev.events = EPOLLIN | EPOLLET;
-		break;
-	case ETOOL_SELECT_ALL :
 		ev.events = EPOLLIN | EPOLLOUT;
+		break;
+	case ETOOL_SELECT_ACCEPT :
+		ev.events = EPOLLIN | EPOLLET;
 		break;
 	default :
 		return -1;
@@ -160,14 +152,11 @@ void etool_select_wait(etool_select *selectfd, etool_selectCallback *callback, c
 		case EPOLLIN :
 			callback(events[n].data.ptr, ETOOL_SELECT_RECV);
 			break;
-		case EPOLLOUT :
+		case EPOLLIN | EPOLLOUT :
 			callback(events[n].data.ptr, ETOOL_SELECT_SEND);
 			break;
 		case EPOLLIN | EPOLLET :
-			callback(events[n].data.ptr, ETOOL_SELECT_LISTEN);
-			break;
-		case EPOLLIN | EPOLLOUT :
-			callback(events[n].data.ptr, ETOOL_SELECT_ALL);
+			callback(events[n].data.ptr, ETOOL_SELECT_ACCEPT);
 			break;
 		default :
 			epoll_ctl(selectfd->fd, EPOLL_CTL_DEL, events[n].data.fd, events + n);
