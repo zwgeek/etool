@@ -11,10 +11,16 @@
 #include <winsock2.h>
 #include <windows.h>
 #endif
-#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+#if defined(_linux) || defined(_android)
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/epoll.h>
+#include "../type/CircQueue.h"
+#endif
+#if defined(_mac) || defined(_ios)
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/event.h>
 #include "../type/CircQueue.h"
 #endif
 
@@ -22,16 +28,18 @@ typedef struct _etool_socket etool_socket;
 typedef struct _etool_socketIo etool_socketIo;
 
 #define ETOOL_SELECT_SIZE 20
-#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+#if defined(_linux) || defined(_android)
 #define ETOOL_SELECT_MOD(selectfd, sockfd, type) \
 struct epoll_event ev; \
 ev.data.ptr = sockfd; \
 ev.data.fd = sockfd->fd; \
 switch (type) { \
 case ETOOL_SELECT_RECV : \
+case ETOOL_SELECT_RECVFROM : \
 	ev.events = EPOLLIN; \
 	break; \
 case ETOOL_SELECT_SEND : \
+case ETOOL_SELECT_SENDTO : \
 	ev.events = EPOLLOUT; \
 	break; \
 case ETOOL_SELECT_ACCEPT : \
@@ -41,6 +49,26 @@ default : \
 	break; \
 } \
 epoll_ctl(selectfd->fd, EPOLL_CTL_MOD, sockfd->fd, &ev)
+#endif
+#if defined(_mac) || defined(_ios)
+#define ETOOL_SELECT_MOD(selectfd, sockfd, type) \
+struct kevent ev; \
+switch (type) { \
+case ETOOL_SELECT_RECV : \
+case ETOOL_SELECT_RECVFROM : \
+	EV_SET(&ev, sockfd->fd, EVFILT_READ, EV_CLEAR, 0, 0, (void*)sockfd); \
+	break; \
+case ETOOL_SELECT_SEND : \
+case ETOOL_SELECT_SENDTO : \
+	EV_SET(&ev, sockfd->fd, EVFILT_WRITE, EV_CLEAR, 0, 0, (void*)sockfd); \
+	break; \
+case ETOOL_SELECT_ACCEPT : \
+	EV_SET(&ev, sockfd->fd, EVFILT_READ, EV_CLEAR, 0, 0, (void*)sockfd); \
+	break; \
+default : \
+	break; \
+} \
+kevent(selectfd->fd, &ev, 1, 0, 0, 0)
 #endif
 
 typedef struct _etool_select {

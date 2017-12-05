@@ -9,8 +9,12 @@ etool_select* etool_select_create(int size)
 	selectfd->fd = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0, 0);
 #endif
 
-#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+#if defined(_linux) || defined(_android)
 	selectfd->fd = epoll_create(size);
+#endif
+
+#if defined(_mac) || defined(_ios)
+	selectfd->fd = kqueue();
 #endif
 	return selectfd;
 }
@@ -21,8 +25,12 @@ int etool_select_load(etool_select *selectfd, int size)
 	selectfd->fd = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0, 0);
 #endif
 
-#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+#if defined(_linux) || defined(_android)
 	selectfd->fd = epoll_create(size);
+#endif
+
+#if defined(_mac) || defined(_ios)
+	selectfd->fd = kqueue();
 #endif
 	return 0;
 }
@@ -84,7 +92,7 @@ int etool_select_bind(etool_select *selectfd, etool_socket *sockfd, etool_select
 	return 0;
 #endif
 
-#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+#if defined(_linux) || defined(_android)
 	struct epoll_event ev;
 	ev.data.ptr = sockfd;
 	ev.data.fd = sockfd->fd;
@@ -94,7 +102,7 @@ int etool_select_bind(etool_select *selectfd, etool_socket *sockfd, etool_select
 		ev.events = EPOLLIN;
 		break;
 	case ETOOL_SELECT_ACCEPT :
-		ev.events = EPOLLET;
+		ev.events = EPOLLIN | EPOLLET;
 		break;
 	case ETOOL_SELECT_SEND :
 	case ETOOL_SELECT_SENDTO :
@@ -103,7 +111,33 @@ int etool_select_bind(etool_select *selectfd, etool_socket *sockfd, etool_select
 	default :
 		return -1;
 	}
+	if (etool_socket_nonblock(sockfd, selectfd) != 0) {
+		return -1;
+	}
 	return epoll_ctl(selectfd->fd, EPOLL_CTL_ADD, sockfd->fd, &ev);
+#endif
+
+#if defined(_mac) || defined(_ios)
+	struct kevent ev;
+	switch (type) {
+	case ETOOL_SELECT_RECV :
+	case ETOOL_SELECT_RECVFROM :
+		EV_SET(&ev, sockfd->fd, EVFILT_READ, EV_ADD|EV_ENABLE, 0, 0, (void*)sockfd);
+		break;
+	case ETOOL_SELECT_ACCEPT :
+		EV_SET(&ev, sockfd->fd, EVFILT_READ, EV_ADD|EV_ENABLE, 0, 0, (void*)sockfd);
+		break;
+	case ETOOL_SELECT_SEND :
+	case ETOOL_SELECT_SENDTO :
+		EV_SET(&ev, sockfd->fd, EVFILT_WRITE, EV_ADD|EV_ENABLE, 0, 0, (void*)sockfd);
+		break;
+	default :
+		return -1;
+	}
+	if (etool_socket_nonblock(sockfd, selectfd) != 0) {
+		return -1;
+	}
+	return kevent(selectfd->fd, &ev, 1, 0, 0, 0);
 #endif
 }
 
@@ -126,7 +160,7 @@ int etool_select_unbind(etool_select *selectfd, etool_socket *sockfd, etool_sele
 	return 0;
 #endif
 
-#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+#if defined(_linux) || defined(_android)
 	struct epoll_event ev;
 	ev.data.ptr = sockfd;
 	ev.data.fd = sockfd->fd;
@@ -146,6 +180,26 @@ int etool_select_unbind(etool_select *selectfd, etool_socket *sockfd, etool_sele
 		return -1;
 	}
 	return epoll_ctl(selectfd->fd, EPOLL_CTL_DEL, sockfd->fd, &ev);
+#endif
+
+#if defined(_mac) || defined(_ios)
+	struct kevent ev;
+	switch (type) {
+	case ETOOL_SELECT_RECV :
+	case ETOOL_SELECT_RECVFROM :
+		EV_SET(&ev, sockfd->fd, EVFILT_READ, EV_DELETE, 0, 0, (void*)sockfd);
+		break;
+	case ETOOL_SELECT_ACCEPT :
+		EV_SET(&ev, sockfd->fd, EVFILT_READ, EV_DELETE, 0, 0, (void*)sockfd);
+		break;
+	case ETOOL_SELECT_SEND :
+	case ETOOL_SELECT_SENDTO :
+		EV_SET(&ev, sockfd->fd, EVFILT_WRITE, EV_DELETE, 0, 0, (void*)sockfd);
+		break;
+	default :
+		return -1;
+	}
+	return kevent(selectfd->fd, &ev, 1, 0, 0, 0);
 #endif
 }
 
@@ -181,7 +235,7 @@ void etool_select_wait(etool_select *selectfd, etool_selectCallback *callback, c
 	}
 #endif
 
-#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+#if defined(_linux) || defined(_android)
 	etool_socketIo *io;
 	etool_socket *sockfd;
 	struct epoll_event events[ETOOL_SELECT_SIZE];
@@ -210,6 +264,61 @@ void etool_select_wait(etool_select *selectfd, etool_selectCallback *callback, c
 			callback(acceptSockfd, 0, 0, 0, ETOOL_SELECT_ACCEPT);
 			break; }
 		case EPOLLOUT :
+			if (etool_circQueue_get(sockfd->sendBuffer, (void*)&io) != 0) {
+				ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SELECT_RECV);
+				continue;
+			}
+			if (io->type == ETOOL_SELECT_SEND) {
+				bytes = send(sockfd->fd, io->buf + io->use, io->len - io->use, 0);
+			} else {
+				bytes = sendto(sockfd->fd, io->buf + io->use, io->len - io->use, 0, (struct sockaddr*)&(io->addr), sizeof(struct sockaddr));
+			}
+			io->use += bytes;
+			if (io->use == io->len) {
+				etool_circQueue_exit(sockfd->sendBuffer, 0);
+				if (bytes == 0) { io->use = -io->use; }
+				callback(sockfd, io, io->buf, io->use, io->type);
+			}
+			break;
+		default :
+			etool_select_unbind(selectfd, sockfd, io->type);
+			break;
+		}
+	}
+#endif
+
+#if defined(_mac) || defined(_ios)
+	etool_socketIo *io;
+	etool_socket *sockfd;
+	struct kevent events[ETOOL_SELECT_SIZE];
+	struct timespec _timeout;
+	_timeout.tv_sec = timeout / 1000;
+	_timeout.tv_nsec = (timeout % 1000) * 1000 * 1000;
+	int bytes, n, nfds = kevent(selectfd->fd, 0, 0, events, ETOOL_SELECT_SIZE, &_timeout);
+	for (n = 0; n < nfds; n++) {
+		sockfd = (etool_socket*)(events[n].udata);
+		switch (events[n].filter) {
+		case EVFILT_READ :
+			if (etool_circQueue_exit(sockfd->recvBuffer, (void*)&io) != 0) {
+				continue;
+			}
+			if (io->type == ETOOL_SELECT_RECV) {
+				bytes = recv(sockfd->fd, io->buf, io->len, 0);
+			} else {
+				size_t addrlen = sizeof(struct sockaddr);
+				bytes = recvfrom(sockfd->fd, io->buf, io->len, 0, (struct sockaddr*)&(io->addr), (socklen_t*)&addrlen);
+			}
+			callback(sockfd, io, io->buf, bytes, io->type);
+			break;
+		// case EPOLLIN | EPOLLET : {
+		// 	struct sockaddr_in addr;
+		// 	etool_socket *acceptSockfd = malloc(sizeof(etool_socket));
+		// 	if (acceptSockfd == 0) { continue; }
+		// 	size_t addrlen = sizeof(struct sockaddr);
+		// 	acceptSockfd->fd = accept(sockfd->fd, (struct sockaddr*)&addr, (socklen_t*)&addrlen);
+		// 	callback(acceptSockfd, 0, 0, 0, ETOOL_SELECT_ACCEPT);
+		// 	break; }
+		case EVFILT_WRITE :
 			if (etool_circQueue_get(sockfd->sendBuffer, (void*)&io) != 0) {
 				ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SELECT_RECV);
 				continue;

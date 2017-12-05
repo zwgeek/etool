@@ -11,7 +11,7 @@ CLEANDONE = @make -f Config.mk clean;
 endif
 
 SRCS_PATH = src
-INCLUDES = -lsrc
+INCLUDES = src
 TEST_SRCS_PATH = test
 
 all :

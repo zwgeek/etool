@@ -53,9 +53,9 @@ typedef struct _etool_socket {
 	SOCKET fd;
 #endif
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	int fd;
 	etool_circQueue *recvBuffer;
 	etool_circQueue *sendBuffer;
-	int fd;
 #endif
 	etool_select *selectfd;
 } etool_socket;

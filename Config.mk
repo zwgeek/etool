@@ -18,7 +18,7 @@ D_android = -D_android
 D_ios = -D_ios
 D_windows = -D_windows -lws2_32
 
-CFLAGS = $(D_windows)
+CFLAGS = $(D_mac)
 CFLAGS += -Wall -O3 -Os -fPIC
 CFLAGS += -D_REENTRANT
 #CFLAGS += -frtti  -fexceptions
@@ -80,16 +80,16 @@ $(TARGET_TEST) : $(TEST_OBJS) $(LIB_OBJS)
 	$(CPP) -o $@ $^ $(LDFLAGS) -ldl -lrt
 
 $(COMPILE_PATH)/%.o : %.c
-	$(CC) -c $(CFLAGS) $(INCLUDES) $< -o $@
+	$(CC) -c $(CFLAGS) -I $(INCLUDES) $< -o $@
 
 $(COMPILE_PATH)/%.o : %.cpp
-	$(CPP) -c $(CFLAGS) $(INCLUDES) $< -o $@
+	$(CPP) -c $(CFLAGS) -I $(INCLUDES) $< -o $@
 
 $(COMPILE_PATH)/%.debug.o : %.c
-	$(CC) -c $(CFLAGS)  $(CFLAGS_DBG) $(INCLUDES) $< -o $@
+	$(CC) -c $(CFLAGS) $(CFLAGS_DBG) -I $(INCLUDES) $< -o $@
 
 $(COMPILE_PATH)/%.debug.o : %.cpp
-	$(CPP) -c $(CFLAGS)  $(CFLAGS_DBG) $(INCLUDES) $< -o $@
+	$(CPP) -c $(CFLAGS) $(CFLAGS_DBG) -I $(INCLUDES) $< -o $@
 
 clean :
 	$(RM) $(TARGET_A) $(TARGET_SO) $(COMPILE_PATH)
