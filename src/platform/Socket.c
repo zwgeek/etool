@@ -486,12 +486,12 @@ int etool_socket_nonblock(etool_socket *sockfd, etool_select *selectfd)
 	return 0;
 }
 
-inline etool_socketIo* etool_socketIo_create()
+etool_socketIo* etool_socketIo_create()
 {
 	return malloc(sizeof(etool_socketIo));
 }
 
-inline void etool_socketIo_destroy(etool_socketIo *io)
+void etool_socketIo_destroy(etool_socketIo *io)
 {
 	free(io);
 }

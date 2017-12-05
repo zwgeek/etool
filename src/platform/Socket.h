@@ -286,12 +286,12 @@ int etool_socket_nonblock(etool_socket *sockfd, etool_select *selectfd);
  * 创建socket的io,一个socket可以对应多个io
  * @return      [description]
  */
-inline etool_socketIo* etool_socketIo_create();
+etool_socketIo* etool_socketIo_create();
 
 /**
  * 销毁io
  * @param  io   [description]
  */
-inline void etool_socketIo_destroy(etool_socketIo *io);
+void etool_socketIo_destroy(etool_socketIo *io);
 
 #endif //ETOOL_PLATFORM_SOCKET

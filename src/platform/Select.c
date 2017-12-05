@@ -67,11 +67,11 @@ int etool_select_bind(etool_select *selectfd, etool_socket *sockfd, etool_select
 		}
 		CreateIoCompletionPort((HANDLE)(sockfd->fd), selectfd->fd, (ULONG_PTR)sockfd, 0);
 		//需要开启接收
-		char *io = malloc(sizeof(OVERLAPPED) + sizeof(etool_selectType) + sizeof(SOCKET) + (sizeof(sockaddr_in) + 16) * 2);
-		io + sizeof(OVERLAPPED) = ETOOL_SELECT_ACCEPT;
-		io + sizeof(OVERLAPPED) + sizeof(etool_selectType) = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+		char *io = malloc(sizeof(OVERLAPPED) + sizeof(etool_selectType) + sizeof(SOCKET) + (sizeof(struct sockaddr_in) + 16) * 2);
+		*(etool_selectType*)(io + sizeof(OVERLAPPED)) = ETOOL_SELECT_ACCEPT;
+		*(SOCKET*)(io + sizeof(OVERLAPPED) + sizeof(etool_selectType)) = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 		acceptEx(sockfd->fd, *(SOCKET*)(io + sizeof(OVERLAPPED) + sizeof(etool_selectType)), io + sizeof(OVERLAPPED) + sizeof(etool_selectType) + sizeof(SOCKET),
-			0, sizeof(sockaddr_in) + 16, sizeof(sockaddr_in) + 16, 0, (OVERLAPPED*)&io);
+			0, sizeof(struct sockaddr_in) + 16, sizeof(struct sockaddr_in) + 16, 0, (OVERLAPPED*)&io);
 		break; }
 	case ETOOL_SELECT_SEND :
 	case ETOOL_SELECT_RECVFROM :
@@ -110,6 +110,18 @@ int etool_select_bind(etool_select *selectfd, etool_socket *sockfd, etool_select
 int etool_select_unbind(etool_select *selectfd, etool_socket *sockfd, etool_selectType type)
 {
 #if defined(_windows)
+	static int isInit = 0;
+	static LPFN_DISCONNECTEX DisconnectEx;
+	if (isInit == 0) {
+		DWORD bytes;
+		LPFN_DISCONNECTEX DisconnectEx;
+		GUID guidDisconnectEx = WSAID_DISCONNECTEX;
+		if (WSAIoctl(sockfd->fd, SIO_GET_EXTENSION_FUNCTION_POINTER, &guidDisconnectEx,
+			sizeof(guidDisconnectEx), &DisconnectEx, sizeof(LPFN_DISCONNECTEX), &bytes, 0, 0) != 0) {
+			return -1;
+		}
+		isInit = 1;
+	}
 	DisconnectEx(sockfd->fd, 0, TF_REUSE_SOCKET, 0);
 	return 0;
 #endif
@@ -143,10 +155,10 @@ void etool_select_wait(etool_select *selectfd, etool_selectCallback *callback, c
 	DWORD bytes;
 	OVERLAPPED *io;
 	etool_socket *sockfd;
-	if (GetQueuedCompletionStatus(selectfd->fd, &bytes, (LPDWORD)&sockfd, (LPOVERLAPPED*)&io, timeout) == 0) {
+	if (GetQueuedCompletionStatus(selectfd->fd, &bytes, (PULONG_PTR)&sockfd, (LPOVERLAPPED*)&io, timeout) == 0) {
 		return;
 	}
-	etool_selectType type = *(etool_selectType*)(io + sizeof(OVERLAPPED))
+	etool_selectType type = *(etool_selectType*)(io + sizeof(OVERLAPPED));
 	switch (type) {
 	case ETOOL_SELECT_ACCEPT : {
 		etool_socket *acceptSockfd = malloc(sizeof(etool_socket));
@@ -161,7 +173,7 @@ void etool_select_wait(etool_select *selectfd, etool_selectCallback *callback, c
 	case ETOOL_SELECT_SEND :
 	case ETOOL_SELECT_RECVFROM :
 	case ETOOL_SELECT_SENDTO :
-		callback(sockfd, (etool_socketIo*)io, ((etool_socketIo*)io)->buffer->buf, bytes, type);
+		callback(sockfd, (etool_socketIo*)io, ((etool_socketIo*)io)->buffer.buf, bytes, type);
 		break;
 	default :
 		etool_select_unbind(selectfd, sockfd, type);
