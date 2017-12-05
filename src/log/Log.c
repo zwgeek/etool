@@ -7,7 +7,7 @@ void etool_log_threadProc(void *this)
 	char *msg;
 	while(etool_thread_loop(&(log->thread))) {
 		etool_mutexEx_lock(&(log->mutex));
-		if (etool_circQueue_exit(log->queue, (void*)&msg) == -1) {
+		if (etool_circQueue_exit(log->queue, (void*)&msg) != 0) {
 			etool_condition_wait(&(log->condition), &(log->mutex));
 		}
 #ifdef USE_LOG_STDOUT

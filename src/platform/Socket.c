@@ -1,4 +1,5 @@
 #include "Socket.h"
+#include "Select.h"
 
 
 etool_socket* etool_socket_create(etool_socketType type)
@@ -38,7 +39,7 @@ etool_socket* etool_socket_create(etool_socketType type)
 		free(sockfd);
 		return 0;
 	}
-	sockfd->buffer = 0;
+	sockfd->selectfd = 0;
 	return sockfd;
 }
 
@@ -75,7 +76,7 @@ int etool_socket_load(etool_socket *sockfd, etool_socketType type)
 	if (sockfd->fd == INVALID_SOCKET) {
 		return -1;
 	}
-	sockfd->buffer = 0;
+	sockfd->selectfd = 0;
 	return 0;
 }
 
@@ -172,17 +173,41 @@ etool_socket* etool_socket_accept(etool_socket *sockfd, char **ip, short *port)
 	return client;
 }
 
-int etool_socket_send(etool_socket *sockfd, char *data, int length)
+int etool_socket_send(etool_socket *sockfd, char *data, int length, etool_socketIo *io)
 {
 #if defined(_windows)
-	if (sockfd->buffer != 0) {
+	if (io != 0) {
 		DWORD sendBytes;
-		sockfd->buffer->len = length;
-		sockfd->buffer->buf = data;
-		if (WSASend(sockfd->fd, sockfd->buffer, 1, &sendBytes, 0, &(sockfd->overlapped), 0) == SOCKET_ERROR) {
+		ETOOL_SOCKET_IO_INIT(io, ETOOL_SELECT_SEND, length, data);
+		if (WSASend(sockfd->fd, &(io->buffer), 1, &sendBytes, 0, &(io->overlapped), 0) == SOCKET_ERROR) {
 			if (WSAGetLastError() != ERROR_IO_PENDING) {
 				return -1;
 			}
+			return 0;
+		}
+		return sendBytes;
+	}
+#endif
+
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	if (io != 0) {
+		if (etool_circQueue_empty(sockfd->sendBuffer) == 0) {
+			ETOOL_SOCKET_IO_INIT(io, ETOOL_SELECT_SEND, length, 0, data);
+			etool_circQueue_enter(sockfd->sendBuffer, (void*)&io);
+			return 0;
+		}
+		int sendBytes = send(sockfd->fd, data, length, 0);
+		if (sendBytes == SOCKET_ERROR) {
+			if (errno == EAGAIN) {
+				ETOOL_SOCKET_IO_INIT(io, ETOOL_SELECT_SEND, length, 0, data);
+				etool_circQueue_enter(sockfd->sendBuffer, (void*)&io);
+				ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SELECT_SEND);
+				return 0;
+			}
+		} else if (sendBytes < length) {
+			ETOOL_SOCKET_IO_INIT(io, ETOOL_SELECT_SEND, length, sendBytes, data);
+			etool_circQueue_enter(sockfd->sendBuffer, (void*)&io);
+			ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SELECT_SEND);
 			return 0;
 		}
 		return sendBytes;
@@ -191,14 +216,13 @@ int etool_socket_send(etool_socket *sockfd, char *data, int length)
 	return send(sockfd->fd, data, length, 0);
 }
 
-int etool_socket_recv(etool_socket *sockfd, char *data, int length)
+int etool_socket_recv(etool_socket *sockfd, char *data, int length, etool_socketIo *io)
 {
 #if defined(_windows)
-	if (sockfd->buffer != 0) {
+	if (io != 0) {
 		DWORD recvBytes;
-		sockfd->buffer->len = length;
-		sockfd->buffer->buf = data;
-		if (WSARecv(sockfd->fd, sockfd->buffer, 1, &recvBytes, 0, &(sockfd->overlapped), 0) == SOCKET_ERROR) {
+		ETOOL_SOCKET_IO_INIT(io, ETOOL_SELECT_RECV, length, data);
+		if (WSARecv(sockfd->fd, &(io->buffer), 1, &recvBytes, 0, &(io->overlapped), 0) == SOCKET_ERROR) {
 			if (WSAGetLastError() != ERROR_IO_PENDING) {
 				return -1;
 			}
@@ -207,35 +231,51 @@ int etool_socket_recv(etool_socket *sockfd, char *data, int length)
 		return recvBytes;
 	}
 #endif
+
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	if (io != 0) {
+		io->type = ETOOL_SELECT_RECV;
+		io->len = length;
+		io->buf = data;
+		etool_circQueue_enter(sockfd->recvBuffer, (void*)&io);
+		return 0;
+	}
+#endif
 	return recv(sockfd->fd, data, length, 0);
 }
 
-int etool_socket_sendto(etool_socket *sockfd, char *data, int length, const char *host, const short port)
+int etool_socket_sendto(etool_socket *sockfd, char *data, int length, const char *host, const short port, etool_socketIo *io)
 {
-	struct sockaddr_in addr;
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(port);
+	struct sockaddr_in *addr, _addr;
 #if defined(_windows)
-	addr.sin_addr.S_un.S_addr = host == 0 ? htonl(INADDR_ANY) : inet_addr(host);
-	if (addr.sin_addr.S_un.S_addr == INADDR_NONE && strcmp(host, "255.255.225.225") != 0) {
+	addr = &_addr;
 #endif
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
-	addr.sin_addr.s_addr = host == 0 ? htonl(INADDR_ANY) : inet_addr(host);
-	if (addr.sin_addr.s_addr == INADDR_NONE && strcmp(host, "255.255.225.225") != 0) {
+	if (io != 0) { addr = &(io->addr); } else { addr = &_addr; }
+#endif
+	addr->sin_family = AF_INET;
+	addr->sin_port = htons(port);
+#if defined(_windows)
+	addr->sin_addr.S_un.S_addr = host == 0 ? htonl(INADDR_ANY) : inet_addr(host);
+	if (addr->sin_addr.S_un.S_addr == INADDR_NONE && strcmp(host, "255.255.225.225") != 0) {
+#endif
+
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	addr->sin_addr.s_addr = host == 0 ? htonl(INADDR_ANY) : inet_addr(host);
+	if (addr->sin_addr.s_addr == INADDR_NONE && strcmp(host, "255.255.225.225") != 0) {
 #endif
 		struct hostent *ent = gethostbyname(host);
 		if (!ent) {
 			return -1;
 		}
-		addr.sin_addr = *(struct in_addr*)(ent->h_addr_list[0]);
+		addr->sin_addr = *(struct in_addr*)(ent->h_addr_list[0]);
 	}
 #if defined(_windows)
-	if (sockfd->buffer != 0) {
+	if (io != 0) {
 		DWORD sendBytes;
-		sockfd->buffer->len = length;
-		sockfd->buffer->buf = data;
-		if (WSASendTo(sockfd->fd, sockfd->buffer, 1, &sendBytes, 0, (void*)&addr, sizeof(struct sockaddr), &(sockfd->overlapped), 0) == SOCKET_ERROR) {
+		ETOOL_SOCKET_IO_INIT(io, ETOOL_SELECT_SENDTO, length, data);
+		if (WSASendTo(sockfd->fd, &(io->buffer), 1, &sendBytes, 0, (void*)addr, sizeof(struct sockaddr), &(io->overlapped), 0) == SOCKET_ERROR) {
 			if (WSAGetLastError() != ERROR_IO_PENDING) {
 				return -1;
 			}
@@ -244,36 +284,67 @@ int etool_socket_sendto(etool_socket *sockfd, char *data, int length, const char
 		return sendBytes;
 	}
 #endif
-	return sendto(sockfd->fd, data, length, 0, (struct sockaddr*)&addr, sizeof(struct sockaddr));
+
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	if (io != 0) {
+		if (etool_circQueue_empty(sockfd->sendBuffer) == 0) {
+			ETOOL_SOCKET_IO_INIT(io, ETOOL_SELECT_SENDTO, length, 0, data);
+			etool_circQueue_enter(sockfd->sendBuffer, (void*)&io);
+			return 0;
+		}
+		int sendBytes = sendto(sockfd->fd, data, length, 0, (struct sockaddr*)addr, sizeof(struct sockaddr));
+		if (sendBytes == SOCKET_ERROR) {
+			if (errno == EAGAIN) {
+				ETOOL_SOCKET_IO_INIT(io, ETOOL_SELECT_SENDTO, length, 0, data);
+				etool_circQueue_enter(sockfd->sendBuffer, (void*)&io);
+				ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SELECT_SEND);
+				return 0;
+			}
+		} else if (sendBytes < length) {
+			ETOOL_SOCKET_IO_INIT(io, ETOOL_SELECT_SENDTO, length, sendBytes, data);
+			etool_circQueue_enter(sockfd->sendBuffer, (void*)&io);
+			ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SELECT_SEND);
+			return 0;
+		}
+		return sendBytes;
+	}
+#endif
+	return sendto(sockfd->fd, data, length, 0, (struct sockaddr*)addr, sizeof(struct sockaddr));
 }
 
-int etool_socket_recvfrom(etool_socket *sockfd, char *data, int length, const char *host, const short port)
+int etool_socket_recvfrom(etool_socket *sockfd, char *data, int length, const char *host, const short port, etool_socketIo *io)
 {
-	struct sockaddr_in addr;
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(port);
+	struct sockaddr_in *addr, _addr;
 #if defined(_windows)
-	addr.sin_addr.S_un.S_addr = host == 0 ? htonl(INADDR_ANY) : inet_addr(host);
-	if (addr.sin_addr.S_un.S_addr == INADDR_NONE) {
+	addr = &_addr;
 #endif
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
-	addr.sin_addr.s_addr = host == 0 ? htonl(INADDR_ANY) : inet_addr(host);
-	if (addr.sin_addr.s_addr == INADDR_NONE) {
+	if (io != 0) { addr = &(io->addr); } else { addr = &_addr; }
+#endif
+	addr->sin_family = AF_INET;
+	addr->sin_port = htons(port);
+#if defined(_windows)
+	addr->sin_addr.S_un.S_addr = host == 0 ? htonl(INADDR_ANY) : inet_addr(host);
+	if (addr->sin_addr.S_un.S_addr == INADDR_NONE) {
+#endif
+
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	addr->sin_addr.s_addr = host == 0 ? htonl(INADDR_ANY) : inet_addr(host);
+	if (addr->sin_addr.s_addr == INADDR_NONE) {
 #endif
 		struct hostent *ent = gethostbyname(host);
 		if (!ent) {
 			return -1;
 		}
-		addr.sin_addr = *(struct in_addr*)(ent->h_addr_list[0]);
+		addr->sin_addr = *(struct in_addr*)(ent->h_addr_list[0]);
 	}
 	size_t addrlen = sizeof(struct sockaddr);
 #if defined(_windows)
-	if (sockfd->buffer != 0) {
+	if (io != 0) {
 		DWORD recvBytes;
-		sockfd->buffer->len = length;
-		sockfd->buffer->buf = data;
-		if (WSARecvFrom(sockfd->fd, sockfd->buffer, 1, &recvBytes, 0, (struct sockaddr*)&addr, (socklen_t*)&addrlen, &(sockfd->overlapped), 0) == SOCKET_ERROR) {
+		ETOOL_SOCKET_IO_INIT(io, ETOOL_SELECT_RECVFROM, length, data);
+		if (WSARecvFrom(sockfd->fd, &(io->buffer), 1, &recvBytes, 0, (struct sockaddr*)addr, (socklen_t*)&addrlen, &(io->overlapped), 0) == SOCKET_ERROR) {
 			if (WSAGetLastError() != ERROR_IO_PENDING) {
 				return -1;
 			}
@@ -282,7 +353,17 @@ int etool_socket_recvfrom(etool_socket *sockfd, char *data, int length, const ch
 		return recvBytes;
 	}
 #endif
-	return recvfrom(sockfd->fd, data, length, 0, (struct sockaddr*)&addr, (socklen_t*)&addrlen);
+
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	if (io != 0) {
+		io->type = ETOOL_SELECT_RECVFROM;
+		io->len = length;
+		io->buf = data;
+		etool_circQueue_enter(sockfd->recvBuffer, (void*)&io);
+		return 0;
+	}
+#endif
+	return recvfrom(sockfd->fd, data, length, 0, (struct sockaddr*)addr, (socklen_t*)&addrlen);
 }
 
 int etool_socket_sockname(etool_socket *sockfd, char **ip, short *port)
@@ -378,6 +459,41 @@ int etool_socket_errno()
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	return errno;
 #endif
+}
+
+int etool_socket_nonblock(etool_socket *sockfd, etool_select *selectfd)
+{
+#if defined(_windows)
+	// 首先将这个sockfd设置为非阻塞(IOCP模型不需要非阻塞)
+	// unsigned long mode = 1;
+	// if (ioctlsocket(sockfd->fd, FIONBIO, &mode) != 0) {
+	// 	return -1;
+	// }
+	// return 0;
+#endif
+
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	//首先将这个sockfd设置为非阻塞
+	int opts = fcntl(sockfd->fd, F_GETFL);
+	if (opts != 0) { return -1; }
+	if (fcntl(sockfd->fd, F_SETFL, opts | O_NONBLOCK) != 0) {
+		return -1;
+	}
+	sockfd->recvBuffer = etool_circQueue_create(sizeof(etool_socketIo*), IO_RECV_SIZE);
+	sockfd->sendBuffer = etool_circQueue_create(sizeof(etool_socketIo*), IO_SEND_SIZE);
+#endif
+	sockfd->selectfd = selectfd;
+	return 0;
+}
+
+inline etool_socketIo* etool_socketIo_create()
+{
+	return malloc(sizeof(etool_socketIo));
+}
+
+inline void etool_socketIo_destroy(etool_socketIo *io)
+{
+	free(io);
 }
 
 // #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)

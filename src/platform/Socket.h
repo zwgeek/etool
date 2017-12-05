@@ -8,7 +8,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "Select.h"
 #if defined(_windows)
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -25,25 +24,57 @@
 #include "../type/CircQueue.h"
 #endif
 
+typedef struct _etool_select etool_select;
+
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	#define INVALID_SOCKET -1
 	#define SOCKET_ERROR   -1
+	#define IO_RECV_SIZE   20
+	#define IO_SEND_SIZE   20
 #endif
 
 #define ETOOL_SOCKET_MULTICAST_IP "224.0.1.0"
+#if defined(_windows)
+#define ETOOL_SOCKET_IO_INIT(io, _type, length, data) \
+io->type = _type; \
+io->buffer.len = length; \
+io->buffer.buf = data
+#endif
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+#define ETOOL_SOCKET_IO_INIT(io, _type, length, _use, data) \
+io->type = _type; \
+io->len = length; \
+io->use = _use; \
+io->buf = data
+#endif
 
 typedef struct _etool_socket {
 #if defined(_windows)
-	OVERLAPPED overlapped;
-	WSABUF *buffer;
 	SOCKET fd;
 #endif
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
-	etool_circQueue *buffer;
+	etool_circQueue *recvBuffer;
+	etool_circQueue *sendBuffer;
 	int fd;
 #endif
 	etool_select *selectfd;
 } etool_socket;
+
+typedef struct _etool_socketIo {
+#if defined(_windows)
+	OVERLAPPED overlapped;
+	int type;
+	WSABUF buffer;
+	struct _etool_socket *sockfd;
+#endif
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	int type;
+	unsigned long len;
+	unsigned long use;
+	char *buf;
+	struct sockaddr_in addr;
+#endif
+} etool_socketIo;
 
 /**
  * linux可以支持PF_PACKET协议地址族,对数链层以太网帧头进行维护(sockaddr_ll)
@@ -112,11 +143,11 @@ int etool_socket_connect(etool_socket *sockfd, const char *host, const short por
 int etool_socket_listen(etool_socket *sockfd);
 
 /**
- * 接收连接,返回新的socket(tcp)
+ * 接收连接,返回新的socket(tcp|阻塞)
  * @param  sockfd   [description]
- * @param  ip   [description]
- * @param  port [description]
- * @return      [description]
+ * @param  ip       [description]
+ * @param  port     [description]
+ * @return          [description]
  */
 etool_socket* etool_socket_accept(etool_socket *sockfd, char **ip, short *port);
 
@@ -125,18 +156,20 @@ etool_socket* etool_socket_accept(etool_socket *sockfd, char **ip, short *port);
  * @param  sockfd [description]
  * @param  data   [description]
  * @param  length [description]
+ * @param  io     [0:走阻塞函数]
  * @return        [description]
  */
-int etool_socket_send(etool_socket *sockfd, char *data, int length);
+int etool_socket_send(etool_socket *sockfd, char *data, int length, etool_socketIo *io);
 
 /**
  * 接收数据(socket必须绑定了源地址和目标地址)
  * @param  sockfd [description]
  * @param  data   [description]
  * @param  length [description]
+ * @param  io     [0:走阻塞函数]
  * @return        [description]
  */
-int etool_socket_recv(etool_socket *sockfd, char *data, int length);
+int etool_socket_recv(etool_socket *sockfd, char *data, int length, etool_socketIo *io);
 
 /**
  * 发送数据(空socket)
@@ -145,9 +178,10 @@ int etool_socket_recv(etool_socket *sockfd, char *data, int length);
  * @param  length [description]
  * @param  host   [description]
  * @param  port   [description]
+ * @param  io     [0:走阻塞函数]
  * @return        [description]
  */
-int etool_socket_sendto(etool_socket *sockfd, char *data, int length, const char *host, const short port);
+int etool_socket_sendto(etool_socket *sockfd, char *data, int length, const char *host, const short port, etool_socketIo *io);
 
 /**
  * 接收数据(空socket)
@@ -156,9 +190,10 @@ int etool_socket_sendto(etool_socket *sockfd, char *data, int length, const char
  * @param  length [description]
  * @param  host   [description]
  * @param  port   [description]
+ * @param  io     [0:走阻塞函数]
  * @return        [description]
  */
-int etool_socket_recvfrom(etool_socket *sockfd, char *data, int length, const char *host, const short port);
+int etool_socket_recvfrom(etool_socket *sockfd, char *data, int length, const char *host, const short port, etool_socketIo *io);
 
 /**
  * 获取与套接口关联的本地协议地址
@@ -238,5 +273,25 @@ int etool_socket_shutdown(etool_socket *sockfd, const int how);
  * @return [description]
  */
 int etool_socket_errno();
+
+/**
+ * 设置socket为非阻塞
+ * @param  sockfd   [description]
+ * @param  selectfd [description]
+ * @return          [description]
+ */
+int etool_socket_nonblock(etool_socket *sockfd, etool_select *selectfd);
+
+/**
+ * 创建socket的io,一个socket可以对应多个io
+ * @return      [description]
+ */
+inline etool_socketIo* etool_socketIo_create();
+
+/**
+ * 销毁io
+ * @param  io   [description]
+ */
+inline void etool_socketIo_destroy(etool_socketIo *io);
 
 #endif //ETOOL_PLATFORM_SOCKET
