@@ -316,7 +316,7 @@ void etool_select_wait(etool_select *selectfd, etool_selectCallback *callback, c
 				acceptSockfd->fd = accept(sockfd->fd, (struct sockaddr*)&addr, (socklen_t*)&addrlen);
 				*(char**)_addr[0] = inet_ntoa(addr.sin_addr);
 				*(short*)_addr[1] = ntohs(addr.sin_port);
-				callback(acceptSockfd, sockfd->state, _addr, 2, ETOOL_SOCKET_ACCEPT);
+				callback(acceptSockfd, sockfd->state, (char*)_addr, 2, ETOOL_SOCKET_ACCEPT);
 			}
 			break;
 		case EVFILT_WRITE :
