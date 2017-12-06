@@ -6,7 +6,7 @@ etool_dblList* etool_dblList_create(const unsigned int typeSize, const unsigned 
 	etool_dblList *list = malloc(sizeof(etool_dblList));
 	if (list == 0) { return 0; }
 	list->memory = etool_memory_create(sizeof(struct _etool_dblNode) + typeSize, size);
-	if (list->memory == 0) { return 0; }
+	if (list->memory == 0) { free(list); return 0; }
 	list->previous = list->next = (struct _etool_dblNode*)list;
 	return list;
 }

@@ -63,24 +63,7 @@ int etool_select_bind(etool_select *selectfd, etool_socket *sockfd, etool_select
 #if defined(_windows)
 	switch (type) {
 	case ETOOL_SELECT_RECV :
-		CreateIoCompletionPort((HANDLE)(sockfd->fd), selectfd->fd, (ULONG_PTR)sockfd, 0);
-		break;
-	case ETOOL_SELECT_ACCEPT : {
-		DWORD bytes;
-		LPFN_ACCEPTEX acceptEx;
-		GUID guidAcceptEx = WSAID_ACCEPTEX;
-		if (WSAIoctl(sockfd->fd, SIO_GET_EXTENSION_FUNCTION_POINTER, &guidAcceptEx,
-			sizeof(guidAcceptEx), &acceptEx, sizeof(LPFN_ACCEPTEX), &bytes, 0, 0) != 0) {
-			return -1;
-		}
-		CreateIoCompletionPort((HANDLE)(sockfd->fd), selectfd->fd, (ULONG_PTR)sockfd, 0);
-		//需要开启接收
-		char *io = malloc(sizeof(OVERLAPPED) + sizeof(etool_selectType) + sizeof(SOCKET) + (sizeof(struct sockaddr_in) + 16) * 2);
-		*(etool_selectType*)(io + sizeof(OVERLAPPED)) = ETOOL_SELECT_ACCEPT;
-		*(SOCKET*)(io + sizeof(OVERLAPPED) + sizeof(etool_selectType)) = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-		acceptEx(sockfd->fd, *(SOCKET*)(io + sizeof(OVERLAPPED) + sizeof(etool_selectType)), io + sizeof(OVERLAPPED) + sizeof(etool_selectType) + sizeof(SOCKET),
-			0, sizeof(struct sockaddr_in) + 16, sizeof(struct sockaddr_in) + 16, 0, (OVERLAPPED*)&io);
-		break; }
+	case ETOOL_SELECT_ACCEPT :
 	case ETOOL_SELECT_SEND :
 	case ETOOL_SELECT_RECVFROM :
 	case ETOOL_SELECT_SENDTO :
@@ -100,18 +83,24 @@ int etool_select_bind(etool_select *selectfd, etool_socket *sockfd, etool_select
 	case ETOOL_SELECT_RECV :
 	case ETOOL_SELECT_RECVFROM :
 		ev.events = EPOLLIN;
+		if (etool_socket_nonblock(sockfd, selectfd, IO_RECV_SIZE, IO_SEND_SIZE) != 0) {
+			return -1;
+		}
 		break;
 	case ETOOL_SELECT_ACCEPT :
-		ev.events = EPOLLIN | EPOLLET;
+		ev.events = EPOLLIN;
+		if (etool_socket_nonblock(sockfd, selectfd, 1, 0) != 0) {
+			return -1;
+		}
 		break;
 	case ETOOL_SELECT_SEND :
 	case ETOOL_SELECT_SENDTO :
 		ev.events = EPOLLOUT;
+		if (etool_socket_nonblock(sockfd, selectfd, IO_RECV_SIZE, IO_SEND_SIZE) != 0) {
+			return -1;
+		}
 		break;
 	default :
-		return -1;
-	}
-	if (etool_socket_nonblock(sockfd, selectfd) != 0) {
 		return -1;
 	}
 	return epoll_ctl(selectfd->fd, EPOLL_CTL_ADD, sockfd->fd, &ev);
@@ -123,18 +112,24 @@ int etool_select_bind(etool_select *selectfd, etool_socket *sockfd, etool_select
 	case ETOOL_SELECT_RECV :
 	case ETOOL_SELECT_RECVFROM :
 		EV_SET(&ev, sockfd->fd, EVFILT_READ, EV_ADD|EV_ENABLE, 0, 0, (void*)sockfd);
+		if (etool_socket_nonblock(sockfd, selectfd, IO_RECV_SIZE, IO_SEND_SIZE) != 0) {
+			return -1;
+		}
 		break;
 	case ETOOL_SELECT_ACCEPT :
 		EV_SET(&ev, sockfd->fd, EVFILT_READ, EV_ADD|EV_ENABLE, 0, 0, (void*)sockfd);
+		if (etool_socket_nonblock(sockfd, selectfd, 1, 0) != 0) {
+			return -1;
+		}
 		break;
 	case ETOOL_SELECT_SEND :
 	case ETOOL_SELECT_SENDTO :
 		EV_SET(&ev, sockfd->fd, EVFILT_WRITE, EV_ADD|EV_ENABLE, 0, 0, (void*)sockfd);
+		if (etool_socket_nonblock(sockfd, selectfd, IO_RECV_SIZE, IO_SEND_SIZE) != 0) {
+			return -1;
+		}
 		break;
 	default :
-		return -1;
-	}
-	if (etool_socket_nonblock(sockfd, selectfd) != 0) {
 		return -1;
 	}
 	return kevent(selectfd->fd, &ev, 1, 0, 0, 0);

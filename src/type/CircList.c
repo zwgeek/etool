@@ -6,7 +6,7 @@ etool_circList* etool_circList_create(const unsigned int typeSize, const unsigne
 	etool_circList *list = malloc(sizeof(etool_circList));
 	if (list == 0) { return 0; }
 	list->memory = etool_memory_create(sizeof(struct _etool_circNode) + typeSize, size);
-	if (list->memory == 0) { return 0; }
+	if (list->memory == 0) { free(list); return 0; }
 	list->next = (struct _etool_circNode*)list;
 	return list;
 }

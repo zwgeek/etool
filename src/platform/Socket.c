@@ -158,8 +158,35 @@ int etool_socket_listen(etool_socket *sockfd)
 	return 0;
 }
 
-etool_socket* etool_socket_accept(etool_socket *sockfd, char **ip, short *port)
+etool_socket* etool_socket_accept(etool_socket *sockfd, char **ip, short *port, etool_socketIo *io)
 {
+#if defined(_windows)
+	if (io != 0) {
+		static int isInit = 0;
+		static LPFN_ACCEPTEX acceptEx;
+		if (isInit == 0) {
+			DWORD bytes;
+			GUID guidAcceptEx = WSAID_ACCEPTEX;
+			if (WSAIoctl(sockfd->fd, SIO_GET_EXTENSION_FUNCTION_POINTER, &guidAcceptEx,
+				sizeof(guidAcceptEx), &acceptEx, sizeof(LPFN_ACCEPTEX), &bytes, 0, 0) != 0) {
+				return -1;
+			}
+			isInit = 1;
+		}
+		//char *io = malloc(sizeof(OVERLAPPED) + sizeof(etool_selectType) + sizeof(SOCKET) + (sizeof(struct sockaddr_in) + 16) * 2);
+		//需要开启接收
+		io->type = ETOOL_SELECT_ACCEPT;
+		io->buffer.buf = (char*)etool_socket_create(ETOOL_SOCKET_TCP)
+		if (io->buffer.buf == 0) {
+			return -1;
+		}
+		acceptEx(sockfd->fd, ((etool_socket*)(io->buffer.buf))->fd, 0,
+			0, sizeof(struct sockaddr_in) + 16, sizeof(struct sockaddr_in) + 16, 0, (LPOVERLAPPED)&io);
+		return 0;
+	}
+#endif
+
+
 	struct sockaddr_in addr;
 	etool_socket *client = malloc(sizeof(etool_socket));
 	size_t addrlen = sizeof(struct sockaddr);
@@ -461,7 +488,7 @@ int etool_socket_errno()
 #endif
 }
 
-int etool_socket_nonblock(etool_socket *sockfd, etool_select *selectfd)
+int etool_socket_nonblock(etool_socket *sockfd, etool_select *selectfd, recvSize, sendSize)
 {
 #if defined(_windows)
 	// 首先将这个sockfd设置为非阻塞(IOCP模型不需要非阻塞)
@@ -479,8 +506,8 @@ int etool_socket_nonblock(etool_socket *sockfd, etool_select *selectfd)
 	if (fcntl(sockfd->fd, F_SETFL, opts | O_NONBLOCK) != 0) {
 		return -1;
 	}
-	sockfd->recvBuffer = etool_circQueue_create(sizeof(etool_socketIo*), IO_RECV_SIZE);
-	sockfd->sendBuffer = etool_circQueue_create(sizeof(etool_socketIo*), IO_SEND_SIZE);
+	sockfd->recvBuffer = etool_circQueue_create(sizeof(etool_socketIo*), recvSize);
+	sockfd->sendBuffer = etool_circQueue_create(sizeof(etool_socketIo*), sendSize);
 #endif
 	sockfd->selectfd = selectfd;
 	return 0;

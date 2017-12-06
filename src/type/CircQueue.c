@@ -6,7 +6,7 @@ etool_circQueue* etool_circQueue_create(const unsigned int typeSize, const unsig
 	etool_circQueue *queue = malloc(sizeof(etool_circQueue));
 	if (queue == 0) { return 0; }
 	queue->data = malloc(typeSize * size);
-	if (queue->data == 0) { return 0; }
+	if (queue->data == 0) { free(queue); return 0; }
 	queue->typeSize = typeSize;
 	queue->size = size;
 	queue->front = 0;

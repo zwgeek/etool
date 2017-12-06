@@ -6,7 +6,7 @@ etool_seqList* etool_seqList_create(const unsigned int typeSize, const unsigned 
 	etool_seqList *list = malloc(sizeof(etool_seqList));
 	if (list == 0) { return 0; }
 	list->data = malloc(typeSize * size);
-	if (list->data == 0) { return 0; }
+	if (list->data == 0) { free(list); return 0; }
 	list->typeSize = typeSize;
 	list->size = size;
 	list->length = 0;

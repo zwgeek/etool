@@ -6,7 +6,7 @@ etool_linkList* etool_linkList_create(const unsigned int typeSize, const unsigne
 	etool_linkList *list = malloc(sizeof(etool_linkList));
 	if (list == 0) { return 0; }
 	list->memory = etool_memory_create(sizeof(struct _etool_linkNode) + typeSize, size);
-	if (list->memory == 0) { return 0; }
+	if (list->memory == 0) { free(list); return 0; }
 	list->next = 0;
 	return list;
 }

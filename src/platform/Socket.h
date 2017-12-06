@@ -65,7 +65,7 @@ typedef struct _etool_socketIo {
 	OVERLAPPED overlapped;
 	int type;
 	WSABUF buffer;
-	struct _etool_socket *sockfd;
+	// struct _etool_socket *sockfd;
 #endif
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	int type;

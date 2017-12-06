@@ -6,7 +6,7 @@ etool_seqStack* etool_seqStack_create(const unsigned int typeSize, const unsigne
 	etool_seqStack *stack = malloc(sizeof(etool_seqStack));
 	if (stack == 0) { return 0; }
 	stack->data = malloc(typeSize * size);
-	if (stack->data == 0) { return 0; }
+	if (stack->data == 0) { free(stack); return 0; }
 	stack->typeSize = typeSize;
 	stack->size = size;
 	stack->top = 0;

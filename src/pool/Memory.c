@@ -6,7 +6,7 @@ etool_memory* etool_memory_create(const unsigned int typeSize, const unsigned in
 	etool_memory *memory = malloc(sizeof(etool_memory));
 	if (memory == 0) { return 0; }
 	memory->data = malloc(typeSize * size + sizeof(void*) * size);
-	if (memory->data == 0) { return 0; }
+	if (memory->data == 0) { free(memory); return 0; }
 	memory->freeAddr = (unsigned char**)(memory->data + typeSize * size);
 	int n;
 	for (n = 0; n < size; n++) {
