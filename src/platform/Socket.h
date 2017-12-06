@@ -35,46 +35,18 @@ typedef struct _etool_select etool_select;
 
 #define ETOOL_SOCKET_MULTICAST_IP "224.0.1.0"
 #if defined(_windows)
-#define ETOOL_SOCKET_IO_INIT(io, _type, length, data) \
-io->type = _type; \
+#define ETOOL_SOCKET_IO_INIT(io, operate, length, data) \
+io->op = operate; \
 io->buffer.len = length; \
 io->buffer.buf = data
 #endif
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
-#define ETOOL_SOCKET_IO_INIT(io, _type, length, _use, data) \
-io->type = _type; \
+#define ETOOL_SOCKET_IO_INIT(io, operate, length, useSize, data) \
+io->op = operate; \
 io->len = length; \
-io->use = _use; \
+io->use = useSize; \
 io->buf = data
 #endif
-
-typedef struct _etool_socket {
-#if defined(_windows)
-	SOCKET fd;
-#endif
-#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
-	int fd;
-	etool_circQueue *recvBuffer;
-	etool_circQueue *sendBuffer;
-#endif
-	etool_select *selectfd;
-} etool_socket;
-
-typedef struct _etool_socketIo {
-#if defined(_windows)
-	OVERLAPPED overlapped;
-	int type;
-	WSABUF buffer;
-	// struct _etool_socket *sockfd;
-#endif
-#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
-	int type;
-	unsigned long len;
-	unsigned long use;
-	char *buf;
-	struct sockaddr_in addr;
-#endif
-} etool_socketIo;
 
 /**
  * linux可以支持PF_PACKET协议地址族,对数链层以太网帧头进行维护(sockaddr_ll)
@@ -88,6 +60,59 @@ typedef enum {
 	ETOOL_SOCKET_IP,
 	ETOOL_SOCKET_ETHER
 } etool_socketType;
+
+typedef enum _etool_socketOp {
+	ETOOL_SOCKET_RECV = 0,
+	ETOOL_SOCKET_RECVFROM,
+	ETOOL_SOCKET_ACCEPT,
+	ETOOL_SOCKET_SEND,
+	ETOOL_SOCKET_SENDTO
+} etool_socketOp;
+
+typedef struct _etool_socketIo {
+#if defined(_windows)
+	OVERLAPPED overlapped;
+	etool_socketOp op;
+	WSABUF buffer;
+#endif
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	etool_socketOp op;
+	unsigned long len;
+	unsigned long use;
+	char *buf;
+	struct sockaddr_in addr;
+#endif
+} etool_socketIo;
+
+typedef struct _etool_socket {
+#if defined(_windows)
+	SOCKET fd;
+#endif
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	int fd;
+#endif
+	void *ptr;
+	void *state;
+	etool_select *selectfd;
+} etool_socket;
+
+typedef struct {
+#if defined(_windows)
+	char addr[(sizeof(struct sockaddr_in) + 16) * 2];
+#endif
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+#endif
+	void *_addr[2];
+} etool_socketSingle;
+
+typedef struct {
+#if defined(_windows)
+#endif
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	char recvBuffer[sizeof(etool_circQueue) + sizeof(etool_socketIo*) * IO_RECV_SIZE];
+	char sendBuffer[sizeof(etool_circQueue) + sizeof(etool_socketIo*) * IO_SEND_SIZE];
+#endif
+} etool_socketConnect;
 
 /**
  * 创建socket
@@ -147,9 +172,10 @@ int etool_socket_listen(etool_socket *sockfd);
  * @param  sockfd   [description]
  * @param  ip       [description]
  * @param  port     [description]
+ * @param  io       [description]
  * @return          [description]
  */
-etool_socket* etool_socket_accept(etool_socket *sockfd, char **ip, short *port);
+etool_socket* etool_socket_accept(etool_socket *sockfd, char **ip, short *port, etool_socketIo *io);
 
 /**
  * 发送数据(socket必须绑定了源地址和目标地址)
@@ -278,9 +304,10 @@ int etool_socket_errno();
  * 设置socket为非阻塞
  * @param  sockfd   [description]
  * @param  selectfd [description]
+ * @param  op       [description]
  * @return          [description]
  */
-int etool_socket_nonblock(etool_socket *sockfd, etool_select *selectfd);
+int etool_socket_nonblock(etool_socket *sockfd, etool_select *selectfd, etool_socketOp op);
 
 /**
  * 创建socket的io,一个socket可以对应多个io

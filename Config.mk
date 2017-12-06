@@ -18,7 +18,7 @@ D_android = -D_android
 D_ios = -D_ios
 D_windows = -D_windows -lws2_32
 
-CFLAGS = $(D_mac)
+CFLAGS = $(D_windows)
 CFLAGS += -Wall -O3 -Os -fPIC
 CFLAGS += -D_REENTRANT
 #CFLAGS += -frtti  -fexceptions

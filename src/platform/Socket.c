@@ -1,16 +1,22 @@
 #include "Socket.h"
 #include "Select.h"
 
+#if defined(_windows)
+	short g_isInit = 0;
+#endif
 
 etool_socket* etool_socket_create(etool_socketType type)
 {
 	etool_socket *sockfd = malloc(sizeof(etool_socket));
 	if (sockfd == 0) { return 0; }
 #if defined(_windows)
-	WSADATA  wsaData;
-	if (WSAStartup(MAKEWORD(2,2), &wsaData) != 0) {
-		return 0;
+	if (g_isInit == 0) {
+		WSADATA  wsaData;
+		if (WSAStartup(MAKEWORD(2,2), &wsaData) != 0) {
+			return 0;
+		}
 	}
+	g_isInit++;
 #endif
 	//windows:A socket created by the socket function will have the overlapped attribute as the default
 	switch (type) {
@@ -39,6 +45,7 @@ etool_socket* etool_socket_create(etool_socketType type)
 		free(sockfd);
 		return 0;
 	}
+	sockfd->ptr = 0;
 	sockfd->selectfd = 0;
 	return sockfd;
 }
@@ -46,9 +53,13 @@ etool_socket* etool_socket_create(etool_socketType type)
 int etool_socket_load(etool_socket *sockfd, etool_socketType type)
 {
 #if defined(_windows)
-	WSADATA  wsaData;
-	if (WSAStartup(MAKEWORD(2,2), &wsaData) != 0) {
-		return -1;
+	static short isInit = 0;
+	if (isInit == 0) {
+		WSADATA  wsaData;
+		if (WSAStartup(MAKEWORD(2,2), &wsaData) != 0) {
+			return -1;
+		}
+		isInit = 1;
 	}
 #endif
 	//windows:A socket created by the socket function will have the overlapped attribute as the default
@@ -76,6 +87,7 @@ int etool_socket_load(etool_socket *sockfd, etool_socketType type)
 	if (sockfd->fd == INVALID_SOCKET) {
 		return -1;
 	}
+	sockfd->ptr = 0;
 	sockfd->selectfd = 0;
 	return 0;
 }
@@ -84,24 +96,36 @@ void etool_socket_unload(etool_socket *sockfd)
 {
 #if defined(_windows)
 	closesocket(sockfd->fd);
-	WSACleanup();
+	g_isInit--;
+	if (g_isInit == 0) {
+		WSACleanup();
+	}
 #endif
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	close(sockfd->fd);
-#endif	
+#endif
+	if (sockfd->ptr != 0) {
+		free(sockfd->ptr);
+	}
 }
 
 void etool_socket_destroy(etool_socket *sockfd)
 {
 #if defined(_windows)
 	closesocket(sockfd->fd);
-	WSACleanup();
+	g_isInit--;
+	if (g_isInit == 0) {
+		WSACleanup();
+	}
 #endif
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	close(sockfd->fd);
 #endif
+	if (sockfd->ptr != 0) {
+		free(sockfd->ptr);
+	}
 	free(sockfd);
 }
 
@@ -162,31 +186,39 @@ etool_socket* etool_socket_accept(etool_socket *sockfd, char **ip, short *port, 
 {
 #if defined(_windows)
 	if (io != 0) {
-		static int isInit = 0;
+		static short isInit = 0;
 		static LPFN_ACCEPTEX acceptEx;
 		if (isInit == 0) {
 			DWORD bytes;
 			GUID guidAcceptEx = WSAID_ACCEPTEX;
 			if (WSAIoctl(sockfd->fd, SIO_GET_EXTENSION_FUNCTION_POINTER, &guidAcceptEx,
 				sizeof(guidAcceptEx), &acceptEx, sizeof(LPFN_ACCEPTEX), &bytes, 0, 0) != 0) {
-				return -1;
+				return 0;
 			}
 			isInit = 1;
 		}
-		//char *io = malloc(sizeof(OVERLAPPED) + sizeof(etool_selectType) + sizeof(SOCKET) + (sizeof(struct sockaddr_in) + 16) * 2);
 		//需要开启接收
-		io->type = ETOOL_SELECT_ACCEPT;
-		io->buffer.buf = (char*)etool_socket_create(ETOOL_SOCKET_TCP)
+		io->op = ETOOL_SOCKET_ACCEPT;
+		io->buffer.buf = (char*)etool_socket_create(ETOOL_SOCKET_TCP);
 		if (io->buffer.buf == 0) {
-			return -1;
+			return 0;
 		}
-		acceptEx(sockfd->fd, ((etool_socket*)(io->buffer.buf))->fd, 0,
+		((etool_socketSingle*)(sockfd->ptr))->_addr[0] = ip;
+		((etool_socketSingle*)(sockfd->ptr))->_addr[1] = port;
+		acceptEx(sockfd->fd, ((etool_socket*)(io->buffer.buf))->fd, ((etool_socketSingle*)(sockfd->ptr))->addr,
 			0, sizeof(struct sockaddr_in) + 16, sizeof(struct sockaddr_in) + 16, 0, (LPOVERLAPPED)&io);
 		return 0;
 	}
 #endif
 
-
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	if (io != 0) {
+		sockfd->state = io;
+		((etool_socketSingle*)(sockfd->ptr))->_addr[0] = ip;
+		((etool_socketSingle*)(sockfd->ptr))->_addr[1] = port;
+		return 0; 
+	}
+#endif
 	struct sockaddr_in addr;
 	etool_socket *client = malloc(sizeof(etool_socket));
 	size_t addrlen = sizeof(struct sockaddr);
@@ -205,7 +237,7 @@ int etool_socket_send(etool_socket *sockfd, char *data, int length, etool_socket
 #if defined(_windows)
 	if (io != 0) {
 		DWORD sendBytes;
-		ETOOL_SOCKET_IO_INIT(io, ETOOL_SELECT_SEND, length, data);
+		ETOOL_SOCKET_IO_INIT(io, ETOOL_SOCKET_SEND, length, data);
 		if (WSASend(sockfd->fd, &(io->buffer), 1, &sendBytes, 0, &(io->overlapped), 0) == SOCKET_ERROR) {
 			if (WSAGetLastError() != ERROR_IO_PENDING) {
 				return -1;
@@ -218,23 +250,24 @@ int etool_socket_send(etool_socket *sockfd, char *data, int length, etool_socket
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	if (io != 0) {
-		if (etool_circQueue_empty(sockfd->sendBuffer) == 0) {
-			ETOOL_SOCKET_IO_INIT(io, ETOOL_SELECT_SEND, length, 0, data);
-			etool_circQueue_enter(sockfd->sendBuffer, (void*)&io);
+		etool_circQueue *buffer = (etool_circQueue*)((etool_socketConnect*)(sockfd->ptr))->sendBuffer;
+		if (etool_circQueue_empty(buffer) == 0) {
+			ETOOL_SOCKET_IO_INIT(io, ETOOL_SOCKET_SEND, length, 0, data);
+			etool_circQueue_enter(buffer, (void*)&io);
 			return 0;
 		}
 		int sendBytes = send(sockfd->fd, data, length, 0);
 		if (sendBytes == SOCKET_ERROR) {
 			if (errno == EAGAIN) {
-				ETOOL_SOCKET_IO_INIT(io, ETOOL_SELECT_SEND, length, 0, data);
-				etool_circQueue_enter(sockfd->sendBuffer, (void*)&io);
-				ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SELECT_SEND);
+				ETOOL_SOCKET_IO_INIT(io, ETOOL_SOCKET_SEND, length, 0, data);
+				etool_circQueue_enter(buffer, (void*)&io);
+				ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SOCKET_SEND);
 				return 0;
 			}
 		} else if (sendBytes < length) {
-			ETOOL_SOCKET_IO_INIT(io, ETOOL_SELECT_SEND, length, sendBytes, data);
-			etool_circQueue_enter(sockfd->sendBuffer, (void*)&io);
-			ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SELECT_SEND);
+			ETOOL_SOCKET_IO_INIT(io, ETOOL_SOCKET_SEND, length, sendBytes, data);
+			etool_circQueue_enter(buffer, (void*)&io);
+			ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SOCKET_SEND);
 			return 0;
 		}
 		return sendBytes;
@@ -248,7 +281,7 @@ int etool_socket_recv(etool_socket *sockfd, char *data, int length, etool_socket
 #if defined(_windows)
 	if (io != 0) {
 		DWORD recvBytes;
-		ETOOL_SOCKET_IO_INIT(io, ETOOL_SELECT_RECV, length, data);
+		ETOOL_SOCKET_IO_INIT(io, ETOOL_SOCKET_RECV, length, data);
 		if (WSARecv(sockfd->fd, &(io->buffer), 1, &recvBytes, 0, &(io->overlapped), 0) == SOCKET_ERROR) {
 			if (WSAGetLastError() != ERROR_IO_PENDING) {
 				return -1;
@@ -261,10 +294,10 @@ int etool_socket_recv(etool_socket *sockfd, char *data, int length, etool_socket
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	if (io != 0) {
-		io->type = ETOOL_SELECT_RECV;
+		io->op = ETOOL_SOCKET_RECV;
 		io->len = length;
 		io->buf = data;
-		etool_circQueue_enter(sockfd->recvBuffer, (void*)&io);
+		etool_circQueue_enter((etool_circQueue*)((etool_socketConnect*)(sockfd->ptr))->recvBuffer, (void*)&io);
 		return 0;
 	}
 #endif
@@ -301,7 +334,7 @@ int etool_socket_sendto(etool_socket *sockfd, char *data, int length, const char
 #if defined(_windows)
 	if (io != 0) {
 		DWORD sendBytes;
-		ETOOL_SOCKET_IO_INIT(io, ETOOL_SELECT_SENDTO, length, data);
+		ETOOL_SOCKET_IO_INIT(io, ETOOL_SOCKET_SENDTO, length, data);
 		if (WSASendTo(sockfd->fd, &(io->buffer), 1, &sendBytes, 0, (void*)addr, sizeof(struct sockaddr), &(io->overlapped), 0) == SOCKET_ERROR) {
 			if (WSAGetLastError() != ERROR_IO_PENDING) {
 				return -1;
@@ -314,23 +347,24 @@ int etool_socket_sendto(etool_socket *sockfd, char *data, int length, const char
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	if (io != 0) {
-		if (etool_circQueue_empty(sockfd->sendBuffer) == 0) {
-			ETOOL_SOCKET_IO_INIT(io, ETOOL_SELECT_SENDTO, length, 0, data);
-			etool_circQueue_enter(sockfd->sendBuffer, (void*)&io);
+		etool_circQueue *buffer = (etool_circQueue*)((etool_socketConnect*)(sockfd->ptr))->sendBuffer;
+		if (etool_circQueue_empty(buffer) == 0) {
+			ETOOL_SOCKET_IO_INIT(io, ETOOL_SOCKET_SENDTO, length, 0, data);
+			etool_circQueue_enter(buffer, (void*)&io);
 			return 0;
 		}
 		int sendBytes = sendto(sockfd->fd, data, length, 0, (struct sockaddr*)addr, sizeof(struct sockaddr));
 		if (sendBytes == SOCKET_ERROR) {
 			if (errno == EAGAIN) {
-				ETOOL_SOCKET_IO_INIT(io, ETOOL_SELECT_SENDTO, length, 0, data);
-				etool_circQueue_enter(sockfd->sendBuffer, (void*)&io);
-				ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SELECT_SEND);
+				ETOOL_SOCKET_IO_INIT(io, ETOOL_SOCKET_SENDTO, length, 0, data);
+				etool_circQueue_enter(buffer, (void*)&io);
+				ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SOCKET_SEND);
 				return 0;
 			}
 		} else if (sendBytes < length) {
-			ETOOL_SOCKET_IO_INIT(io, ETOOL_SELECT_SENDTO, length, sendBytes, data);
-			etool_circQueue_enter(sockfd->sendBuffer, (void*)&io);
-			ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SELECT_SEND);
+			ETOOL_SOCKET_IO_INIT(io, ETOOL_SOCKET_SENDTO, length, sendBytes, data);
+			etool_circQueue_enter(buffer, (void*)&io);
+			ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SOCKET_SEND);
 			return 0;
 		}
 		return sendBytes;
@@ -370,7 +404,7 @@ int etool_socket_recvfrom(etool_socket *sockfd, char *data, int length, const ch
 #if defined(_windows)
 	if (io != 0) {
 		DWORD recvBytes;
-		ETOOL_SOCKET_IO_INIT(io, ETOOL_SELECT_RECVFROM, length, data);
+		ETOOL_SOCKET_IO_INIT(io, ETOOL_SOCKET_RECVFROM, length, data);
 		if (WSARecvFrom(sockfd->fd, &(io->buffer), 1, &recvBytes, 0, (struct sockaddr*)addr, (socklen_t*)&addrlen, &(io->overlapped), 0) == SOCKET_ERROR) {
 			if (WSAGetLastError() != ERROR_IO_PENDING) {
 				return -1;
@@ -383,10 +417,10 @@ int etool_socket_recvfrom(etool_socket *sockfd, char *data, int length, const ch
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	if (io != 0) {
-		io->type = ETOOL_SELECT_RECVFROM;
+		io->op = ETOOL_SOCKET_RECVFROM;
 		io->len = length;
 		io->buf = data;
-		etool_circQueue_enter(sockfd->recvBuffer, (void*)&io);
+		etool_circQueue_enter((etool_circQueue*)((etool_socketConnect*)(sockfd->ptr))->recvBuffer, (void*)&io);
 		return 0;
 	}
 #endif
@@ -488,10 +522,25 @@ int etool_socket_errno()
 #endif
 }
 
-int etool_socket_nonblock(etool_socket *sockfd, etool_select *selectfd, recvSize, sendSize)
+int etool_socket_nonblock(etool_socket *sockfd, etool_select *selectfd, etool_socketOp op)
 {
 #if defined(_windows)
-	// 首先将这个sockfd设置为非阻塞(IOCP模型不需要非阻塞)
+	switch (op) {
+	case ETOOL_SOCKET_RECV :
+	case ETOOL_SOCKET_RECVFROM :
+	case ETOOL_SOCKET_SEND :
+	case ETOOL_SOCKET_SENDTO : {
+		sockfd->ptr = malloc(sizeof(etool_socketConnect));
+		if (sockfd->ptr == 0) { return -1; }
+		break; }
+	case ETOOL_SOCKET_ACCEPT :
+		sockfd->ptr = malloc(sizeof(etool_socketSingle));
+		if (sockfd->ptr == 0) { return -1; }
+		break;
+	default :
+		return -1;
+	}
+	// 将这个sockfd设置为非阻塞(IOCP模型不需要非阻塞)
 	// unsigned long mode = 1;
 	// if (ioctlsocket(sockfd->fd, FIONBIO, &mode) != 0) {
 	// 	return -1;
@@ -500,15 +549,32 @@ int etool_socket_nonblock(etool_socket *sockfd, etool_select *selectfd, recvSize
 #endif
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
-	//首先将这个sockfd设置为非阻塞
+	switch (op) {
+	case ETOOL_SOCKET_RECV :
+	case ETOOL_SOCKET_RECVFROM :
+	case ETOOL_SOCKET_SEND :
+	case ETOOL_SOCKET_SENDTO : {
+		sockfd->ptr = malloc(sizeof(etool_socketConnect));
+		if (sockfd->ptr == 0) { return -1; }
+		etool_circQueue_init(((etool_socketConnect*)(sockfd->ptr))->recvBuffer, sizeof(etool_socketIo*), IO_RECV_SIZE);
+		etool_circQueue_init(((etool_socketConnect*)(sockfd->ptr))->sendBuffer, sizeof(etool_socketIo*), IO_SEND_SIZE);
+		break; }
+	case ETOOL_SOCKET_ACCEPT :
+		sockfd->ptr = malloc(sizeof(etool_socketSingle));
+		if (sockfd->ptr == 0) { return -1; }
+		break;
+	default :
+		return -1;
+	}
+	//将这个sockfd设置为非阻塞
 	int opts = fcntl(sockfd->fd, F_GETFL);
 	if (opts != 0) { return -1; }
 	if (fcntl(sockfd->fd, F_SETFL, opts | O_NONBLOCK) != 0) {
+		free(sockfd->ptr);
 		return -1;
 	}
-	sockfd->recvBuffer = etool_circQueue_create(sizeof(etool_socketIo*), recvSize);
-	sockfd->sendBuffer = etool_circQueue_create(sizeof(etool_socketIo*), sendSize);
 #endif
+	sockfd->state = 0;
 	sockfd->selectfd = selectfd;
 	return 0;
 }

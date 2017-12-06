@@ -26,24 +26,23 @@
 
 typedef struct _etool_socket etool_socket;
 typedef struct _etool_socketIo etool_socketIo;
+typedef enum _etool_socketOp etool_socketOp;
 
 #define ETOOL_SELECT_SIZE 20
 #if defined(_linux) || defined(_android)
-#define ETOOL_SELECT_MOD(selectfd, sockfd, type) \
+#define ETOOL_SELECT_MOD(selectfd, sockfd, op) \
 struct epoll_event ev; \
 ev.data.ptr = sockfd; \
 ev.data.fd = sockfd->fd; \
-switch (type) { \
-case ETOOL_SELECT_RECV : \
-case ETOOL_SELECT_RECVFROM : \
-	ev.events = EPOLLIN; \
-	break; \
-case ETOOL_SELECT_SEND : \
-case ETOOL_SELECT_SENDTO : \
+switch (op) { \
+case ETOOL_SOCKET_SEND : \
+case ETOOL_SOCKET_SENDTO : \
 	ev.events = EPOLLOUT; \
 	break; \
-case ETOOL_SELECT_ACCEPT : \
-	ev.events = EPOLLIN | EPOLLET; \
+case ETOOL_SOCKET_RECV : \
+case ETOOL_SOCKET_RECVFROM : \
+case ETOOL_SOCKET_ACCEPT : \
+	ev.events = EPOLLIN; \
 	break; \
 default : \
 	break; \
@@ -51,18 +50,16 @@ default : \
 epoll_ctl(selectfd->fd, EPOLL_CTL_MOD, sockfd->fd, &ev)
 #endif
 #if defined(_mac) || defined(_ios)
-#define ETOOL_SELECT_MOD(selectfd, sockfd, type) \
+#define ETOOL_SELECT_MOD(selectfd, sockfd, op) \
 struct kevent ev; \
-switch (type) { \
-case ETOOL_SELECT_RECV : \
-case ETOOL_SELECT_RECVFROM : \
-	EV_SET(&ev, sockfd->fd, EVFILT_READ, EV_CLEAR, 0, 0, (void*)sockfd); \
-	break; \
-case ETOOL_SELECT_SEND : \
-case ETOOL_SELECT_SENDTO : \
+switch (op) { \
+case ETOOL_SOCKET_SEND : \
+case ETOOL_SOCKET_SENDTO : \
 	EV_SET(&ev, sockfd->fd, EVFILT_WRITE, EV_CLEAR, 0, 0, (void*)sockfd); \
 	break; \
-case ETOOL_SELECT_ACCEPT : \
+case ETOOL_SOCKET_RECV : \
+case ETOOL_SOCKET_RECVFROM : \
+case ETOOL_SOCKET_ACCEPT : \
 	EV_SET(&ev, sockfd->fd, EVFILT_READ, EV_CLEAR, 0, 0, (void*)sockfd); \
 	break; \
 default : \
@@ -79,15 +76,7 @@ typedef struct _etool_select {
 	int fd;
 #endif
 } etool_select;
-
-typedef enum {
-	ETOOL_SELECT_RECV = 0,
-	ETOOL_SELECT_RECVFROM,
-	ETOOL_SELECT_ACCEPT,
-	ETOOL_SELECT_SEND,
-	ETOOL_SELECT_SENDTO
-} etool_selectType;
-typedef void etool_selectCallback(etool_socket *sockfd, etool_socketIo *io, char *data, int length, etool_selectType type);
+typedef void etool_selectCallback(etool_socket *sockfd, etool_socketIo *io, char *data, int length, etool_socketOp op);
 
 /**
  * 创建select
@@ -124,7 +113,7 @@ void etool_select_destroy(etool_select *selectfd);
  * @param  type       [description]
  * @return 
  */
-int etool_select_bind(etool_select *selectfd, etool_socket *sockfd, etool_selectType type);
+int etool_select_bind(etool_select *selectfd, etool_socket *sockfd, etool_socketOp op);
 
 /**
  * 删除socket
@@ -133,7 +122,7 @@ int etool_select_bind(etool_select *selectfd, etool_socket *sockfd, etool_select
  * @param  type       [description]
  * @return 
  */
-int etool_select_unbind(etool_select *selectfd, etool_socket *sockfd, etool_selectType type);
+int etool_select_unbind(etool_select *selectfd, etool_socket *sockfd, etool_socketOp op);
 
 /**
  * 等待轮询
@@ -153,4 +142,4 @@ void etool_select_wait(etool_select *selectfd, etool_selectCallback *callback, c
  * @param  type       [description]
  * @return 
  */
-// int etool_select_mod(etool_select *selectfd, etool_socket *sockfd, etool_selectType type);
+// int etool_select_mod(etool_select *selectfd, etool_socket *sockfd, etool_socketOp op);
