@@ -159,3 +159,26 @@ int etool_circQueue_peer_exit(etool_circQueue *queue, void *value)
 	queue->rear = (queue->rear - 1 + queue->size) % queue->size;
 	return 0;	
 }
+
+etool_circQueueIterator* etool_circQueueIterator_init(etool_circQueue *queue)
+{
+	if (queue->rear == queue->front) { return 0; }
+	etool_circQueueIterator *iterator = malloc(sizeof(etool_circQueueIterator));
+	if (iterator == 0) { return 0; }
+	iterator->data = queue->data + ((queue->front + 1)  % queue->size) * queue->typeSize;
+	iterator->queue = queue;
+	iterator->num = (queue->front + 2)  % queue->size;
+	return iterator;
+}
+
+int etool_circQueueIterator_next(etool_circQueueIterator *iterator)
+{
+	etool_circQueue *queue = iterator->queue;
+	if (queue->rear == iterator->num) {
+		free(iterator);
+		return 0;
+	}
+	iterator->data = queue->data + iterator->num * queue->typeSize;
+	iterator->num = (iterator->num + 1)  % queue->size;
+	return 1;
+}

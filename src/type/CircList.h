@@ -20,6 +20,12 @@ struct _etool_circNode {
 	struct _etool_circNode *next;
 };
 
+typedef struct _etool_circListIterator {
+	unsigned char *data;
+	struct _etool_circNode *list;
+	struct _etool_circNode *next;
+} etool_circListIterator;
+
 /**
  * 创建list (动态存储表示)
  * @param  typeSize [not null]
@@ -115,5 +121,19 @@ int etool_circList_erase(etool_circList *list, unsigned int index, void *value);
  * @param dstlist [description]
  */
 int etool_circList_copy(etool_circList *srcList, etool_circList *dstList);
+
+/**
+ * 创建迭代器
+ * @param  list [description]
+ * @return         [description]
+ */
+etool_circListIterator* etool_circListIterator_init(etool_circList *list);
+
+/**
+ * 遍历迭代器
+ * @param  iterator [description]
+ * @return          [description]
+ */
+int etool_circListIterator_next(etool_circListIterator *iterator);
 
 #endif //ETOOL_TYPE_CIRCLIST

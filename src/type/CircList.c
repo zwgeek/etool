@@ -158,3 +158,25 @@ int etool_circList_copy(etool_circList *srcList, etool_circList *dstList)
 	dstNode->next = (struct _etool_circNode*)dstList;
 	return 0;
 }
+
+etool_circListIterator* etool_circListIterator_init(etool_circList *list)
+{
+	if (list->next == (struct _etool_circNode*)list) { return 0; }
+	etool_circListIterator *iterator = malloc(sizeof(etool_circListIterator));
+	if (iterator == 0) { return 0; }
+	iterator->data = list->next->data;
+	iterator->list = (struct _etool_circNode*)list;
+	iterator->next = list->next->next;
+	return iterator;
+}
+
+int etool_circListIterator_next(etool_circListIterator *iterator)
+{
+	if (iterator->next == iterator->list) {
+		free(iterator);
+		return 0;
+	}
+	iterator->data = iterator->next->data;
+	iterator->next = iterator->next->next;
+	return 1;
+}

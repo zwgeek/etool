@@ -32,6 +32,12 @@ typedef struct _etool_circQueue {
 	unsigned int mode;
 } etool_circQueue;
 
+typedef struct _etool_circQueueIterator {
+	unsigned char *data;
+	struct _etool_circQueue *queue;
+	unsigned int num;
+} etool_circQueueIterator;
+
 /**
  * 创建queue (动态存储表示)
  * @param  typeSize [not null]
@@ -145,5 +151,19 @@ int etool_circQueue_exit(etool_circQueue *queue, void *value);
  * @return      [description]
  */
 int etool_circQueue_peer_exit(etool_circQueue *queue, void *value);
+
+/**
+ * 创建迭代器
+ * @param  queue [description]
+ * @return       [description]
+ */
+etool_circQueueIterator* etool_circQueueIterator_init(etool_circQueue *queue);
+
+/**
+ * 遍历迭代器
+ * @param  iterator [description]
+ * @return          [description]
+ */
+int etool_circQueueIterator_next(etool_circQueueIterator *iterator);
 
 #endif //ETOOL_TYPE_CIRCQUEUE
