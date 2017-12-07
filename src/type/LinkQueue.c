@@ -137,3 +137,24 @@ int etool_linkQueue_peer_exit(etool_linkQueue *queue, void *value)
 	queue->length--;
 	return 0;
 }
+
+etool_linkQueueIterator* etool_linkQueueIterator_init(etool_linkQueue *queue)
+{
+	if (queue->length == 0) { return 0; }
+	etool_linkQueueIterator *iterator = malloc(sizeof(etool_linkQueueIterator));
+	if (iterator == 0) { return 0; }
+	iterator->data = queue->front->next->data;
+	iterator->next = queue->front->next->next;
+	return iterator;
+}
+
+int etool_linkQueueIterator_next(etool_linkQueueIterator *iterator)
+{
+	if (iterator->next == 0) {
+		free(iterator);
+		return 0;
+	}
+	iterator->data = iterator->next->data;
+	iterator->next = iterator->next->next;
+	return 1;
+}

@@ -20,6 +20,12 @@ struct _etool_linkNode {
 	struct _etool_linkNode *next;
 };
 
+typedef struct _etool_linkListIterator {
+	unsigned char *data;
+	struct _etool_linkNode *next;
+} etool_linkListIterator;
+
+
 /**
  * 创建list (动态存储表示)
  * @param  typeSize [not null]
@@ -115,5 +121,19 @@ int etool_linkList_erase(etool_linkList *list, unsigned int index, void *value);
  * @param dstlist [description]
  */
 int etool_linkList_copy(etool_linkList *srcList, etool_linkList *dstList);
+
+/**
+ * 创建迭代器
+ * @param  list [description]
+ * @return         [description]
+ */
+etool_linkListIterator* etool_linkListIterator_init(etool_linkList *list);
+
+/**
+ * 遍历迭代器
+ * @param  iterator [description]
+ * @return          [description]
+ */
+int etool_linkListIterator_next(etool_linkListIterator *iterator);
 
 #endif //ETOOL_TYPE_LINKLIST

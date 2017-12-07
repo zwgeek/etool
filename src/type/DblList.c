@@ -169,3 +169,25 @@ int etool_dblList_copy(etool_dblList *srcList, etool_dblList *dstList)
 	dstNode->next = (struct _etool_dblNode*)dstList;
 	return 0;
 }
+
+etool_dblListIterator* etool_dblListIterator_init(etool_dblList *list)
+{
+	if (list->next == (struct _etool_dblNode*)list) { return 0; }
+	etool_dblListIterator *iterator = malloc(sizeof(etool_dblListIterator));
+	if (iterator == 0) { return 0; }
+	iterator->data = list->next->data;
+	iterator->list = (struct _etool_dblNode*)list;
+	iterator->next = list->next->next;
+	return iterator;
+}
+
+int etool_dblListIterator_next(etool_dblListIterator *iterator)
+{
+	if (iterator->next == iterator->list) {
+		free(iterator);
+		return 0;
+	}
+	iterator->data = iterator->next->data;
+	iterator->next = iterator->next->next;
+	return 1;
+}

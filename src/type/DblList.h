@@ -20,6 +20,12 @@ struct _etool_dblNode {
 	struct _etool_dblNode *previous, *next;
 };
 
+typedef struct _etool_dblListIterator {
+	unsigned char *data;
+	struct _etool_dblNode *list;
+	struct _etool_dblNode *next;
+} etool_dblListIterator;
+
 /**
  * 创建list (动态存储表示)
  * @param  typeSize [not null]
@@ -118,5 +124,19 @@ int etool_dblList_erase(etool_dblList *list, unsigned int index, void *value, in
  * @param dstlist [description]
  */
 int etool_dblList_copy(etool_dblList *srcList, etool_dblList *dstList);
+
+/**
+ * 创建迭代器
+ * @param  list [description]
+ * @return         [description]
+ */
+etool_dblListIterator* etool_dblListIterator_init(etool_dblList *list);
+
+/**
+ * 遍历迭代器
+ * @param  iterator [description]
+ * @return          [description]
+ */
+int etool_dblListIterator_next(etool_dblListIterator *iterator);
 
 #endif //ETOOL_TYPE_CIRCLIST

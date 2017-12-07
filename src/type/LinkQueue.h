@@ -21,6 +21,11 @@ struct _etool_linkNode {
 	struct _etool_linkNode *next;
 };
 
+typedef struct _etool_linkQueueIterator {
+	unsigned char *data;
+	struct _etool_linkNode *next;
+} etool_linkQueueIterator;
+
 /**
  * 创建queue (动态存储表示)
  * @param  typeSize [not null]
@@ -109,5 +114,19 @@ int etool_linkQueue_exit(etool_linkQueue *queue, void *value);
  * @return      [description]
  */
 int etool_linkQueue_peer_exit(etool_linkQueue *queue, void *value);
+
+/**
+ * 创建迭代器
+ * @param  queue [description]
+ * @return         [description]
+ */
+etool_linkQueueIterator* etool_linkQueueIterator_init(etool_linkQueue *queue);
+
+/**
+ * 遍历迭代器
+ * @param  iterator [description]
+ * @return          [description]
+ */
+int etool_linkQueueIterator_next(etool_linkQueueIterator *iterator);
 
 #endif //ETOOL_TYPE_LINKQUEUE

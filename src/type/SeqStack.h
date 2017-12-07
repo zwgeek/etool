@@ -37,6 +37,12 @@ typedef struct _etool_seqStack {
 	unsigned int mode;
 } etool_seqStack;
 
+typedef struct _etool_seqStackIterator {
+	unsigned char *data;
+	struct _etool_seqStack *stack;
+	unsigned int num;
+} etool_seqStackIterator;
+
 /**
  * 创建stack (动态存储表示)
  * @param  typeSize [not null]
@@ -151,5 +157,33 @@ int etool_seqStack_pop(etool_seqStack *stack, void *value);
  * @return      [description]
  */
 int etool_seqStack_other_pop(etool_seqStack *stack, void *value);
+
+/**
+ * 创建迭代器
+ * @param  stack [description]
+ * @return       [description]
+ */
+etool_seqStackIterator* etool_seqStackIterator_init(etool_seqStack *stack);
+
+/**
+ * 遍历迭代器
+ * @param  iterator [description]
+ * @return          [description]
+ */
+int etool_seqStackIterator_next(etool_seqStackIterator *iterator);
+
+/**
+ * 创建另一个迭代器
+ * @param  stack [description]
+ * @return       [description]
+ */
+etool_seqStackIterator* etool_seqStackIterator_other_init(etool_seqStack *stack);
+
+/**
+ * 遍历另一个迭代器
+ * @param  iterator [description]
+ * @return          [description]
+ */
+int etool_seqStackIterator_other_next(etool_seqStackIterator *iterator);
 
 #endif //ETOOL_TYPE_SEQSTACK

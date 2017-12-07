@@ -29,6 +29,13 @@ typedef struct _etool_seqList {
 	unsigned int mode;
 } etool_seqList;
 
+typedef struct _etool_seqListIterator {
+	unsigned char *data;
+	struct _etool_seqList *list;
+	unsigned int num;
+} etool_seqListIterator;
+
+
 /**
  * 创建list (动态存储表示)
  * @param  typeSize [not null]
@@ -138,5 +145,19 @@ int etool_seqList_erase(etool_seqList *list, const unsigned int index, void *val
  * @return      [description]
  */
 int etool_seqList_eraseEx(etool_seqList *list, const unsigned int index, void *value);
+
+/**
+ * 创建迭代器
+ * @param  list [description]
+ * @return       [description]
+ */
+etool_seqListIterator* etool_seqListIterator_init(etool_seqList *list);
+
+/**
+ * 遍历迭代器
+ * @param  iterator [description]
+ * @return          [description]
+ */
+int etool_seqListIterator_next(etool_seqListIterator *iterator);
 
 #endif //ETOOL_TYPE_SEQLIST

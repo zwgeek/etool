@@ -86,3 +86,24 @@ int etool_linkStack_pop(etool_linkStack *stack, void *value)
 	free(node);
 	return 0;
 }
+
+etool_linkStackIterator* etool_linkStackIterator_init(etool_linkStack *stack)
+{
+	if (stack->length == 0) { return 0; }
+	etool_linkStackIterator *iterator = malloc(sizeof(etool_linkStackIterator));
+	if (iterator == 0) { return 0; }
+	iterator->data = stack->top->data;
+	iterator->next = stack->top->next;
+	return iterator;
+}
+
+int etool_linkStackIterator_next(etool_linkStackIterator *iterator)
+{
+	if (iterator->next == 0) {
+		free(iterator);
+		return 0;
+	}
+	iterator->data = iterator->next->data;
+	iterator->next = iterator->next->next;
+	return 1;
+}

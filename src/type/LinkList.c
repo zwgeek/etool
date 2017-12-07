@@ -158,3 +158,24 @@ int etool_linkList_copy(etool_linkList *srcList, etool_linkList *dstList)
 	dstNode->next = 0;
 	return 0;
 }
+
+etool_linkListIterator* etool_linkListIterator_init(etool_linkList *list)
+{
+	if (list->next == 0) { return 0; }
+	etool_linkListIterator *iterator = malloc(sizeof(etool_linkListIterator));
+	if (iterator == 0) { return 0; }
+	iterator->data = list->next->data;
+	iterator->next = list->next->next;
+	return iterator;
+}
+
+int etool_linkListIterator_next(etool_linkListIterator *iterator)
+{
+	if (iterator->next == 0) {
+		free(iterator);
+		return 0;
+	}
+	iterator->data = iterator->next->data;
+	iterator->next = iterator->next->next;
+	return 1;
+}

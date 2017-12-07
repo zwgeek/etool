@@ -180,3 +180,25 @@ int etool_seqList_eraseEx(etool_seqList *list, const unsigned int index, void *v
 	return 0;
 }
 
+etool_seqListIterator* etool_seqListIterator_init(etool_seqList *list)
+{
+	if (list->length == 0) { return 0; }
+	etool_seqListIterator *iterator = malloc(sizeof(etool_seqListIterator));
+	if (iterator == 0) { return 0; }
+	iterator->data = list->data;
+	iterator->list = list;
+	iterator->num = 1;
+	return iterator;
+}
+
+int etool_seqListIterator_next(etool_seqListIterator *iterator)
+{
+	etool_seqList *list = iterator->list;
+	if (list->length == iterator->num) {
+		free(iterator);
+		return 0;
+	}
+	iterator->data = list->data + iterator->num * list->typeSize;
+	iterator->num++;
+	return 1;
+}

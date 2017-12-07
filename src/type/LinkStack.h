@@ -20,6 +20,12 @@ struct _etool_linkNode {
 	struct _etool_linkNode *next;
 };
 
+typedef struct _etool_linkStackIterator {
+	unsigned char *data;
+	struct _etool_linkNode *next;
+} etool_linkStackIterator;
+
+
 /**
  * 创建stack (动态存储表示)
  * @param  typeSize [not null]
@@ -78,5 +84,19 @@ int etool_linkStack_push(etool_linkStack *stack, void *value);
  * @return      [description]
  */
 int etool_linkStack_pop(etool_linkStack *stack, void *value);
+
+/**
+ * 创建迭代器
+ * @param  stack [description]
+ * @return         [description]
+ */
+etool_linkStackIterator* etool_linkStackIterator_init(etool_linkStack *stack);
+
+/**
+ * 遍历迭代器
+ * @param  iterator [description]
+ * @return          [description]
+ */
+int etool_linkStackIterator_next(etool_linkStackIterator *iterator);
 
 #endif //ETOOL_TYPE_LINKSTACK
