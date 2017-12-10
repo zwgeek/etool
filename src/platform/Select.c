@@ -16,6 +16,10 @@ etool_select* etool_select_create(int size)
 #if defined(_mac) || defined(_ios)
 	selectfd->fd = kqueue();
 #endif
+	if (selectfd->fd == 0) {
+		free(selectfd);
+		return 0;
+	}
 	return selectfd;
 }
 
@@ -32,6 +36,9 @@ int etool_select_load(etool_select *selectfd, int size)
 #if defined(_mac) || defined(_ios)
 	selectfd->fd = kqueue();
 #endif
+	if (selectfd->fd == 0) {
+		return -1;
+	}
 	return 0;
 }
 

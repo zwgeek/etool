@@ -124,6 +124,7 @@ void etool_log_async_printf(etool_log *log, etool_logLevel level, const char *fm
 		return;		
 	}
 	char *msg = malloc(sizeof(char) * ETOOL_LOG_MSG_SIZE);
+	if (msg == 0) { return; }
 	va_list argList;
 	va_start(argList, fmt);
 	vsprintf(msg, fmt, argList);
