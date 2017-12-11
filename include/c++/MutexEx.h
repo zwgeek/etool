@@ -15,7 +15,7 @@ class CMutexEx
 	CMutexEx& operator=(const CMutexEx &mutex) { this->m_mutex = mutex.m_mutex; return *this; }
 public:
 	friend class CCondition;
-	CMutexEx() { m_mutex = etool_mutexEx_create(); }
+	CMutexEx() : m_mutex(etool_mutexEx_create()) {}
 	~CMutexEx() { etool_mutexEx_destroy(m_mutex); }
 
 	inline void lock() { etool_mutexEx_lock(m_mutex); }

@@ -15,7 +15,7 @@ class CMemory {
 	CMemory& operator=(const CMemory &memory) { this->m_memory = memory.m_memory; return *this; }
 
 public:
-	CMemory(const unsigned int typeSize, const unsigned int size) { m_memory = etool_memory_create(typeSize, size); }
+	CMemory(const unsigned int typeSize, const unsigned int size) : m_memory(etool_memory_create(typeSize, size)) {}
 	~CMemory() { etool_memory_destroy(m_memory); }
 
 	inline void  clear() { etool_memory_clear(m_memory); }

@@ -6,49 +6,46 @@
 #ifndef ETOOL_READWRITEMUTEX
 #define ETOOL_READWRITEMUTEX
 
+typedef struct _etool_readWriteMutex etool_readWriteMutex;
 namespace etool {
 
-class CMutex;
-class CRecursiveMutex;
 class CReadWriteMutex
 {
-	CReadWriteMutex(const CReadWriteMutex&);
-	CReadWriteMutex& operator=(const CReadWriteMutex&);
+	CReadWriteMutex(const CReadWriteMutex &mutex) { this->m_mutex = mutex.m_mutex; }
+	CReadWriteMutex& operator=(const CReadWriteMutex&) { this->m_mutex = mutex.m_mutex; return *this; }
 public:
-	CReadWriteMutex();
-	~CReadWriteMutex();
+	CReadWriteMutex() : m_mutex(etool_readWriteMutex_create()) {}
+	~CReadWriteMutex() { etool_readWriteMutex_destroy(m_mutex); }
 
-	void lockRead();
-	bool trylockRead();
-	void unlockRead();
-	void lockWrite();
-	bool trylockWrite();
-	void unlockWrite();
+	inline void lockRead() { etool_readWriteMutex_lockRead(m_mutex); }
+	inline int trylockRead() { return etool_readWriteMutex_trylockRead(m_mutex); }
+	inline void unlockRead() { etool_readWriteMutex_unlockRead(m_mutex); }
+	inline void lockWrite() { etool_readWriteMutex_lockWrite(m_mutex); }
+	inline int trylockWrite() { return etool_readWriteMutex_trylockWrite(m_mutex); }
+	inline void unlockWrite() { etool_readWriteMutex_unlockWrite(m_mutex); }
 
 private:
-	int                           m_readCount;
-	CMutex                  m_readMutex;
-	CRecursiveMutex m_writeMutex;
+	etool_readWriteMutex *m_mutex;
 };
 
 class CReadMutexGuard
 {
 public:
-	CReadMutexGuard(CRecursiveMutex &mutex) : m_mutex(mutex) { m_mutex.lockRead(); }
-	~CReadMutexGuard() { m_mutex.unlockRead(); }
+	CReadMutexGuard(CReadWriteMutex &mutex) : mc_mutex(mutex) { mc_mutex.lockRead(); }
+	~CReadMutexGuard() { mc_mutex.unlockRead(); }
 
 private:
-	CRecursiveMutex &m_mutex;
+	CReadWriteMutex &mc_mutex;
 };
 
 class CWriteMutexGuard
 {
 public:
-	CReadMutexGuard(CRecursiveMutex &mutex) : m_mutex(mutex) { m_mutex.lockWrite(); }
-	~CReadMutexGuard() { m_mutex.unlockWrite(); }
+	CReadMutexGuard(CReadWriteMutex &mutex) : mc_mutex(mutex) { mc_mutex.lockWrite(); }
+	~CReadMutexGuard() { mc_mutex.unlockWrite(); }
 	
 private:
-	CRecursiveMutex &m_mutex;
+	CReadWriteMutex &mc_mutex;
 };
 } //etool
 #endif //ETOOL_READWRITEMUTEX

@@ -13,7 +13,7 @@ class CAtomic {
 	CAtomic(const CAtomic &atomic) { this->m_atomic = atomic.m_atomic; }
 	CAtomic& operator=(const CAtomic &atomic) {}
 public:
-	CAtomic(int count = 0) { m_atomic = etool_atomic_create(count); }
+	CAtomic(int count = 0) : m_atomic = etool_atomic_create(count)) {}
 	~CAtomic() { etool_atomic_destroy(m_atomic); }
 
 	inline int inc() { return etool_atomic_inc(m_atomic); }

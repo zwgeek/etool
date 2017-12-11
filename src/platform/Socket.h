@@ -119,7 +119,7 @@ typedef struct {
  * @param  type [description]
  * @return      [description]
  */
-etool_socket* etool_socket_create(etool_socketType type);
+etool_socket* etool_socket_create(const etool_socketType type);
 
 /**
  * 装载
@@ -127,7 +127,7 @@ etool_socket* etool_socket_create(etool_socketType type);
  * @param  type   [description]
  * @return        [description]
  */
-int etool_socket_load(etool_socket *sockfd, etool_socketType type);
+int etool_socket_load(etool_socket *sockfd, const etool_socketType type);
 
 /**
  * 卸载

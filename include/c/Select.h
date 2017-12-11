@@ -18,7 +18,7 @@ typedef void etool_selectCallback(etool_socket *sockfd, etool_socketIo *io, char
  * @param  size       [description]
  * @return            [description]
  */
-etool_select* etool_select_create(int size);
+etool_select* etool_select_create(const int size);
 
 /**
  * 创建select
@@ -48,7 +48,7 @@ void etool_select_destroy(etool_select *selectfd);
  * @param  type       [description]
  * @return 
  */
-int etool_select_bind(etool_select *selectfd, etool_socket *sockfd, etool_socketOp op);
+int etool_select_bind(etool_select *selectfd, etool_socket *sockfd, const etool_socketOp op);
 
 /**
  * 删除socket
@@ -57,7 +57,7 @@ int etool_select_bind(etool_select *selectfd, etool_socket *sockfd, etool_socket
  * @param  type       [description]
  * @return 
  */
-int etool_select_unbind(etool_select *selectfd, etool_socket *sockfd, etool_socketOp op);
+int etool_select_unbind(etool_select *selectfd, etool_socket *sockfd, const etool_socketOp op);
 
 /**
  * 等待轮询

@@ -14,7 +14,7 @@ class CMutex
 	CMutex(const CMutex &mutex) { this->m_mutex = mutex.m_mutex; }
 	CMutex& operator=(const CMutex &mutex) { this->m_mutex = mutex.m_mutex; return *this; }
 public:
-	CMutex() { m_mutex = etool_mutex_create(); }
+	CMutex() : m_mutex(etool_mutex_create()) {}
 	~CMutex() { etool_mutex_destroy(m_mutex); }
 
 	inline void lock() { etool_mutex_lock(m_mutex); }

@@ -14,7 +14,7 @@ class CCondition
 	CCondition(const CCondition &condition) { this->m_condition = condition.m_condition; }
 	CCondition& operator=(const CCondition &condition) { this->m_condition = condition.m_condition; return *this; }
 public:
-	CCondition() { m_condition = etool_condition_create(); }
+	CCondition() : m_condition(etool_condition_create()) {}
 	~CCondition() { etool_condition_destroy(m_condition); }
 
 	inline void wait(CMutex *mutex) { etool_condition_wait(m_condition, mutex->m_mutex); }

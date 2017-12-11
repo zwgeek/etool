@@ -30,7 +30,7 @@ class CLog {
 	CLog& operator=(const CLog &log) { this->m_log = log.m_log; return *this; }
 
 public:
-	CLog(const char *path = "./", const etool_logLevel level = ETOOL_LOG_DEBUG) { m_log = etool_log_create(path, level); }
+	CLog(const char *path = "./", const etool_logLevel level = ETOOL_LOG_DEBUG) : m_log(etool_log_create(path, level)) {}
 	~CLog() { etool_log_destroy(m_log); }
 
 	inline  int setPath(const char *path) { return etool_log_path(m_log, path); }

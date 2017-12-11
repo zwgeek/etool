@@ -5,7 +5,7 @@
 	short g_isInit = 0;
 #endif
 
-etool_socket* etool_socket_create(etool_socketType type)
+etool_socket* etool_socket_create(const etool_socketType type)
 {
 	etool_socket *sockfd = malloc(sizeof(etool_socket));
 	if (sockfd == 0) { return 0; }
@@ -50,7 +50,7 @@ etool_socket* etool_socket_create(etool_socketType type)
 	return sockfd;
 }
 
-int etool_socket_load(etool_socket *sockfd, etool_socketType type)
+int etool_socket_load(etool_socket *sockfd, const etool_socketType type)
 {
 #if defined(_windows)
 	static short isInit = 0;

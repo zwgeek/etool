@@ -1,7 +1,7 @@
 #include "Select.h"
 #include "Socket.h"
 
-etool_select* etool_select_create(int size)
+etool_select* etool_select_create(const int size)
 {
 	etool_select *selectfd = malloc(sizeof(etool_select));
 	if (selectfd == 0) { return 0; }
@@ -23,7 +23,7 @@ etool_select* etool_select_create(int size)
 	return selectfd;
 }
 
-int etool_select_load(etool_select *selectfd, int size)
+int etool_select_load(etool_select *selectfd, const int size)
 {
 #if defined(_windows)
 	selectfd->fd = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0, 0);
@@ -65,7 +65,7 @@ void etool_select_destroy(etool_select *selectfd)
 	free(selectfd);
 }
 
-int etool_select_bind(etool_select *selectfd, etool_socket *sockfd, etool_socketOp op)
+int etool_select_bind(etool_select *selectfd, etool_socket *sockfd, const etool_socketOp op)
 {
 #if defined(_windows)
 	switch (op) {
@@ -127,7 +127,7 @@ int etool_select_bind(etool_select *selectfd, etool_socket *sockfd, etool_socket
 #endif
 }
 
-int etool_select_unbind(etool_select *selectfd, etool_socket *sockfd, etool_socketOp op)
+int etool_select_unbind(etool_select *selectfd, etool_socket *sockfd, const etool_socketOp op)
 {
 #if defined(_windows)
 	// static short isInit = 0;
