@@ -99,7 +99,7 @@ void etool_log_flush(etool_log *log)
 }
 
 //const char *fileName, const int lineNum, const char *functionName
-void etool_log_printf(etool_log *log, etool_logLevel level, const char *fmt, ...)
+void etool_log_printf(etool_log *log, const etool_logLevel level, const char *fmt, ...)
 {
 	if (level > log->level) {
 		return;		
@@ -118,7 +118,7 @@ void etool_log_printf(etool_log *log, etool_logLevel level, const char *fmt, ...
 	fwrite(msg, sizeof(char), strlen(msg), log->file);
 }
 
-void etool_log_async_printf(etool_log *log, etool_logLevel level, const char *fmt, ...)
+void etool_log_async_printf(etool_log *log, const etool_logLevel level, const char *fmt, ...)
 {
 	if (level > log->level) {
 		return;		

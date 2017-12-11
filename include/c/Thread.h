@@ -3,34 +3,11 @@
  * 线程
  */
 
-#ifndef ETOOL_PLATFORM_THREAD
-#define ETOOL_PLATFORM_THREAD
-
-#include <stdlib.h>
-#if defined(_windows)
-#include <windows.h>
-#include <process.h>
-#endif
-#if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
-#include <pthread.h>
-#endif
+#ifndef ETOOL_THREAD
+#define ETOOL_THREAD
 
 typedef void etool_threadProc(void *param);
-typedef struct _etool_thread {
-	short loop;
-#if defined(_windows)
-	HANDLE thread;
-#endif
-#if defined(_linux) || defined(_android) || defined(_mac) || defined(_ios)
-	pthread_t thread;
-#endif
-} etool_thread;
-
-struct _etool_threadAttr
-{
-	etool_threadProc *proc;
-	void *param;
-};
+typedef struct _etool_thread etool_thread;
 
 /**
  * 获取线程ID
@@ -96,4 +73,4 @@ int etool_thread_cancel(etool_thread *thread);
  */
 void etool_thread_terminate(etool_thread *thread);
 
-#endif //ETOOL_PLATFORM_THREAD
+#endif //ETOOL_THREAD

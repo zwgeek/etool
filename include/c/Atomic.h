@@ -1,0 +1,79 @@
+/**
+ * Copyright 2017, PaPa.  All rights reserved.
+ * 原子计数器
+ */
+
+#ifndef ETOOL_ATOMIC
+#define ETOOL_ATOMIC
+
+typedef struct _etool_atomic etool_atomic;
+
+/**
+ * 创建
+ * @return       [实体]
+ */
+etool_atomic* etool_atomic_create(const int count);
+
+/**
+ * 装载
+ * @param atomic [not null]
+ * @param count  [not null]
+ * @return
+ */
+int etool_atomic_load(etool_atomic *atomic, const int count);
+
+/**
+ * 卸载
+ * @param atomic [not null]
+ */
+void etool_atomic_unload(etool_atomic *atomic);
+
+/**
+ * 销毁
+ * @param atomic [not null]
+ */
+void etool_atomic_destroy(etool_atomic *atomic);
+
+/**
+ * 自增
+ * @param atomic [not null]
+ */
+int etool_atomic_inc(etool_atomic *atomic);
+
+/**
+ * 自减
+ * @param atomic [not null]
+ */
+int etool_atomic_dec(etool_atomic *atomic);
+
+/**
+ * 增
+ * @param atomic [not null]
+ */
+int etool_atomic_add(etool_atomic *atomic, const int count);
+
+/**
+ * 减
+ * @param atomic [not null]
+ */
+int etool_atomic_sub(etool_atomic *atomic, const int count);
+
+/**
+ * 或运算(位)
+ * @param atomic [not null]
+ */
+int etool_atomic_or(etool_atomic *atomic, const int count);
+
+/**
+ * 与运算(位)
+ * @param atomic [not null]
+ */
+int etool_atomic_and(etool_atomic *atomic, const int count);
+
+/**
+ * 异或运算(位)
+ * @param atomic [not null]
+ */
+int etool_atomic_xor(etool_atomic *atomic, const int count);
+
+#endif //ETOOL_ATOMIC

@@ -6,17 +6,12 @@
 #ifndef ETOOL_LOG
 #define ETOOL_LOG
 
-#include <stdio.h>
-#include <string.h>
-#include <stdarg.h>
-#include "Stdout.h"
-#include "../type/CircQueue.h"
-#include "../platform/Mutex.h"
-#include "../platform/Condition.h"
-#include "../platform/Thread.h"
-
-#define ETOOL_LOG_MSG_SIZE 50
-#define ETOOL_LOG_QUEUE_SIZE 50
+#define VERBOSE(fmt, ...) etool_log_printf(g_log, ETOOL_LOG_VERBOSE, "__FILE__:__FUNCTION__:%05d--verbose: "fmt"\n", __LINE__, ##__VA_ARGS__)
+#define DEBUG(fmt, ...)   etool_log_printf(g_log, ETOOL_LOG_DEBUG, "__FILE__:__FUNCTION__:%05d--debug: "fmt"\n", __LINE__, ##__VA_ARGS__)
+#define INFO(fmt, ...)    etool_log_printf(g_log, ETOOL_LOG_INFO, "__FILE__:__FUNCTION__:%05d--info: "fmt"\n", __LINE__, ##__VA_ARGS__)
+#define WARN(fmt, ...)    etool_log_printf(g_log, ETOOL_LOG_WARN, "__FILE__:__FUNCTION__:%05d--warn: "fmt"\n", __LINE__, ##__VA_ARGS__)
+#define ERR(fmt, ...)     etool_log_printf(g_log, ETOOL_LOG_ERR, "__FILE__:__FUNCTION__:%05d--err: "fmt"\n", __LINE__, ##__VA_ARGS__)
+#define FATAL(fmt, ...)   etool_log_printf(g_log, ETOOL_LOG_FATAL, "__FILE__:__FUNCTION__:%05d--fatal: "fmt"\n", __LINE__, ##__VA_ARGS__)
 
 typedef enum _etool_logLevel {
 	ETOOL_LOG_VERBOSE = 0,
@@ -27,15 +22,7 @@ typedef enum _etool_logLevel {
 	ETOOL_LOG_FATAL
 } etool_logLevel;
 
-typedef struct _etool_log {
-	FILE *file;
-	char path[128];
-	enum _etool_logLevel level;
-	struct _etool_circQueue *queue;
-	struct _etool_mutexEx mutex;
-	struct _etool_condition condition;
-	struct _etool_thread thread;
-} etool_log;
+typedef struct _etool_log etool_log;
 
 /**
  * 日志模块打开
@@ -87,5 +74,8 @@ void etool_log_printf(etool_log *log, const etool_logLevel level, const char *fm
  * @param fmt [not null]
  */
 void etool_log_async_printf(etool_log *log, const etool_logLevel level, const char *fmt, ...);
+
+//声明一个log,跟宏搭配使用,建议这种用法
+extern etool_log *g_log;
 
 #endif //ETOOL_LOG

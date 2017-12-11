@@ -44,7 +44,7 @@ void etool_thread_destroy(etool_thread *thread)
 	free(thread);
 }
 
-int etool_thread_loop(etool_thread *thread)
+short etool_thread_loop(etool_thread *thread)
 {
 	return thread->loop;
 }
