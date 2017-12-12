@@ -12,20 +12,25 @@ AR	= @echo ar 	$@; $(CROSS)ar
 RM	= @echo rm 	$@; rm -rf
 STRIP	= @echo strip 	$@; $(CROSS)strip
 
-D_linux = -D_linux
-D_mac = -D_mac
-D_android = -D_android
-D_ios = -D_ios
-D_windows = -D_windows -lws2_32
-
-CFLAGS = $(D_windows)
+CFLAGS = -D_$(SYSTEM)
 CFLAGS += -Wall -O3 -Os -fPIC
 CFLAGS += -D_REENTRANT
 #CFLAGS += -frtti  -fexceptions
 CFLAGS_DBG := -g -ggdb
 
 AFLAGS += -r
-#LDFLAGS += -lc
+#LDFLAGS := -lc
+ifeq ($(SYSTEM), linux)
+LDFLAGS += -lpthread -ldl -lrt
+else ifeq ($(SYSTEM), mac)
+LDFLAGS += -lpthread -ldl -lrt
+else ifeq ($(SYSTEM), android)
+LDFLAGS += -lpthread -ldl -lrt
+else ifeq ($(SYSTEM), ios)
+LDFLAGS += -lpthread -ldl -lrt
+else ifeq ($(SYSTEM), windows)
+LDFLAGS += -lws2_32
+endif
 
 LIBDIR  := ./lib/$(CROSS)
 BINDIR  := ./bin/$(CROSS)
@@ -65,7 +70,7 @@ $(TARGET_A) : $(VERSION) $(LIB_OBJS)
 
 $(TARGET_SO) : $(VERSION) $(LIB_OBJS)
 	$(RM) $@;
-	$(CPP) -o $@ $(LIB_OBJS) $(LDFLAGS) $(CFLAGS) -shared
+	$(CPP) -o $@ $(LIB_OBJS) $(LDFLAGS) -shared
 
 $(TARGET_DEBUG_A) : $(VERSION) $(LIB_DEBUG_OBJS)
 	$(RM) $@;
@@ -73,11 +78,11 @@ $(TARGET_DEBUG_A) : $(VERSION) $(LIB_DEBUG_OBJS)
 
 $(TARGET_DEBUG_SO) : $(VERSION) $(LIB_DEBUG_OBJS)
 	$(RM) $@;
-	$(CPP) -o $@ $(LIB_DEBUG_OBJS) $(LDFLAGS) $(CFLAGS) -shared
+	$(CPP) -o $@ $(LIB_DEBUG_OBJS) $(LDFLAGS) -shared
 
 $(TARGET_TEST) : $(TEST_OBJS) $(LIB_OBJS)
 	$(RM) $@;
-	$(CPP) -o $@ $^ $(LDFLAGS) -ldl -lrt
+	$(CPP) -o $@ $^ $(LDFLAGS)
 
 $(COMPILE_PATH)/%.o : %.c
 	$(CC) -c $(CFLAGS) -I $(INCLUDES) $< -o $@
