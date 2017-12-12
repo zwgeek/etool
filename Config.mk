@@ -23,11 +23,11 @@ AFLAGS += -r
 ifeq ($(SYSTEM), linux)
 LDFLAGS += -lpthread -ldl -lrt
 else ifeq ($(SYSTEM), mac)
-LDFLAGS += -lpthread -ldl -lrt
+LDFLAGS += -lpthread -ldl
 else ifeq ($(SYSTEM), android)
 LDFLAGS += -lpthread -ldl -lrt
 else ifeq ($(SYSTEM), ios)
-LDFLAGS += -lpthread -ldl -lrt
+LDFLAGS += -lpthread -ldl
 else ifeq ($(SYSTEM), windows)
 LDFLAGS += -lws2_32
 endif
