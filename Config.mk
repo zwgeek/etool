@@ -51,10 +51,10 @@ TEST_OBJS += $(patsubst %.cpp, $(COMPILE_PATH)/%.o, $(TEST_SRCS))
 $(shell mkdir -p $(LIBDIR))
 $(shell mkdir -p $(BINDIR))
 $(foreach dir, $(wildcard $(SRCS_PATH)/*), $(shell mkdir -p $(COMPILE_PATH)/$(dir)))
-
+$(shell mkdir -p $(COMPILE_PATH)/$(TEST_SRCS_PATH))
 
 #compile
-all : $(TARGET_A) $(TARGET_SO) #$(TARGET_TEST)
+all : $(TARGET_A) $(TARGET_SO) $(TARGET_TEST)
 debug :  $(TARGET_DEBUG_A) $(TARGET_DEBUG_SO)
 $(VERSION) :
 	echo The gitversion :  && git reflog
