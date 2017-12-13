@@ -44,12 +44,12 @@ int etool_circList_length(etool_circList *list)
 
 int etool_circList_empty(etool_circList *list)
 {
-	return (list->next == (struct _etool_circNode*)list) ? 1 : 0;
+	return list->next == (struct _etool_circNode*)list;
 }
 
 int etool_circList_full(etool_circList *list)
 {
-	return (list->memory->length == list->memory->size) ? 1 : 0;
+	return list->memory->length == list->memory->size;
 }
 
 void* etool_circList_find(etool_circList *list, unsigned int index)

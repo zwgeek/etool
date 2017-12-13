@@ -44,12 +44,12 @@ int etool_dblList_length(etool_dblList *list)
 
 int etool_dblList_empty(etool_dblList *list)
 {
-	return (list->next == (struct _etool_dblNode*)list) ? 1 : 0;
+	return list->next == (struct _etool_dblNode*)list;
 }
 
 int etool_dblList_full(etool_dblList *list)
 {
-	return (list->memory->length == list->memory->size) ? 1 : 0;
+	return list->memory->length == list->memory->size;
 }
 
 void* etool_dblList_find(etool_dblList *list, unsigned int index, int direction)

@@ -49,14 +49,12 @@ int etool_seqList_length(etool_seqList *list)
 
 int etool_seqList_empty(etool_seqList *list)
 {
-	//1为真, 0为假
-	return (list->length == 0) ? 1 : 0;
+	return list->length == 0;
 }
 
 int etool_seqList_full(etool_seqList *list)
 {
-	//1为真, 0为假
-	return (list->length == list->size) ? 1 : 0;
+	return list->length == list->size;
 }
 
 void* etool_seqList_find(etool_seqList *list, const unsigned int index)

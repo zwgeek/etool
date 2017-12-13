@@ -57,14 +57,12 @@ int etool_seqStack_other_length(etool_seqStack *stack)
 
 int etool_seqStack_empty(etool_seqStack *stack)
 {
-	//1为真, 0为假
-	return (stack->top == 0 && stack->bottom == stack->size) ? 1 : 0;
+	return stack->top == 0 && stack->bottom == stack->size;
 }
 
 int etool_seqStack_full(etool_seqStack *stack)
 {
-	//1为真, 0为假
-	return (stack->top == stack->bottom) ? 1 : 0;
+	return stack->top == stack->bottom;
 }
 
 int etool_seqStack_get(etool_seqStack *stack, void *value)

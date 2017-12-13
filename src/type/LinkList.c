@@ -44,12 +44,12 @@ int etool_linkList_length(etool_linkList *list)
 
 int etool_linkList_empty(etool_linkList *list)
 {
-	return (list->next == 0) ? 1 : 0;
+	return list->next == 0;
 }
 
 int etool_linkList_full(etool_linkList *list)
 {
-	return (list->memory->length == list->memory->size) ? 1 : 0;
+	return list->memory->length == list->memory->size;
 }
 
 void* etool_linkList_find(etool_linkList *list, unsigned int index)

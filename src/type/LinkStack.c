@@ -40,8 +40,7 @@ int etool_linkStack_length(etool_linkStack *stack)
 
 int etool_linkStack_empty(etool_linkStack *stack)
 {
-	//1为真, 0为假
-	return (stack->length == 0) ? 1 : 0;
+	return stack->length == 0;
 }
 
 int etool_linkStack_get(etool_linkStack *stack, void *value)

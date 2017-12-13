@@ -251,7 +251,7 @@ int etool_socket_send(etool_socket *sockfd, char *data, int length, etool_socket
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	if (io != 0) {
 		etool_circQueue *buffer = (etool_circQueue*)((etool_socketConnect*)(sockfd->ptr))->sendBuffer;
-		if (etool_circQueue_empty(buffer) == 0) {
+		if (etool_circQueue_empty(buffer)) {
 			ETOOL_SOCKET_IO_INIT(io, ETOOL_SOCKET_SEND, length, 0, data);
 			etool_circQueue_enter(buffer, (void*)&io);
 			return 0;
@@ -348,7 +348,7 @@ int etool_socket_sendto(etool_socket *sockfd, char *data, int length, const char
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	if (io != 0) {
 		etool_circQueue *buffer = (etool_circQueue*)((etool_socketConnect*)(sockfd->ptr))->sendBuffer;
-		if (etool_circQueue_empty(buffer) == 0) {
+		if (etool_circQueue_empty(buffer)) {
 			ETOOL_SOCKET_IO_INIT(io, ETOOL_SOCKET_SENDTO, length, 0, data);
 			etool_circQueue_enter(buffer, (void*)&io);
 			return 0;

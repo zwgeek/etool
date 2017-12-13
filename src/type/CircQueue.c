@@ -52,14 +52,12 @@ int etool_circQueue_length(etool_circQueue *queue)
 
 int etool_circQueue_empty(etool_circQueue *queue)
 {
-	//1为真, 0为假
-	return (queue->rear == queue->front) ? 1 : 0;
+	return queue->rear == queue->front;
 }
 
 int etool_circQueue_full(etool_circQueue *queue)
 {
-	//1为真, 0为假
-	return ((queue->rear + 1) % queue->size == queue->front) ? 1 : 0;
+	return (queue->rear + 1) % queue->size == queue->front;
 }
 
 int etool_circQueue_get(etool_circQueue *queue, void *value)

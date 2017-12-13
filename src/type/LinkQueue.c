@@ -46,8 +46,7 @@ int etool_linkQueue_length(etool_linkQueue *queue)
 
 int etool_linkQueue_empty(etool_linkQueue *queue)
 {
-	//1为真, 0为假
-	return (queue->length == 0) ? 1 : 0;
+	return queue->length == 0;
 }
 
 int etool_linkQueue_get(etool_linkQueue *queue, void *value)
