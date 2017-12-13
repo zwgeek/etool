@@ -5,23 +5,23 @@ etool_memory* etool_memory_create(const unsigned int typeSize, const unsigned in
 {
 	etool_memory *memory = malloc(sizeof(etool_memory));
 	if (memory == 0) { return 0; }
-	memory->data = malloc(typeSize * size + sizeof(void*) * size);
-	if (memory->data == 0) { free(memory); return 0; }
-	memory->freeAddr = (unsigned char**)(memory->data + typeSize * size);
+	unsigned char *data = malloc(typeSize * size);
+	if (data == 0) { free(memory); return 0; }
+	memory->freeAddr = (unsigned char**)malloc(sizeof(void*) * size);
+	if (memory->freeAddr == 0) { free(memory); free(data); return 0; }
 	int n;
 	for (n = 0; n < size; n++) {
-		memory->freeAddr[n] = memory->data + n * typeSize;
+		memory->freeAddr[n] = data + n * typeSize;
 	}
 	memory->typeSize = typeSize;
 	memory->size = size;
 	memory->length = 0;
-	memory->mode = ETOOL_MODE_CREATE;
+	memory->mode = size;
 	return memory;
 }
 
 void etool_memory_destroy(etool_memory *memory)
 {
-	free(memory->data);
 	free(memory);
 }
 
@@ -35,10 +35,10 @@ etool_memory* etool_memory_init(void *block, const unsigned int typeSize, const 
 	if (block == 0) { return 0; }
 	int n;
 	etool_memory *memory = block;
-	memory->data = block + sizeof(etool_memory);
+	unsigned char *data = block + sizeof(etool_memory);
 	memory->freeAddr = block + sizeof(etool_memory) + typeSize * size;
 	for (n = 0; n < size; n++) {
-		memory->freeAddr[n] = memory->data + n * typeSize;
+		memory->freeAddr[n] = data + n * typeSize;
 	}
 	memory->typeSize = typeSize;
 	memory->size = size;
@@ -49,23 +49,15 @@ etool_memory* etool_memory_init(void *block, const unsigned int typeSize, const 
 
 void etool_memory_clear(etool_memory *memory)
 {
-	int n;
 	memory->length = 0;
-	for (n = 0; n < memory->size; n++) {
-		memory->freeAddr[n] = memory->data + n * memory->typeSize;
-	}
 }
 
 void* etool_memory_malloc(etool_memory *memory)
 {
 	if (memory->length == memory->size) {
-		switch (memory->mode) {
-		case ETOOL_MODE_CREATE :
-			{ ETOOL_MEMORY_EXTEND(memory); }
-			break;
-		case ETOOL_MODE_INIT :
-			return 0;
-		default :
+		if (memory->mode > ETOOL_MODE_INIT) {
+			ETOOL_MEMORY_EXTEND(memory);
+		} else {
 			return 0;
 		}
 	}

@@ -8,6 +8,7 @@ etool_circList* etool_circList_create(const unsigned int typeSize, const unsigne
 	list->memory = etool_memory_create(sizeof(struct _etool_circNode) + typeSize, size);
 	if (list->memory == 0) { free(list); return 0; }
 	list->next = (struct _etool_circNode*)list;
+	list->typeSize = typeSize;
 	return list;
 }
 
@@ -28,6 +29,7 @@ etool_circList* etool_circList_init(void *block, const unsigned int typeSize, co
 	etool_circList *list = block;
 	list->memory = etool_memory_init(block + sizeof(etool_circList), typeSize, size);
 	list->next = (struct _etool_circNode*)list;
+	list->typeSize = typeSize;
 	return list;
 }
 
@@ -67,10 +69,10 @@ int etool_circList_locate(etool_circList *list, void *value)
 {
 	int n, index = 0, isFind = 0;
 	struct _etool_circNode *node = list->next;
-	while(node != 0) {
+	while(node != (struct _etool_circNode*)list) {
 		if (node->data[0] == ((unsigned char*)value)[0]) {
 			isFind = 1;
-			for (n = 1; n <= list->memory->typeSize; n++) {
+			for (n = 1; n <= list->typeSize; n++) {
 				if (node->data[n] != ((unsigned char*)value)[n]) {
 					isFind = 0;
 					break;
@@ -95,13 +97,12 @@ int etool_circList_insert(etool_circList *list, unsigned int index, void *value)
 	if (newNode == 0) { return -1; }
 	newNode->data = (void*)newNode + sizeof(struct _etool_circNode);
 	int n;
-	for (n = 0; n < list->memory->typeSize; n++) {
+	for (n = 0; n < list->typeSize; n++) {
 		newNode->data[n] = ((unsigned char*)value)[n];
 	}
 
 	//建立在list可以和node互转
 	struct _etool_circNode *node = (struct _etool_circNode*)list;
-	index--;
 	while(index > 0) {
 		index--;
 		node = node->next;
@@ -119,14 +120,13 @@ int etool_circList_erase(etool_circList *list, unsigned int index, void *value)
 	int n;
 	//建立在list可以和node互转
 	struct _etool_circNode *node = (struct _etool_circNode*)list;
-	index--;
 	while(index > 0) {
 		index--;
 		node = node->next;
 	}
 	struct _etool_circNode *_node = node->next;
 	node->next = _node->next;
-	for (n = 0; n < list->memory->typeSize; n++) {
+	for (n = 0; n < list->typeSize; n++) {
 		((unsigned char*)value)[n] = _node->data[n];
 	}
 	etool_memory_free(list->memory, _node);
@@ -135,7 +135,7 @@ int etool_circList_erase(etool_circList *list, unsigned int index, void *value)
 
 int etool_circList_copy(etool_circList *srcList, etool_circList *dstList)
 {
-	if (srcList->memory->typeSize != dstList->memory->typeSize) {
+	if (srcList->typeSize != dstList->typeSize) {
 		return -1;
 	}
 	struct _etool_circNode *srcNode = (struct _etool_circNode*)srcList;
@@ -148,7 +148,7 @@ int etool_circList_copy(etool_circList *srcList, etool_circList *dstList)
 		newNode = etool_memory_malloc(dstList->memory);
 		if (newNode == 0) { return -1; }
 		newNode->data = (void*)newNode + sizeof(struct _etool_circNode);
-		for (n = 0; n < srcList->memory->typeSize; n++) {
+		for (n = 0; n < srcList->typeSize; n++) {
 			newNode->data[n] = srcNode->data[n];
 		}
 		dstNode->next = newNode;

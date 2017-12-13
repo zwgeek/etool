@@ -67,12 +67,12 @@ int etool_dblList_locate(etool_dblList *list, void *value)
 {
 	struct _etool_dblNode *node = list->next;
 	int n, index = 0, isFind = 0;
-	while(node != 0) {
+	while(node != (struct _etool_dblNode*)list) {
 		if (node->data[0] == ((unsigned char*)value)[0]) {
-			isFind = 1;
+			isFind = 0;
 			for (n = 1; n <= list->memory->typeSize; n++) {
 				if (node->data[n] != ((unsigned char*)value)[n]) {
-					isFind = 0;
+					isFind = 1;
 					break;
 				}
 			}
@@ -101,7 +101,6 @@ int etool_dblList_insert(etool_dblList *list, unsigned int index, void *value, i
 
 	//建立在list可以和node互转
 	struct _etool_dblNode *node = (struct _etool_dblNode*)list;
-	index--;
 	while(index > 0) {
 		index--;
 		node = (direction == -1) ? node->previous : node->next;
@@ -128,7 +127,6 @@ int etool_dblList_erase(etool_dblList *list, unsigned int index, void *value, in
 	//建立在list可以和node互转
 	int n;
 	struct _etool_dblNode *node = (direction == -1) ? list->previous : list->next;
-	index--;
 	while(index > 0) {
 		index--;
 		node = (direction == -1) ? node->previous : node->next;
