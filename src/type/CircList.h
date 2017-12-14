@@ -13,6 +13,7 @@
 typedef struct _etool_circList {
 	etool_memory *memory;
 	struct _etool_circNode *next;
+	unsigned int typeSize;
 } etool_circList;
 
 struct _etool_circNode {

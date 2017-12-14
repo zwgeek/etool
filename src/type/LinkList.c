@@ -101,7 +101,6 @@ int etool_linkList_insert(etool_linkList *list, unsigned int index, void *value)
 
 	//建立在list可以和node互转
 	struct _etool_linkNode *node = (struct _etool_linkNode*)list;
-	index--;
 	while(index > 0) {
 		index--;
 		node = node->next;
@@ -119,7 +118,6 @@ int etool_linkList_erase(etool_linkList *list, unsigned int index, void *value)
 	//建立在list可以和node互转
 	int n;
 	struct _etool_linkNode *node = (struct _etool_linkNode*)list;
-	index--;
 	while(index > 0) {
 		index--;
 		node = node->next;
