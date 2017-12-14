@@ -13,6 +13,7 @@
 typedef struct _etool_dblList {
 	etool_memory *memory;
 	struct _etool_dblNode *previous, *next;
+	unsigned int typeSize;
 } etool_dblList;
 
 struct _etool_dblNode {
@@ -98,7 +99,7 @@ void* etool_dblList_find(etool_dblList *list, unsigned int index, int direction)
  * @param  value [description]
  * @return      [description]
  */
-int etool_dblList_locate(etool_dblList *list, void *value);
+int etool_dblList_locate(etool_dblList *list, const void *value);
 
 /*
  * 插入节点,O(n/2)
@@ -107,7 +108,7 @@ int etool_dblList_locate(etool_dblList *list, void *value);
  * @param  direction [-1:previous,1:next]
  * @return      [description]
  */
-int etool_dblList_insert(etool_dblList *list, unsigned int index, void *value, int direction);
+int etool_dblList_insert(etool_dblList *list, unsigned int index, const void *value, int direction);
 
 /**
  * 删除节点,O((n-1)/2)

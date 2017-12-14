@@ -8,6 +8,7 @@ etool_linkList* etool_linkList_create(const unsigned int typeSize, const unsigne
 	list->memory = etool_memory_create(sizeof(struct _etool_linkNode) + typeSize, size);
 	if (list->memory == 0) { free(list); return 0; }
 	list->next = 0;
+	list->typeSize = typeSize;
 	return list;
 }
 
@@ -28,6 +29,7 @@ etool_linkList* etool_linkList_init(void *block, const unsigned int typeSize, co
 	etool_linkList *list = block;
 	list->memory = etool_memory_init(block + sizeof(etool_linkList), typeSize, size);
 	list->next = 0;
+	list->typeSize = typeSize;
 	return list;
 }
 
@@ -63,14 +65,14 @@ void* etool_linkList_find(etool_linkList *list, unsigned int index)
 	return node->data;
 }
 
-int etool_linkList_locate(etool_linkList *list, void *value)
+int etool_linkList_locate(etool_linkList *list, const void *value)
 {
 	struct _etool_linkNode *node = list->next;
 	int n, index = 0, isFind = 0;
 	while(node != 0) {
 		if (node->data[0] == ((unsigned char*)value)[0]) {
 			isFind = 1;
-			for (n = 1; n <= list->memory->typeSize; n++) {
+			for (n = 1; n < list->typeSize; n++) {
 				if (node->data[n] != ((unsigned char*)value)[n]) {
 					isFind = 0;
 					break;
@@ -86,7 +88,7 @@ int etool_linkList_locate(etool_linkList *list, void *value)
 	return -1;
 }
 
-int etool_linkList_insert(etool_linkList *list, unsigned int index, void *value)
+int etool_linkList_insert(etool_linkList *list, unsigned int index, const void *value)
 {
 	if (index > list->memory->length) {
 		return -1;
@@ -95,7 +97,7 @@ int etool_linkList_insert(etool_linkList *list, unsigned int index, void *value)
 	if (newNode == 0) { return -1; }
 	int n;
 	newNode->data = (void*)newNode + sizeof(struct _etool_linkNode);
-	for (n = 0; n < list->memory->typeSize; n++) {
+	for (n = 0; n < list->typeSize; n++) {
 		newNode->data[n] = ((unsigned char*)value)[n];
 	}
 
@@ -124,7 +126,7 @@ int etool_linkList_erase(etool_linkList *list, unsigned int index, void *value)
 	}
 	struct _etool_linkNode *_node = node->next;
 	node->next = _node->next;
-	for (n = 0; n < list->memory->typeSize; n++) {
+	for (n = 0; n < list->typeSize; n++) {
 		((unsigned char*)value)[n] = _node->data[n];
 	}
 	etool_memory_free(list->memory, _node);
@@ -133,7 +135,7 @@ int etool_linkList_erase(etool_linkList *list, unsigned int index, void *value)
 
 int etool_linkList_copy(etool_linkList *srcList, etool_linkList *dstList)
 {
-	if (srcList->memory->typeSize != dstList->memory->typeSize) {
+	if (srcList->typeSize != dstList->typeSize) {
 		return -1;
 	}
 	struct _etool_linkNode *srcNode = (struct _etool_linkNode*)srcList;
@@ -146,7 +148,7 @@ int etool_linkList_copy(etool_linkList *srcList, etool_linkList *dstList)
 		newNode = etool_memory_malloc(dstList->memory);
 		if (newNode == 0) { return -1; }
 		newNode->data = (void*)newNode + sizeof(struct _etool_linkNode);
-		for (n = 0; n < srcList->memory->typeSize; n++) {
+		for (n = 0; n < srcList->typeSize; n++) {
 			newNode->data[n] = srcNode->data[n];
 		}
 		dstNode->next = newNode;

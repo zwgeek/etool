@@ -65,14 +65,14 @@ void* etool_circList_find(etool_circList *list, unsigned int index)
 	return node->data;
 }
 
-int etool_circList_locate(etool_circList *list, void *value)
+int etool_circList_locate(etool_circList *list, const void *value)
 {
 	int n, index = 0, isFind = 0;
 	struct _etool_circNode *node = list->next;
 	while(node != (struct _etool_circNode*)list) {
 		if (node->data[0] == ((unsigned char*)value)[0]) {
 			isFind = 1;
-			for (n = 1; n <= list->typeSize; n++) {
+			for (n = 1; n < list->typeSize; n++) {
 				if (node->data[n] != ((unsigned char*)value)[n]) {
 					isFind = 0;
 					break;
@@ -88,7 +88,7 @@ int etool_circList_locate(etool_circList *list, void *value)
 	return -1;
 }
 
-int etool_circList_insert(etool_circList *list, unsigned int index, void *value)
+int etool_circList_insert(etool_circList *list, unsigned int index, const void *value)
 {
 	if (index > list->memory->length) {
 		return -1;

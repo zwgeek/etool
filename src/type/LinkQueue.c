@@ -73,7 +73,7 @@ int etool_linkQueue_peer_get(etool_linkQueue *queue, void *value)
 	return 0;
 }
 
-int etool_linkQueue_enter(etool_linkQueue *queue, void *value)
+int etool_linkQueue_enter(etool_linkQueue *queue, const void *value)
 {
 	struct _etool_linkNode *node = malloc(sizeof(struct _etool_linkNode));
 	if (node == 0) { return -1; }
@@ -88,7 +88,7 @@ int etool_linkQueue_enter(etool_linkQueue *queue, void *value)
 	return 0;
 }
 
-int etool_linkQueue_peer_enter(etool_linkQueue *queue, void *value)
+int etool_linkQueue_peer_enter(etool_linkQueue *queue, const void *value)
 {
 	struct _etool_linkNode *node = malloc(sizeof(struct _etool_linkNode));
 	if (node == 0) { return -1; }

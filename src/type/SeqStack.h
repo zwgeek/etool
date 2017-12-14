@@ -132,7 +132,7 @@ int etool_seqStack_other_get(etool_seqStack *stack, void *value);
  * @param  value [input data]
  * @return      [description]
  */
-int etool_seqStack_push(etool_seqStack *stack, void *value);
+int etool_seqStack_push(etool_seqStack *stack, const void *value);
 
 /**
  * 另一个stack压入,O(1)
@@ -140,7 +140,7 @@ int etool_seqStack_push(etool_seqStack *stack, void *value);
  * @param  value [input data]
  * @return      [description]
  */
-int etool_seqStack_other_push(etool_seqStack *stack, void *value);
+int etool_seqStack_other_push(etool_seqStack *stack, const void *value);
 
 /**
  * stack弹出,O(1)

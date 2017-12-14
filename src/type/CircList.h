@@ -98,7 +98,7 @@ void* etool_circList_find(etool_circList *list, unsigned int index);
  * @param  value [description]
  * @return      [description]
  */
-int etool_circList_locate(etool_circList *list, void *value);
+int etool_circList_locate(etool_circList *list, const void *value);
 
 /*
  * 插入节点,O(n/2)
@@ -106,7 +106,7 @@ int etool_circList_locate(etool_circList *list, void *value);
  * @param  value [input data]
  * @return      [description]
  */
-int etool_circList_insert(etool_circList *list, unsigned int index, void *value);
+int etool_circList_insert(etool_circList *list, unsigned int index, const void *value);
 
 /**
  * 删除节点,O((n-1)/2)

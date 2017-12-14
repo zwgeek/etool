@@ -123,7 +123,7 @@ int etool_circQueue_peer_get(etool_circQueue *queue, void *value);
  * @param  value [input data]
  * @return      [description]
  */
-int etool_circQueue_enter(etool_circQueue *queue, void *value);
+int etool_circQueue_enter(etool_circQueue *queue, const void *value);
 
 /**
  * 进入队列(从队头进入),O(1)
@@ -132,7 +132,7 @@ int etool_circQueue_enter(etool_circQueue *queue, void *value);
  * @param  value [input data]
  * @return      [description]
  */
-int etool_circQueue_peer_enter(etool_circQueue *queue, void *value);
+int etool_circQueue_peer_enter(etool_circQueue *queue, const void *value);
 
 /**
  * 退出队列,O(1)

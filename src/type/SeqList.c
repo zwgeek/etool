@@ -63,7 +63,7 @@ void* etool_seqList_find(etool_seqList *list, const unsigned int index)
 	return list->data + offset;
 }
 
-int etool_seqList_locate(etool_seqList *list, void *value)
+int etool_seqList_locate(etool_seqList *list, const void *value)
 {
 	int n, offset = 0, isFind = 0;
 	while (offset < list->length * list->typeSize) {
@@ -86,7 +86,7 @@ int etool_seqList_locate(etool_seqList *list, void *value)
 	return -1;
 }
 
-int etool_seqList_insert(etool_seqList *list, const unsigned int index, void *value)
+int etool_seqList_insert(etool_seqList *list, const unsigned int index, const void *value)
 {
 	if (index > list->length) {
 		return -1;
@@ -116,7 +116,7 @@ int etool_seqList_insert(etool_seqList *list, const unsigned int index, void *va
 	return 0;
 }
 
-int etool_seqList_insertEx(etool_seqList *list, void *value)
+int etool_seqList_insertEx(etool_seqList *list, const void *value)
 {
 	if (list->length == list->size) {
 		switch (list->mode) {

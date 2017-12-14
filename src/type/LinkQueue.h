@@ -86,7 +86,7 @@ int etool_linkQueue_peer_get(etool_linkQueue *queue, void *value);
  * @param  value [input data]
  * @return      [description]
  */
-int etool_linkQueue_enter(etool_linkQueue *queue, void *value);
+int etool_linkQueue_enter(etool_linkQueue *queue, const void *value);
 
 /**
  * 进入队列(从队头进入),O(1)
@@ -95,7 +95,7 @@ int etool_linkQueue_enter(etool_linkQueue *queue, void *value);
  * @param  value [input data]
  * @return      [description]
  */
-int etool_linkQueue_peer_enter(etool_linkQueue *queue, void *value);
+int etool_linkQueue_peer_enter(etool_linkQueue *queue, const void *value);
 
 /**
  * 退出队列,O(1)

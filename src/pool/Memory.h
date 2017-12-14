@@ -10,22 +10,27 @@
 #include <stdlib.h>
 
 #define ETOOL_MODE_INIT		0
-#define ETOOL_MODE_CREATE	1  //一般不使用,直接用来存基础大小
+#define ETOOL_MODE_CREATE	1
 #define ETOOL_MEMORY_EXTEND(memory) \
-int n; \
-unsigned char *_data = malloc(memory->typeSize * memory->mode); \
+int n, size = memory->size / memory->mode * (memory->mode + 1); \
+unsigned char *_data = malloc(memory->typeSize * memory->size / memory->mode); \
 if (_data == 0) {return 0; } \
-unsigned char **_freeAddr = (unsigned char**)malloc(sizeof(void*) * (memory->size + memory->mode)); \
+unsigned char **_freeAddr = malloc(sizeof(void*) * (size + memory->mode + 1)); \
 if (_freeAddr == 0) { free(_data); return 0; } \
 for (n = 0; n < memory->size; n++) { \
 	_freeAddr[n] = memory->freeAddr[n]; \
 } \
-for (n = memory->size; n < memory->size + memory->mode; n++) { \
-	_freeAddr[n] = _data + n * memory->typeSize; \
+for (n = 0; n < memory->mode; n++) { \
+	_freeAddr[size + n] = memory->freeAddr[memory->size + n]; \
+} \
+_freeAddr[size + memory->mode] = _data; \
+for (n = 0; n < (memory->size / memory->mode); n++) { \
+	_freeAddr[memory->size + n] = _data + n * memory->typeSize; \
 } \
 free(memory->freeAddr); \
 memory->freeAddr = _freeAddr; \
-memory->size = memory->size + memory->mode
+memory->size = size; \
+memory->mode++ \
 
 typedef struct _etool_memory {
 	unsigned char **freeAddr;

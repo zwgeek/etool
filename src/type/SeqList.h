@@ -109,7 +109,7 @@ void* etool_seqList_find(etool_seqList *list, const unsigned int index);
  * @param  list [description]
  * @return      [description]
  */
-int etool_seqList_locate(etool_seqList *list, void *value);
+int etool_seqList_locate(etool_seqList *list, const void *value);
 
 /**
  * 插入节点,O(n/2)
@@ -118,7 +118,7 @@ int etool_seqList_locate(etool_seqList *list, void *value);
  * @param  value [input data]
  * @return      [description]
  */
-int etool_seqList_insert(etool_seqList *list, const unsigned int index, void *value);
+int etool_seqList_insert(etool_seqList *list, const unsigned int index, const void *value);
 
 /**
  * 插入节点,插到最后一个O(1)
@@ -126,7 +126,7 @@ int etool_seqList_insert(etool_seqList *list, const unsigned int index, void *va
  * @param  value [input data]
  * @return      [description]
  */
-int etool_seqList_insertEx(etool_seqList *list, void *value);
+int etool_seqList_insertEx(etool_seqList *list, const void *value);
 
 /**
  * 删除节点,O((n-1)/2)

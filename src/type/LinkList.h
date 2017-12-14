@@ -13,6 +13,7 @@
 typedef struct _etool_linkList {
 	etool_memory *memory;
 	struct _etool_linkNode *next;
+	unsigned int typeSize;
 } etool_linkList;
 
 struct _etool_linkNode {
@@ -97,7 +98,7 @@ void* etool_linkList_find(etool_linkList *list, unsigned int index);
  * @param  value [description]
  * @return      [description]
  */
-int etool_linkList_locate(etool_linkList *list, void *value);
+int etool_linkList_locate(etool_linkList *list, const void *value);
 
 /*
  * 插入节点,O(n/2)
@@ -105,7 +106,7 @@ int etool_linkList_locate(etool_linkList *list, void *value);
  * @param  value [input data]
  * @return      [description]
  */
-int etool_linkList_insert(etool_linkList *list, unsigned int index, void *value);
+int etool_linkList_insert(etool_linkList *list, unsigned int index, const void *value);
 
 /**
  * 删除节点,O((n-1)/2)

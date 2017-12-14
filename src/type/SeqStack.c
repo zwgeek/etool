@@ -93,7 +93,7 @@ int etool_seqStack_other_get(etool_seqStack *stack, void *value)
 	return 0;
 }
 
-int etool_seqStack_push(etool_seqStack *stack, void *value)
+int etool_seqStack_push(etool_seqStack *stack, const void *value)
 {
 	if (stack->top == stack->bottom) {
 		switch (stack->mode) {
@@ -113,7 +113,7 @@ int etool_seqStack_push(etool_seqStack *stack, void *value)
 	return 0;
 }
 
-int etool_seqStack_other_push(etool_seqStack *stack, void *value)
+int etool_seqStack_other_push(etool_seqStack *stack, const void *value)
 {
 	if (--stack->bottom < stack->top) {
 		switch (stack->mode) {

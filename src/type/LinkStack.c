@@ -56,7 +56,7 @@ int etool_linkStack_get(etool_linkStack *stack, void *value)
 	return 0;
 }
 
-int etool_linkStack_push(etool_linkStack *stack, void *value)
+int etool_linkStack_push(etool_linkStack *stack, const void *value)
 {
 	struct _etool_linkNode *node = malloc(sizeof(struct _etool_linkNode));
 	if (node == 0) { return -1; }

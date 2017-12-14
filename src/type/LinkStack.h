@@ -75,7 +75,7 @@ int etool_linkStack_get(etool_linkStack *stack, void *value);
  * @param  value [input data]
  * @return      [description]
  */
-int etool_linkStack_push(etool_linkStack *stack, void *value);
+int etool_linkStack_push(etool_linkStack *stack, const void *value);
 
 /**
  * stack弹出,O(1)

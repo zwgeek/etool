@@ -88,7 +88,7 @@ int etool_circQueue_peer_get(etool_circQueue *queue, void *value)
 	return 0;	
 }
 
-int etool_circQueue_enter(etool_circQueue *queue, void *value)
+int etool_circQueue_enter(etool_circQueue *queue, const void *value)
 {
 	if ((queue->rear + 1) % queue->size == queue->front) {
 		switch (queue->mode) {
@@ -108,7 +108,7 @@ int etool_circQueue_enter(etool_circQueue *queue, void *value)
 	return 0;
 }
 
-int etool_circQueue_peer_enter(etool_circQueue *queue, void *value)
+int etool_circQueue_peer_enter(etool_circQueue *queue, const void *value)
 {
 	if ((queue->rear + 1) % queue->size == queue->front) {
 		switch (queue->mode) {
