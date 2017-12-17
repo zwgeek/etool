@@ -66,7 +66,8 @@ etool_log* etool_log_create(const char *path, const etool_logLevel level)
 
 void etool_log_destroy(etool_log *log)
 {
-	etool_thread_end(&(log->thread));
+	etool_thread_cancel(&(log->thread));
+	etool_condition_signal(&(log->condition));
 	fclose(log->file);
 	etool_circQueue_destroy(log->queue);
 	etool_mutexEx_unload(&(log->mutex));
@@ -130,9 +131,9 @@ void etool_log_async_printf(etool_log *log, const etool_logLevel level, const ch
 	vsprintf(msg, fmt, argList);
 	va_end(argList);
 	etool_mutexEx_lock(&(log->mutex));
+	etool_circQueue_enter(log->queue, (void*)&msg);
 	if (etool_circQueue_empty(log->queue)) {
 		etool_condition_signal(&(log->condition));
 	}
-	etool_circQueue_enter(log->queue, (void*)&msg);
 	etool_mutexEx_unlock(&(log->mutex));
 }
