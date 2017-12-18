@@ -94,6 +94,7 @@ int etool_circQueue_enter(etool_circQueue *queue, const void *value)
 		switch (queue->mode) {
 		case ETOOL_CIRCQUEUE_MODE_CREATE :
 			{ ETOOL_CIRCQUEUE_EXTEND(queue); }
+			break;
 		case ETOOL_CIRCQUEUE_MODE_INIT :
 			return -1;
 		default :
@@ -163,9 +164,9 @@ etool_circQueueIterator* etool_circQueueIterator_init(etool_circQueue *queue)
 	if (queue->rear == queue->front) { return 0; }
 	etool_circQueueIterator *iterator = malloc(sizeof(etool_circQueueIterator));
 	if (iterator == 0) { return 0; }
-	iterator->data = queue->data + ((queue->front + 1)  % queue->size) * queue->typeSize;
+	iterator->num = (queue->front + 1) % queue->size;
+	iterator->data = queue->data + iterator->num * queue->typeSize;
 	iterator->queue = queue;
-	iterator->num = (queue->front + 2)  % queue->size;
 	return iterator;
 }
 
@@ -176,7 +177,7 @@ int etool_circQueueIterator_next(etool_circQueueIterator *iterator)
 		free(iterator);
 		return 0;
 	}
-	iterator->data = queue->data + iterator->num * queue->typeSize;
 	iterator->num = (iterator->num + 1)  % queue->size;
+	iterator->data = queue->data + iterator->num * queue->typeSize;
 	return 1;
 }

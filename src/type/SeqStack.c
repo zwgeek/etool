@@ -99,6 +99,7 @@ int etool_seqStack_push(etool_seqStack *stack, const void *value)
 		switch (stack->mode) {
 		case ETOOL_SEQSTACK_MODE_CREATE :
 			{ ETOOL_SEQSTACK_EXTEND(stack); }
+			break;
 		case ETOOL_SEQSTACK_MODE_INIT :
 			return -1;
 		default :

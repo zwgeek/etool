@@ -13,14 +13,15 @@
 #define ETOOL_CIRCQUEUE_MODE_CREATE		1
 #define ETOOL_CIRCQUEUE_EXTEND(queue) \
 int n; \
-unsigned char *_data = malloc(queue->typeSize * queue->size * 2); \
-for (n = 0; n < queue->typeSize * queue->size; n++) { \
-	_data[n] = queue->data[(queue->front + n) % queue->size]; \
+unsigned int frontSize = queue->front * queue->typeSize, byteSize = queue->size * queue->typeSize; \
+unsigned char *_data = malloc(byteSize * 2); \
+for (n = 0; n < byteSize; n++) { \
+	_data[n] = queue->data[(frontSize + n) % byteSize]; \
 } \
 free(queue->data); \
 queue->data = _data; \
 queue->front = 0; \
-queue->rear = queue->size; \
+queue->rear = queue->size - 1; \
 queue->size = queue->size * 2
 
 typedef struct _etool_circQueue {
