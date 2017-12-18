@@ -10,7 +10,7 @@ etool_seqList* etool_seqList_create(const unsigned int typeSize, const unsigned 
 	list->typeSize = typeSize;
 	list->size = size;
 	list->length = 0;
-	list->mode = ETOOL_MODE_CREATE;
+	list->mode = ETOOL_SEQLIST_MODE_CREATE;
 	return list;
 }
 
@@ -33,7 +33,7 @@ etool_seqList* etool_seqList_init(void *block, const unsigned int typeSize, cons
 	list->typeSize = typeSize;
 	list->size = size;
 	list->length = 0;
-	list->mode = ETOOL_MODE_INIT;
+	list->mode = ETOOL_SEQLIST_MODE_INIT;
 	return list;
 }
 
@@ -93,10 +93,10 @@ int etool_seqList_insert(etool_seqList *list, const unsigned int index, const vo
 	}
 	if (list->length == list->size) {
 		switch (list->mode) {
-		case ETOOL_MODE_CREATE :
+		case ETOOL_SEQLIST_MODE_CREATE :
 			{ ETOOL_SEQLIST_EXTEND(list); }
 			break;
-		case ETOOL_MODE_INIT :
+		case ETOOL_SEQLIST_MODE_INIT :
 			return -1;
 		default :
 			return -1;
@@ -120,10 +120,10 @@ int etool_seqList_insertEx(etool_seqList *list, const void *value)
 {
 	if (list->length == list->size) {
 		switch (list->mode) {
-		case ETOOL_MODE_CREATE :
+		case ETOOL_SEQLIST_MODE_CREATE :
 			{ ETOOL_SEQLIST_EXTEND(list); }
 			break;
-		case ETOOL_MODE_INIT :
+		case ETOOL_SEQLIST_MODE_INIT :
 			return -1;
 		default :
 			return -1;

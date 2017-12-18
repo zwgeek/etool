@@ -9,8 +9,8 @@
 
 #include <stdlib.h>
 
-#define ETOOL_MODE_CREATE 0
-#define ETOOL_MODE_INIT   1
+#define ETOOL_SEQSTACK_MODE_INIT   0
+#define ETOOL_SEQSTACK_MODE_CREATE 1
 #define ETOOL_SEQSTACK_EXTEND(stack) \
 int n, unitSize = stack->typeSize * stack->size; \
 unsigned char *_data = malloc(unitSize * 2); \

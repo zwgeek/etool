@@ -9,8 +9,8 @@
 
 #include <stdlib.h>
 
-#define ETOOL_MODE_INIT		0
-#define ETOOL_MODE_CREATE	1
+#define ETOOL_MEMORY_MODE_INIT		0
+#define ETOOL_MEMORY_MODE_CREATE	1
 #define ETOOL_MEMORY_EXTEND(memory) \
 int n, size = memory->size / memory->mode * (memory->mode + 1); \
 unsigned char *_data = malloc(memory->typeSize * memory->size / memory->mode); \

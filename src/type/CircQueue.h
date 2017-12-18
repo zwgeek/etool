@@ -9,8 +9,8 @@
 
 #include <stdlib.h>
 
-#define ETOOL_MODE_CREATE	0
-#define ETOOL_MODE_INIT		1
+#define ETOOL_CIRCQUEUE_MODE_INIT		0
+#define ETOOL_CIRCQUEUE_MODE_CREATE		1
 #define ETOOL_CIRCQUEUE_EXTEND(queue) \
 int n; \
 unsigned char *_data = malloc(queue->typeSize * queue->size * 2); \

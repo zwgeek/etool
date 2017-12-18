@@ -11,7 +11,7 @@ etool_circQueue* etool_circQueue_create(const unsigned int typeSize, const unsig
 	queue->size = size;
 	queue->front = 0;
 	queue->rear = 0;
-	queue->mode = ETOOL_MODE_CREATE;
+	queue->mode = ETOOL_CIRCQUEUE_MODE_CREATE;
 	return queue;
 }
 
@@ -35,7 +35,7 @@ etool_circQueue* etool_circQueue_init(void *block, const unsigned int typeSize, 
 	queue->size = size;
 	queue->front = 0;
 	queue->rear = 0;
-	queue->mode = ETOOL_MODE_INIT;
+	queue->mode = ETOOL_CIRCQUEUE_MODE_INIT;
 	return queue;
 }
 
@@ -92,9 +92,9 @@ int etool_circQueue_enter(etool_circQueue *queue, const void *value)
 {
 	if ((queue->rear + 1) % queue->size == queue->front) {
 		switch (queue->mode) {
-		case ETOOL_MODE_CREATE :
+		case ETOOL_CIRCQUEUE_MODE_CREATE :
 			{ ETOOL_CIRCQUEUE_EXTEND(queue); }
-		case ETOOL_MODE_INIT :
+		case ETOOL_CIRCQUEUE_MODE_INIT :
 			return -1;
 		default :
 			return -1;
@@ -112,9 +112,9 @@ int etool_circQueue_peer_enter(etool_circQueue *queue, const void *value)
 {
 	if ((queue->rear + 1) % queue->size == queue->front) {
 		switch (queue->mode) {
-		case ETOOL_MODE_CREATE :
+		case ETOOL_CIRCQUEUE_MODE_CREATE :
 			{ ETOOL_CIRCQUEUE_EXTEND(queue); }
-		case ETOOL_MODE_INIT :
+		case ETOOL_CIRCQUEUE_MODE_INIT :
 			return -1;
 		default :
 			return -1;

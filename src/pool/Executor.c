@@ -10,7 +10,6 @@ void etool_worker_threadProc(void *this)
 		if (etool_circQueue_exit(worker->queue, (void*)&_work) != 0) {
 			worker->tick = 1;
 			etool_condition_wait(&(worker->condition), &(worker->mutex));
-			worker->tick = 0;
 			etool_circQueue_exit(worker->queue, (void*)&_work);
 		}
 		etool_mutexEx_unlock(&(worker->mutex));
@@ -140,6 +139,7 @@ void etool_executor_work(etool_executor *executor, etool_workProc *work, void *p
 	void *_work[2] = {work, param};
 	etool_circQueue_enter(worker->queue, _work);
 	if (worker->tick != 0) {
+		worker->tick = 0;
 		if (worker->tick != ETOOL_MAX_TICK){
 			etool_condition_signal(&(worker->condition));
 		} else {

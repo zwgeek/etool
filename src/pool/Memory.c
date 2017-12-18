@@ -17,7 +17,7 @@ etool_memory* etool_memory_create(const unsigned int typeSize, const unsigned in
 	memory->typeSize = typeSize;
 	memory->size = size;
 	memory->length = 0;
-	memory->mode = ETOOL_MODE_CREATE;
+	memory->mode = ETOOL_MEMORY_MODE_CREATE;
 	return memory;
 }
 
@@ -48,7 +48,7 @@ etool_memory* etool_memory_init(void *block, const unsigned int typeSize, const 
 	memory->typeSize = typeSize;
 	memory->size = size;
 	memory->length = 0;
-	memory->mode = ETOOL_MODE_INIT;
+	memory->mode = ETOOL_MEMORY_MODE_INIT;
 	return memory;
 }
 
@@ -69,7 +69,7 @@ void etool_memory_clear(etool_memory *memory)
 void* etool_memory_malloc(etool_memory *memory)
 {
 	if (memory->length == memory->size) {
-		if (memory->mode != ETOOL_MODE_INIT) {
+		if (memory->mode != ETOOL_MEMORY_MODE_INIT) {
 			ETOOL_MEMORY_EXTEND(memory);
 		} else {
 			return 0;

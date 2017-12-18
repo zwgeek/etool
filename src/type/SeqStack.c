@@ -11,7 +11,7 @@ etool_seqStack* etool_seqStack_create(const unsigned int typeSize, const unsigne
 	stack->size = size;
 	stack->top = 0;
 	stack->bottom = size;
-	stack->mode = ETOOL_MODE_CREATE;
+	stack->mode = ETOOL_SEQSTACK_MODE_CREATE;
 	return stack;
 }
 
@@ -35,7 +35,7 @@ etool_seqStack* etool_seqStack_init(void *block, const unsigned int typeSize, co
 	stack->size = size;
 	stack->top = 0;
 	stack->bottom = size;
-	stack->mode = ETOOL_MODE_INIT;
+	stack->mode = ETOOL_SEQSTACK_MODE_INIT;
 	return stack;
 }
 
@@ -97,9 +97,9 @@ int etool_seqStack_push(etool_seqStack *stack, const void *value)
 {
 	if (stack->top == stack->bottom) {
 		switch (stack->mode) {
-		case ETOOL_MODE_CREATE :
+		case ETOOL_SEQSTACK_MODE_CREATE :
 			{ ETOOL_SEQSTACK_EXTEND(stack); }
-		case ETOOL_MODE_INIT :
+		case ETOOL_SEQSTACK_MODE_INIT :
 			return -1;
 		default :
 			return -1;
@@ -117,9 +117,9 @@ int etool_seqStack_other_push(etool_seqStack *stack, const void *value)
 {
 	if (--stack->bottom < stack->top) {
 		switch (stack->mode) {
-		case ETOOL_MODE_CREATE :
+		case ETOOL_SEQSTACK_MODE_CREATE :
 			{ ETOOL_SEQSTACK_EXTEND(stack); }
-		case ETOOL_MODE_INIT :
+		case ETOOL_SEQSTACK_MODE_INIT :
 			return -1;
 		default :
 			return -1;
