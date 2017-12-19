@@ -266,7 +266,7 @@ void etool_select_wait(etool_select *selectfd, etool_selectCallback *callback, c
 			}
 			break;
 		case EPOLLOUT :
-			if (etool_circQueue_get((etool_circQueue*)((etool_socketConnect*)(sockfd->ptr))->sendBuffer, (void*)&io) != 0) {
+			if (etool_circQueue_head((etool_circQueue*)((etool_socketConnect*)(sockfd->ptr))->sendBuffer, (void*)&io) != 0) {
 				ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SOCKET_RECV);
 				continue;
 			}
@@ -327,7 +327,7 @@ void etool_select_wait(etool_select *selectfd, etool_selectCallback *callback, c
 			}
 			break;
 		case EVFILT_WRITE :
-			if (etool_circQueue_get((etool_circQueue*)((etool_socketConnect*)(sockfd->ptr))->sendBuffer, (void*)&io) != 0) {
+			if (etool_circQueue_head((etool_circQueue*)((etool_socketConnect*)(sockfd->ptr))->sendBuffer, (void*)&io) != 0) {
 				ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SOCKET_RECV);
 				continue;
 			}

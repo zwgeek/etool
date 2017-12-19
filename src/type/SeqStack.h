@@ -116,7 +116,7 @@ int etool_seqStack_full(etool_seqStack *stack);
  * @param  value [input data]
  * @return      [description]
  */
-int etool_seqStack_get(etool_seqStack *stack, void *value);
+int etool_seqStack_head(etool_seqStack *stack, void *value);
 
 /**
  * 获取另一个栈头元素,O(1)
@@ -124,7 +124,7 @@ int etool_seqStack_get(etool_seqStack *stack, void *value);
  * @param  value [input data]
  * @return      [description]
  */
-int etool_seqStack_other_get(etool_seqStack *stack, void *value);
+int etool_seqStack_other_head(etool_seqStack *stack, void *value);
 
 /**
  * stack压入,O(1)

@@ -65,7 +65,7 @@ int etool_seqStack_full(etool_seqStack *stack)
 	return stack->top == stack->bottom;
 }
 
-int etool_seqStack_get(etool_seqStack *stack, void *value)
+int etool_seqStack_head(etool_seqStack *stack, void *value)
 {
 	if (stack->top == 0) {
 		return -1;
@@ -79,7 +79,7 @@ int etool_seqStack_get(etool_seqStack *stack, void *value)
 	return 0;
 }
 
-int etool_seqStack_other_get(etool_seqStack *stack, void *value)
+int etool_seqStack_other_head(etool_seqStack *stack, void *value)
 {
 	if (stack->bottom == stack->size) {
 		return -1;

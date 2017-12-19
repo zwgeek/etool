@@ -148,12 +148,12 @@ int etool_dblList_copy(etool_dblList *srcList, etool_dblList *dstList)
 		return -1;
 	}
 	int n;
-	struct _etool_dblNode *srcNode = (struct _etool_dblNode*)srcList;
+	struct _etool_dblNode *srcNode = (struct _etool_dblNode*)srcList->next;
 	struct _etool_dblNode *dstNode = (struct _etool_dblNode*)dstList;
 	etool_memory_clear(dstList->memory);
 	//开始拷贝
 	struct _etool_dblNode *newNode = 0;
-	while (srcNode->next != 0) {
+	while (srcNode != (struct _etool_dblNode*)srcList) {
 		newNode = etool_memory_malloc(dstList->memory);
 		if (newNode == 0) { return -1; }
 		newNode->data = (void*)newNode + sizeof(struct _etool_dblNode);

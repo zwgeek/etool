@@ -43,7 +43,7 @@ int etool_linkStack_empty(etool_linkStack *stack)
 	return stack->length == 0;
 }
 
-int etool_linkStack_get(etool_linkStack *stack, void *value)
+int etool_linkStack_head(etool_linkStack *stack, void *value)
 {
 	if (stack->top == 0) { return -1; }
 	struct _etool_linkNode *node = stack->top;

@@ -49,7 +49,7 @@ int etool_linkQueue_empty(etool_linkQueue *queue)
 	return queue->length == 0;
 }
 
-int etool_linkQueue_get(etool_linkQueue *queue, void *value)
+int etool_linkQueue_head(etool_linkQueue *queue, void *value)
 {
 	if (queue->length == 0) { return -1; }
 	if (value != 0) {
@@ -61,7 +61,7 @@ int etool_linkQueue_get(etool_linkQueue *queue, void *value)
 	return 0;
 }
 
-int etool_linkQueue_peer_get(etool_linkQueue *queue, void *value)
+int etool_linkQueue_peer_head(etool_linkQueue *queue, void *value)
 {
 	if (queue->length == 0) { return -1; }
 	if (value != 0) {

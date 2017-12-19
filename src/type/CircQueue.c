@@ -60,7 +60,7 @@ int etool_circQueue_full(etool_circQueue *queue)
 	return (queue->rear + 1) % queue->size == queue->front;
 }
 
-int etool_circQueue_get(etool_circQueue *queue, void *value)
+int etool_circQueue_head(etool_circQueue *queue, void *value)
 {
 	if (queue->rear == queue->front) {
 		return -1;
@@ -74,7 +74,7 @@ int etool_circQueue_get(etool_circQueue *queue, void *value)
 	return 0;
 }
 
-int etool_circQueue_peer_get(etool_circQueue *queue, void *value)
+int etool_circQueue_peer_head(etool_circQueue *queue, void *value)
 {
 	if (queue->rear == queue->front) {
 		return -1;

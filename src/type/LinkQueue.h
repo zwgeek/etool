@@ -68,7 +68,7 @@ int etool_linkQueue_empty(etool_linkQueue *queue);
  * @param  value [input data]
  * @return      [description]
  */
-int etool_linkQueue_get(etool_linkQueue *queue, void *value);
+int etool_linkQueue_head(etool_linkQueue *queue, void *value);
 
 /**
  * 获取队尾元素,O(1)
@@ -77,7 +77,7 @@ int etool_linkQueue_get(etool_linkQueue *queue, void *value);
  * @param  value [input data]
  * @return      [description]
  */
-int etool_linkQueue_peer_get(etool_linkQueue *queue, void *value);
+int etool_linkQueue_peer_head(etool_linkQueue *queue, void *value);
 
 /**
  * 进入队列,O(1)

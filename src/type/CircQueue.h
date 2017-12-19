@@ -106,7 +106,7 @@ int etool_circQueue_full(etool_circQueue *queue);
  * @param  value [input data]
  * @return      [description]
  */
-int etool_circQueue_get(etool_circQueue *queue, void *value);
+int etool_circQueue_head(etool_circQueue *queue, void *value);
 
 /**
  * 获取队尾元素,O(1)
@@ -115,7 +115,7 @@ int etool_circQueue_get(etool_circQueue *queue, void *value);
  * @param  value [input data]
  * @return      [description]
  */
-int etool_circQueue_peer_get(etool_circQueue *queue, void *value);
+int etool_circQueue_peer_head(etool_circQueue *queue, void *value);
 
 /**
  * 进入队列,O(1)

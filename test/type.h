@@ -1,6 +1,7 @@
 extern "C" {
 #include "../src/type/CircList.h"
 #include "../src/type/CircQueue.h"
+#include "../src/type/DblList.h"
 }
 
 int type_circList_test()
@@ -84,6 +85,15 @@ int type_circList_test()
 		printf("List node : %d\n", **(int**)(iterator));
 	} while (etool_circListIterator_next(iterator));
 
+	etool_circList *dlist = etool_circList_create(sizeof(int), 10);
+
+	etool_circList_copy(list, dlist);
+
+	etool_circListIterator *diterator = etool_circListIterator_init(dlist);
+	do {
+		printf("dList node : %d\n", **(int**)(diterator));
+	} while (etool_circListIterator_next(diterator));
+
 	etool_circList_destroy(list);
 
 	return 0;
@@ -116,16 +126,16 @@ int type_circQueue_test()
 	// 	printf("add %d : %p\n", i, list->memory->freeAddr[i]);
 	// }
 	
-	etool_circQueue_get(queue, &i);
-	printf("get %d \n", i);
+	etool_circQueue_head(queue, &i);
+	printf("head %d \n", i);
 	etool_circQueue_exit(queue, &i);
 	printf("exit %d \n", i);
 	etool_circQueue_exit(queue, &i);
 	printf("exit %d\n", i);
 
 
-	etool_circQueue_peer_get(queue, &i);
-	printf("peer_get %d \n", i);
+	etool_circQueue_peer_head(queue, &i);
+	printf("peer_head %d \n", i);
 	etool_circQueue_peer_exit(queue, &i);
 	printf("peer_exit %d \n", i);
 	etool_circQueue_exit(queue, &i);
@@ -159,4 +169,91 @@ int type_circQueue_test()
 	} while (etool_circQueueIterator_next(iterator));
 	etool_circQueue_destroy(queue);
 	return 0;	
+}
+
+int type_dblList_test()
+{
+	etool_dblList *list = etool_dblList_create(sizeof(int), 10);
+	for (int i = 0; i < 31; i++) {
+		printf("add %d\n", i);
+		if (etool_dblList_insert(list, i, &i, 1) == -1) {
+			printf("-1");
+			return -1;
+		}
+		printf("add %d : %p , %p\n", i, list->memory->freeAddr[i], ((struct _etool_dblNode*)list->memory->freeAddr[i])->next);
+	}
+	etool_dblList_clear(list);
+	for (int i = 0; i < 21; i++) {
+		printf("add %d\n", i);
+		int a = i*2;
+		if (etool_dblList_insert(list, i, &i, 1) == -1) {
+			printf("-1");
+			return -1;
+		}
+		printf("add %d, %p : %d  , %p\n", i, list->memory->freeAddr[i], list->memory->length, ((struct _etool_dblNode*)list->memory->freeAddr[i])->next);
+	}
+	// printf("addr : %p, %p\n", list->memory->freeAddr, list);
+	// for (int i = 0; i < 44; i++) {
+	// 	printf("add %d : %p\n", i, list->memory->freeAddr[i]);
+	// }
+	int i;
+	etool_dblList_erase(list, 5, &i, 1);
+	printf("add %d : %p\n", list->memory->length, list->memory->freeAddr[list->memory->length]);
+	etool_dblList_insert(list, 5, &i, 1);
+	printf("add %d, %p : %d  , %p\n", i, list->memory->freeAddr[5], list->memory->length, ((struct _etool_dblNode*)list->memory->freeAddr[5])->next);
+
+	etool_dblList_insert(list, 8, &i, 1);
+	etool_dblList_insert(list, 11, &i, 1);
+	etool_dblList_insert(list, 12, &i, 1);
+	etool_dblList_insert(list, 16, &i, 1);
+	etool_dblList_insert(list, 14, &i, 1);
+	etool_dblList_insert(list, 20, &i, 1);
+
+	etool_dblList_erase(list, 8, &i, 1);
+	etool_dblList_erase(list, 11, &i, 1);
+	etool_dblList_erase(list, 12, &i, 1);
+	etool_dblList_erase(list, 16, &i, 1);
+	etool_dblList_erase(list, 14, &i, 1);
+	etool_dblList_erase(list, 20, &i, 1);
+
+	// etool_circList_clear(list);
+	// for (int i = 0; i < 31; i++) {
+	// 	printf("add %d\n", i);
+	// 	int a = i*2;
+	// 	if (etool_dblList_insert(list, i, &a, 1) == -1) {
+	// 		printf("-1");
+	// 		return -1;
+	// 	}
+	// 	printf("add %d : %p , %p\n", i, list->memory->freeAddr[i], ((struct _etool_dblNode*)list->memory->freeAddr[i])->next);
+	// }
+
+	printf("List 5 erase node : %d\n", i);
+	i+=1;
+	int n = etool_dblList_locate(list, &i);
+	if (n == -1) {
+		printf("List %d locate node\n", n);
+	} else {
+		printf("List %d locate node\n", n);
+	}
+	printf("List length : %d\n", etool_dblList_length(list));
+	printf("List size : %d\n", list->memory->size);
+	printf("List 5 node : %d\n", *(int*)etool_dblList_find(list, 8, 1));
+	etool_dblListIterator *iterator = etool_dblListIterator_init(list);
+	do {
+		printf("List node : %d\n", **(int**)(iterator));
+	} while (etool_dblListIterator_next(iterator));
+
+	etool_dblList *dlist = etool_dblList_create(sizeof(int), 10);
+
+	etool_dblList_copy(list, dlist);
+
+	etool_dblListIterator *diterator = etool_dblListIterator_init(dlist);
+	do {
+		printf("dList node : %d\n", **(int**)(diterator));
+	} while (etool_dblListIterator_next(diterator));	
+
+	etool_dblList_destroy(list);
+	etool_dblList_destroy(dlist);
+
+	return 0;
 }

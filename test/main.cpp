@@ -5,8 +5,9 @@
 int main(int argc, char *argv[])
 {
 	printf("hello, world\n");
-	// type_circList_test();
-	type_circQueue_test();
+	type_circList_test();
+	// type_circQueue_test();
+	// type_dblList_test();
 	return 0;
 }
 
