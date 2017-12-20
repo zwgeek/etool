@@ -75,8 +75,9 @@ int etool_linkQueue_peer_head(etool_linkQueue *queue, void *value)
 
 int etool_linkQueue_enter(etool_linkQueue *queue, const void *value)
 {
-	struct _etool_linkNode *node = malloc(sizeof(struct _etool_linkNode));
+	struct _etool_linkNode *node = malloc(sizeof(struct _etool_linkNode) + queue->typeSize);
 	if (node == 0) { return -1; }
+	node->data = (void*)node + sizeof(struct _etool_linkNode);
 	int n;
 	for (n = 0; n < queue->typeSize; n++) {
 		node->data[n] = ((unsigned char*)value)[n];
@@ -90,8 +91,9 @@ int etool_linkQueue_enter(etool_linkQueue *queue, const void *value)
 
 int etool_linkQueue_peer_enter(etool_linkQueue *queue, const void *value)
 {
-	struct _etool_linkNode *node = malloc(sizeof(struct _etool_linkNode));
+	struct _etool_linkNode *node = malloc(sizeof(struct _etool_linkNode) + queue->typeSize);
 	if (node == 0) { return -1; }
+	node->data = (void*)node + sizeof(struct _etool_linkNode);
 	int n;
 	for (n = 0; n < queue->typeSize; n++) {
 		node->data[n] = ((unsigned char*)value)[n];

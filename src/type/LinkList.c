@@ -138,13 +138,13 @@ int etool_linkList_copy(etool_linkList *srcList, etool_linkList *dstList)
 	if (srcList->typeSize != dstList->typeSize) {
 		return -1;
 	}
-	struct _etool_linkNode *srcNode = (struct _etool_linkNode*)srcList;
+	struct _etool_linkNode *srcNode = (struct _etool_linkNode*)srcList->next;
 	struct _etool_linkNode *dstNode = (struct _etool_linkNode*)dstList;
 	etool_memory_clear(dstList->memory);
 	//开始拷贝
 	int n;
 	struct _etool_linkNode *newNode = 0;
-	while (srcNode->next != 0) {
+	while (srcNode != 0) {
 		newNode = etool_memory_malloc(dstList->memory);
 		if (newNode == 0) { return -1; }
 		newNode->data = (void*)newNode + sizeof(struct _etool_linkNode);
