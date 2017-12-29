@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #if defined(_windows)
 #include <windows.h>
 #include <io.h>	//判断文件夹
@@ -43,6 +44,18 @@
 
 // error code
 // #define ETOOL_
+
+/**
+ * 时间戳
+ * @return [s]
+ */
+time_t etool_os_time();
+
+/**
+ * 程序启动时的计时器
+ * @return [ms(CLOCKS_PER_SEC)]
+ */
+clock_t etool_os_clock();
 
 /**
  * 睡眠

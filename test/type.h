@@ -24,8 +24,8 @@ long start1 = etool_os_clock();
 	etool_circList_clear(list);
 	for (int i = 0; i < 99999; i++) {
 		// printf("add %d\n", i);
-		int a = i*2;
-		if (etool_circList_insertL(list, i, &i) == -1) {
+		// int a = i*2;
+		if (etool_circList_insert(list, i, &i) == -1) {
 			printf("-1");
 			return -1;
 		}
@@ -36,24 +36,24 @@ long start1 = etool_os_clock();
 	// 	printf("add %d : %p\n", i, list->memory->freeAddr[i]);
 	// }
 	int i;
-	etool_circList_eraseL(list, 5, &i);
+	etool_circList_erase(list, 5, &i);
 	//printf("add %d : %p\n", list->memory->length, list->memory->freeAddr[list->memory->length]);
-	etool_circList_insertL(list, 5, &i);
+	etool_circList_insert(list, 5, &i);
 	//printf("add %d, %p : %d  , %p\n", 5, list->memory->freeAddr[5], list->memory->length, ((struct _etool_circNode*)list->memory->freeAddr[5])->next);
 
-	// etool_circList_insertL(list, 8, &i);
-	// etool_circList_insertL(list, 11, &i);
-	// etool_circList_insertL(list, 12, &i);
-	// etool_circList_insertL(list, 16, &i);
-	// etool_circList_insertL(list, 14, &i);
-	// etool_circList_insertL(list, 20, &i);
+	// etool_circList_insert(list, 8, &i);
+	// etool_circList_insert(list, 11, &i);
+	// etool_circList_insert(list, 12, &i);
+	// etool_circList_insert(list, 16, &i);
+	// etool_circList_insert(list, 14, &i);
+	// etool_circList_insert(list, 20, &i);
 
-	// etool_circList_eraseL(list, 8, &i);
-	// etool_circList_eraseL(list, 11, &i);
-	// etool_circList_eraseL(list, 12, &i);
-	// etool_circList_eraseL(list, 16, &i);
-	// etool_circList_eraseL(list, 14, &i);
-	// etool_circList_eraseL(list, 20, &i);
+	// etool_circList_erase(list, 8, &i);
+	// etool_circList_erase(list, 11, &i);
+	// etool_circList_erase(list, 12, &i);
+	// etool_circList_erase(list, 16, &i);
+	// etool_circList_erase(list, 14, &i);
+	// etool_circList_erase(list, 20, &i);
 
 	// int d = 0;
 	// printf("ceshi 1 %c \n", i[d]);
@@ -83,7 +83,7 @@ long start1 = etool_os_clock();
 		printf("List %d locate node\n", n);
 	}
 	printf("List length : %d\n", etool_circList_length(list));
-	printf("List size : %d, %d\n", list->memory->size, sizeof(int));
+	// printf("List size : %d, %d\n", list->memory->size, sizeof(int));
 	printf("List 5 node : %d\n", *(int*)etool_circList_find(list, 8));
 	etool_circListIterator *iterator = etool_circListIterator_init(list);
 	do {
@@ -110,7 +110,8 @@ int type_circQueue_test()
 {
 long start = etool_os_clock();
 	int i;
-	etool_circQueue *queue = etool_circQueue_create(sizeof(long), 5000001);
+	etool_circQueue *queue = 0;
+	etool_circQueue_init(queue, 1000, long);
 long start1 = etool_os_clock();
 	// for (int i = 0; i < 11; i++) {
 	// 	//printf("add %d\n", i);
@@ -122,10 +123,10 @@ long start1 = etool_os_clock();
 	// etool_circQueue_exit(queue, &i);
 	// printf("exit %d \n", i);
 	// etool_circQueue_clear(queue);
-	for (long i = 0; i < 5000000; i++) {
+	for (long i = 0; i < 10000000; i++) {
 		//printf("add %d\n", i);
 		// int a = i*2;
-		etool_circQueue_enter(queue, &i);
+		etool_circQueue_enter(queue, i, long);
 		// if ( == -1) {
 		// 	printf("-1");
 		// 	return -1;
@@ -136,47 +137,47 @@ long start1 = etool_os_clock();
 	// 	printf("add %d : %p\n", i, list->memory->freeAddr[i]);
 	// }
 	
-	// etool_circQueue_head(queue, &i);
+	// etool_circQueue_head(queue, i, long);
 	// printf("head %d \n", i);
-	// etool_circQueue_exit(queue, &i);
+	// etool_circQueue_exit(queue, i, long);
 	// printf("exit %d \n", i);
-	// etool_circQueue_exit(queue, &i);
+	// etool_circQueue_exit(queue, i, long);
 	// printf("exit %d\n", i);
 
 
-	// etool_circQueue_peer_head(queue, &i);
+	// etool_circQueue_peer_head(queue, i, long);
 	// printf("peer_head %d \n", i);
-	// etool_circQueue_peer_exit(queue, &i);
+	// etool_circQueue_peer_exit(queue, i, long);
 	// printf("peer_exit %d \n", i);
-	// etool_circQueue_exit(queue, &i);
+	// etool_circQueue_exit(queue, i, long);
 	// printf("exit %d\n", i);
 
 
-	// etool_circQueue_enter(queue, &i);
+	// etool_circQueue_enter(queue, i, long);
 	// printf("enter %d\n", i);
 
-	// etool_circQueue_peer_enter(queue, &i);
+	// etool_circQueue_peer_enter(queue, i, long);
 	// printf("peer_enter %d\n", i);
 
-	// etool_circList_clear(queue);
-	// for (int i = 0; i < 31; i++) {
-	// 	printf("add %d\n", i);
-	// 	int a = i*2;
-	// 	if (etool_circList_insert(queue, i, &a) == -1) {
-	// 		printf("-1");
-	// 		return -1;
-	// 	}
-	// 	printf("add %d : %p , %p\n", i, queue->memory->freeAddr[i], ((struct _etool_circNode*)queue->memory->freeAddr[i])->next);
-	// }
+	// // etool_circList_clear(queue);
+	// // for (int i = 0; i < 31; i++) {
+	// // 	printf("add %d\n", i);
+	// // 	int a = i*2;
+	// // 	if (etool_circList_insert(queue, i, &a) == -1) {
+	// // 		printf("-1");
+	// // 		return -1;
+	// // 	}
+	// // 	printf("add %d : %p , %p\n", i, queue->memory->freeAddr[i], ((struct _etool_circNode*)queue->memory->freeAddr[i])->next);
+	// // }
 
 	// printf("queue front : %d\n", queue->front);
 	// printf("queue rear : %d\n", queue->rear);
 	// printf("queue length : %d\n", etool_circQueue_length(queue));
 	// printf("queue size : %d\n", queue->size);
-	// etool_circQueueIterator *iterator = etool_circQueueIterator_init(queue);
-	// do {
-	// 	//printf("queue node : %d\n", **(int**)(iterator));
-	// } while (etool_circQueueIterator_next(iterator));
+	// etool_circQueue_iterator(queue, {
+	// 	printf("queue node : %ld\n", *c);
+	// }, c, long);
+		
 	// etool_circQueue_destroy(queue);
 long end = etool_os_clock();
 printf("start : %ld, %ld, %ld\n", start, start1, CLOCKS_PER_SEC);

@@ -253,20 +253,20 @@ int etool_socket_send(etool_socket *sockfd, char *data, int length, etool_socket
 		etool_circQueue *buffer = (etool_circQueue*)((etool_socketConnect*)(sockfd->ptr))->sendBuffer;
 		if (etool_circQueue_empty(buffer)) {
 			ETOOL_SOCKET_IO_INIT(io, ETOOL_SOCKET_SEND, length, 0, data);
-			etool_circQueue_enter(buffer, (void*)&io);
+			etool_circQueue_enter(buffer, io, etool_socketIo*);
 			return 0;
 		}
 		int sendBytes = send(sockfd->fd, data, length, 0);
 		if (sendBytes == SOCKET_ERROR) {
 			if (errno == EAGAIN) {
 				ETOOL_SOCKET_IO_INIT(io, ETOOL_SOCKET_SEND, length, 0, data);
-				etool_circQueue_enter(buffer, (void*)&io);
+				etool_circQueue_enter(buffer, io, etool_socketIo*);
 				ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SOCKET_SEND);
 				return 0;
 			}
 		} else if (sendBytes < length) {
 			ETOOL_SOCKET_IO_INIT(io, ETOOL_SOCKET_SEND, length, sendBytes, data);
-			etool_circQueue_enter(buffer, (void*)&io);
+			etool_circQueue_enter(buffer, io, etool_socketIo*);
 			ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SOCKET_SEND);
 			return 0;
 		}
@@ -297,7 +297,7 @@ int etool_socket_recv(etool_socket *sockfd, char *data, int length, etool_socket
 		io->op = ETOOL_SOCKET_RECV;
 		io->len = length;
 		io->buf = data;
-		etool_circQueue_enter((etool_circQueue*)((etool_socketConnect*)(sockfd->ptr))->recvBuffer, (void*)&io);
+		etool_circQueue_enter((etool_circQueue*)(((etool_socketConnect*)(sockfd->ptr))->recvBuffer), io, etool_socketIo*);
 		return 0;
 	}
 #endif
@@ -350,20 +350,20 @@ int etool_socket_sendto(etool_socket *sockfd, char *data, int length, const char
 		etool_circQueue *buffer = (etool_circQueue*)((etool_socketConnect*)(sockfd->ptr))->sendBuffer;
 		if (etool_circQueue_empty(buffer)) {
 			ETOOL_SOCKET_IO_INIT(io, ETOOL_SOCKET_SENDTO, length, 0, data);
-			etool_circQueue_enter(buffer, (void*)&io);
+			etool_circQueue_enter(buffer, io, etool_socketIo*);
 			return 0;
 		}
 		int sendBytes = sendto(sockfd->fd, data, length, 0, (struct sockaddr*)addr, sizeof(struct sockaddr));
 		if (sendBytes == SOCKET_ERROR) {
 			if (errno == EAGAIN) {
 				ETOOL_SOCKET_IO_INIT(io, ETOOL_SOCKET_SENDTO, length, 0, data);
-				etool_circQueue_enter(buffer, (void*)&io);
+				etool_circQueue_enter(buffer, io, etool_socketIo*);
 				ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SOCKET_SEND);
 				return 0;
 			}
 		} else if (sendBytes < length) {
 			ETOOL_SOCKET_IO_INIT(io, ETOOL_SOCKET_SENDTO, length, sendBytes, data);
-			etool_circQueue_enter(buffer, (void*)&io);
+			etool_circQueue_enter(buffer, io, etool_socketIo*);
 			ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SOCKET_SEND);
 			return 0;
 		}
@@ -420,7 +420,7 @@ int etool_socket_recvfrom(etool_socket *sockfd, char *data, int length, const ch
 		io->op = ETOOL_SOCKET_RECVFROM;
 		io->len = length;
 		io->buf = data;
-		etool_circQueue_enter((etool_circQueue*)((etool_socketConnect*)(sockfd->ptr))->recvBuffer, (void*)&io);
+		etool_circQueue_enter((etool_circQueue*)((etool_socketConnect*)(sockfd->ptr))->recvBuffer, io, etool_socketIo*);
 		return 0;
 	}
 #endif
@@ -556,8 +556,18 @@ int etool_socket_nonblock(etool_socket *sockfd, etool_select *selectfd, etool_so
 	case ETOOL_SOCKET_SENDTO : {
 		sockfd->ptr = malloc(sizeof(etool_socketConnect));
 		if (sockfd->ptr == 0) { return -1; }
-		etool_circQueue_init(((etool_socketConnect*)(sockfd->ptr))->recvBuffer, sizeof(etool_socketIo*), IO_RECV_SIZE);
-		etool_circQueue_init(((etool_socketConnect*)(sockfd->ptr))->sendBuffer, sizeof(etool_socketIo*), IO_SEND_SIZE);
+		etool_circQueue *queue = (etool_circQueue*)(((etool_socketConnect*)(sockfd->ptr))->recvBuffer);
+		queue->data = (unsigned char*)queue + sizeof(etool_circQueue);
+		queue->front = 0;
+		queue->rear = 0;
+		queue->size = IO_RECV_SIZE;
+		queue->limit = IO_RECV_SIZE - 1;
+		queue = (etool_circQueue*)(((etool_socketConnect*)(sockfd->ptr))->sendBuffer);
+		queue->data = (unsigned char*)queue + sizeof(etool_circQueue);
+		queue->front = 0;
+		queue->rear = 0;
+		queue->size = IO_SEND_SIZE;
+		queue->limit = IO_SEND_SIZE - 1;
 		break; }
 	case ETOOL_SOCKET_ACCEPT :
 		sockfd->ptr = malloc(sizeof(etool_socketSingle));

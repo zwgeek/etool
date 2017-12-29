@@ -1,19 +1,25 @@
 #include "Executor.h"
 
 
+struct work_with_param
+{
+	etool_workProc *proc;
+	void *param;
+};
+
 void etool_worker_threadProc(void *this)
 {
 	struct _etool_worker *worker = (struct _etool_worker*)this;
-	void *_work[2];
+	struct work_with_param _work;
 	while(etool_thread_loop(&(worker->thread))) {
 		etool_mutexEx_lock(&(worker->mutex));
-		if (etool_circQueue_exit(worker->queue, (void*)&_work) != 0) {
+		if (etool_circQueue_empty(worker->queue)) {
 			worker->tick = 1;
 			etool_condition_wait(&(worker->condition), &(worker->mutex));
-			etool_circQueue_exit(worker->queue, (void*)&_work);
 		}
+		etool_circQueue_exit(worker->queue, _work, struct work_with_param);
 		etool_mutexEx_unlock(&(worker->mutex));
-		((etool_workProc*)(_work[0]))(_work[1]);
+		(_work.proc)(_work.param);
 	}
 }
 
@@ -63,21 +69,21 @@ etool_executor* etool_executor_create(unsigned int minCount, unsigned int maxCou
 			etool_executor_destroy(executor);
 			return 0;
 		}
-		worker->queue = etool_circQueue_create(sizeof(etool_workProc*) + sizeof(void*), ETOOL_WORK_QUEUE_SIZE);
+		etool_circQueue_init(worker->queue, ETOOL_WORK_QUEUE_SIZE, struct work_with_param);
 		if (worker->queue == 0) {
 			free(worker);
 			etool_executor_destroy(executor);
 			return 0;
 		}
 		if (etool_mutexEx_load(&(worker->mutex)) != 0) {
-			etool_circQueue_destroy(worker->queue);
+			etool_circQueue_free(worker->queue);
 			free(worker);
 			etool_executor_destroy(executor);
 			return 0;
 		}
 		if (etool_condition_load(&(worker->condition)) != 0) {
 			etool_mutexEx_unload(&(worker->mutex));
-			etool_circQueue_destroy(worker->queue);
+			etool_circQueue_free(worker->queue);
 			free(worker);
 			etool_executor_destroy(executor);
 			return 0;
@@ -85,7 +91,7 @@ etool_executor* etool_executor_create(unsigned int minCount, unsigned int maxCou
 		if (etool_thread_load(&(worker->thread)) != 0) {
 			etool_mutexEx_unload(&(worker->mutex));
 			etool_condition_unload(&(worker->condition));
-			etool_circQueue_destroy(worker->queue);
+			etool_circQueue_free(worker->queue);
 			free(worker);
 			etool_executor_destroy(executor);
 			return 0;
@@ -111,7 +117,7 @@ void etool_executor_destroy(etool_executor *executor)
 		etool_condition_signal(&(worker->condition));
 		etool_mutexEx_unload(&(worker->mutex));
 		etool_condition_unload(&(worker->condition));
-		etool_circQueue_destroy(worker->queue);
+		etool_circQueue_free(worker->queue);
 		etool_thread_unload(&(worker->thread));
 		free(worker);
 	}
@@ -136,8 +142,8 @@ void etool_executor_work(etool_executor *executor, etool_workProc *work, void *p
 	}
 	struct _etool_worker *worker = executor->workers[index];
 	etool_mutexEx_lock(&(worker->mutex));
-	void *_work[2] = {work, param};
-	etool_circQueue_enter(worker->queue, _work);
+	struct work_with_param _work = {work, param};
+	etool_circQueue_enter(worker->queue, _work, struct work_with_param);
 	if (worker->tick != 0) {
 		worker->tick = 0;
 		if (worker->tick != ETOOL_MAX_TICK){

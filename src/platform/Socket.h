@@ -109,8 +109,8 @@ typedef struct {
 #if defined(_windows)
 #endif
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
-	char recvBuffer[sizeof(etool_circQueue) + sizeof(etool_socketIo*) * IO_RECV_SIZE];
-	char sendBuffer[sizeof(etool_circQueue) + sizeof(etool_socketIo*) * IO_SEND_SIZE];
+	unsigned char recvBuffer[sizeof(etool_circQueue) + sizeof(etool_socketIo*) * IO_RECV_SIZE];
+	unsigned char sendBuffer[sizeof(etool_circQueue) + sizeof(etool_socketIo*) * IO_SEND_SIZE];
 #endif
 } etool_socketConnect;
 

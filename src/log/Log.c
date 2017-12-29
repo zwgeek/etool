@@ -4,10 +4,11 @@
 void etool_log_threadProc(void *this)
 {
 	etool_log *log = (etool_log*)this;
-	char *msg;
+	char *msg = 0;
 	while(etool_thread_loop(&(log->thread))) {
 		etool_mutexEx_lock(&(log->mutex));
-		if (etool_circQueue_exit(log->queue, (void*)&msg) != 0) {
+		if (!etool_circQueue_empty(log->queue)) {
+			etool_circQueue_exit(log->queue, msg, char*);
 			etool_condition_wait(&(log->condition), &(log->mutex));
 		}
 #ifdef USE_LOG_STDOUT
@@ -33,7 +34,7 @@ etool_log* etool_log_create(const char *path, const etool_logLevel level)
 	}
 	strcpy(log->path, path);
 	log->level = level;
-	log->queue = etool_circQueue_create(sizeof(char*), ETOOL_LOG_QUEUE_SIZE);
+	etool_circQueue_init(log->queue, ETOOL_LOG_QUEUE_SIZE, char*);
 	if (log->queue == 0) {
 		fclose(log->file);
 		free(log);
@@ -41,20 +42,20 @@ etool_log* etool_log_create(const char *path, const etool_logLevel level)
 	}
 	if (etool_mutexEx_load(&(log->mutex)) != 0) {
 		fclose(log->file);
-		etool_circQueue_destroy(log->queue);
+		etool_circQueue_free(log->queue);
 		free(log);
 		return 0;
 	}
 	if (etool_condition_load(&(log->condition)) != 0) {
 		fclose(log->file);
-		etool_circQueue_destroy(log->queue);
+		etool_circQueue_free(log->queue);
 		etool_mutexEx_unload(&(log->mutex));
 		free(log);
 		return 0;
 	}
 	if (etool_thread_load(&(log->thread)) != 0) {
 		fclose(log->file);
-		etool_circQueue_destroy(log->queue);
+		etool_circQueue_free(log->queue);
 		etool_mutexEx_unload(&(log->mutex));
 		etool_condition_unload(&(log->condition));
 		free(log);
@@ -69,7 +70,7 @@ void etool_log_destroy(etool_log *log)
 	etool_thread_cancel(&(log->thread));
 	etool_condition_signal(&(log->condition));
 	fclose(log->file);
-	etool_circQueue_destroy(log->queue);
+	etool_circQueue_free(log->queue);
 	etool_mutexEx_unload(&(log->mutex));
 	etool_condition_unload(&(log->condition));
 	etool_thread_unload(&(log->thread));
@@ -131,7 +132,7 @@ void etool_log_async_printf(etool_log *log, const etool_logLevel level, const ch
 	vsprintf(msg, fmt, argList);
 	va_end(argList);
 	etool_mutexEx_lock(&(log->mutex));
-	etool_circQueue_enter(log->queue, (void*)&msg);
+	etool_circQueue_enter(log->queue, msg, char*);
 	if (etool_circQueue_empty(log->queue)) {
 		etool_condition_signal(&(log->condition));
 	}

@@ -1,6 +1,16 @@
 #include "System.h"
 
 
+time_t etool_os_time()
+{
+	return time(0);
+}
+
+clock_t etool_os_clock()
+{
+	return clock();
+}
+
 void etool_os_sleep(const unsigned long milliseconds)
 {
 #if defined(_windows)
