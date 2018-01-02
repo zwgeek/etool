@@ -232,7 +232,7 @@ void etool_select_wait(etool_select *selectfd, etool_selectCallback *callback, c
 #endif
 
 #if defined(_linux) || defined(_android)
-	etool_socketIo *io;
+	etool_socketIo *io = 0;
 	etool_socket *sockfd;
 	struct epoll_event events[ETOOL_SELECT_SIZE];
 	int bytes, n, nfds = epoll_wait(selectfd->fd, events, ETOOL_SELECT_SIZE, timeout);
@@ -242,10 +242,10 @@ void etool_select_wait(etool_select *selectfd, etool_selectCallback *callback, c
 		case EPOLLIN :
 			if (sockfd->state == 0) {
 				//recv
-				if (etool_circQueue_empty((etool_circQueue*)(((etool_socketConnect*)(sockfd->ptr))->recvBuffer))) {
+				if (etool_circQueue_empty(&(((etool_socketConnect*)(sockfd->ptr))->recvQueue))) {
 					continue;
 				}
-				etool_circQueue_exit((etool_circQueue*)(((etool_socketConnect*)(sockfd->ptr))->recvBuffer), io, etool_socketIo*);
+				etool_circQueue_exit(&(((etool_socketConnect*)(sockfd->ptr))->recvQueue), io, etool_socketIo*);
 				if (io->op == ETOOL_SOCKET_RECV) {
 					bytes = recv(sockfd->fd, io->buf, io->len, 0);
 				} else {
@@ -267,11 +267,11 @@ void etool_select_wait(etool_select *selectfd, etool_selectCallback *callback, c
 			}
 			break;
 		case EPOLLOUT :
-			if (etool_circQueue_empty((etool_circQueue*)(((etool_socketConnect*)(sockfd->ptr))->sendBuffer))) {
+			if (etool_circQueue_empty(&(((etool_socketConnect*)(sockfd->ptr))->sendQueue))) {
 				ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SOCKET_RECV);
 				continue;
 			}
-			etool_circQueue_head((etool_circQueue*)(((etool_socketConnect*)(sockfd->ptr))->sendBuffer), io, etool_socketIo*);
+			etool_circQueue_head(&(((etool_socketConnect*)(sockfd->ptr))->sendQueue), io, etool_socketIo*);
 			if (io->op == ETOOL_SOCKET_SEND) {
 				bytes = send(sockfd->fd, io->buf + io->use, io->len - io->use, 0);
 			} else {
@@ -279,7 +279,7 @@ void etool_select_wait(etool_select *selectfd, etool_selectCallback *callback, c
 			}
 			io->use += bytes;
 			if (io->use == io->len) {
-				etool_circQueue_exit((etool_circQueue*)(((etool_socketConnect*)(sockfd->ptr))->sendBuffer), io, etool_socketIo*);
+				etool_circQueue_exit(&(((etool_socketConnect*)(sockfd->ptr))->sendQueue), io, etool_socketIo*);
 				if (bytes == 0) { io->use = -io->use; }
 				callback(sockfd, io, io->buf, io->use, io->op);
 			}
@@ -305,10 +305,10 @@ void etool_select_wait(etool_select *selectfd, etool_selectCallback *callback, c
 		case EVFILT_READ :
 			if (sockfd->state == 0) {
 				//recv		
-				if (etool_circQueue_empty((etool_circQueue*)(((etool_socketConnect*)(sockfd->ptr))->recvBuffer))) {
+				if (etool_circQueue_empty(&(((etool_socketConnect*)(sockfd->ptr))->recvQueue))) {
 					continue;
 				}
-				etool_circQueue_exit((etool_circQueue*)(((etool_socketConnect*)(sockfd->ptr))->recvBuffer), io, etool_socketIo*);
+				etool_circQueue_exit(&(((etool_socketConnect*)(sockfd->ptr))->recvQueue), io, etool_socketIo*);
 				if (io->op == ETOOL_SOCKET_RECV) {
 					bytes = recv(sockfd->fd, io->buf, io->len, 0);
 				} else {
@@ -330,11 +330,11 @@ void etool_select_wait(etool_select *selectfd, etool_selectCallback *callback, c
 			}
 			break;
 		case EVFILT_WRITE :
-			if (etool_circQueue_empty((etool_circQueue*)(((etool_socketConnect*)(sockfd->ptr))->sendBuffer))) {
+			if (etool_circQueue_empty(&(((etool_socketConnect*)(sockfd->ptr))->sendQueue))) {
 				ETOOL_SELECT_MOD(sockfd->selectfd, sockfd, ETOOL_SOCKET_RECV);
 				continue;
 			}
-			etool_circQueue_head((etool_circQueue*)(((etool_socketConnect*)(sockfd->ptr))->sendBuffer), io, etool_socketIo*);
+			etool_circQueue_head(&(((etool_socketConnect*)(sockfd->ptr))->sendQueue), io, etool_socketIo*);
 			if (io->op == ETOOL_SOCKET_SEND) {
 				bytes = send(sockfd->fd, io->buf + io->use, io->len - io->use, 0);
 			} else {
@@ -342,7 +342,7 @@ void etool_select_wait(etool_select *selectfd, etool_selectCallback *callback, c
 			}
 			io->use += bytes;
 			if (io->use == io->len) {
-				etool_circQueue_exit((etool_circQueue*)(((etool_socketConnect*)(sockfd->ptr))->sendBuffer), io, etool_socketIo*);
+				etool_circQueue_exit(&(((etool_socketConnect*)(sockfd->ptr))->sendQueue), io, etool_socketIo*);
 				if (bytes == 0) { io->use = -io->use; }
 				callback(sockfd, io, io->buf, io->use, io->op);
 			}

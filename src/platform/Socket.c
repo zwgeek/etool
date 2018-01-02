@@ -250,7 +250,7 @@ int etool_socket_send(etool_socket *sockfd, char *data, int length, etool_socket
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	if (io != 0) {
-		etool_circQueue *buffer = (etool_circQueue*)((etool_socketConnect*)(sockfd->ptr))->sendBuffer;
+		etool_circQueue *buffer = &(((etool_socketConnect*)(sockfd->ptr))->sendQueue);
 		if (etool_circQueue_empty(buffer)) {
 			ETOOL_SOCKET_IO_INIT(io, ETOOL_SOCKET_SEND, length, 0, data);
 			etool_circQueue_enter(buffer, io, etool_socketIo*);
@@ -297,7 +297,7 @@ int etool_socket_recv(etool_socket *sockfd, char *data, int length, etool_socket
 		io->op = ETOOL_SOCKET_RECV;
 		io->len = length;
 		io->buf = data;
-		etool_circQueue_enter((etool_circQueue*)(((etool_socketConnect*)(sockfd->ptr))->recvBuffer), io, etool_socketIo*);
+		etool_circQueue_enter(&(((etool_socketConnect*)(sockfd->ptr))->recvQueue), io, etool_socketIo*);
 		return 0;
 	}
 #endif
@@ -347,7 +347,7 @@ int etool_socket_sendto(etool_socket *sockfd, char *data, int length, const char
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	if (io != 0) {
-		etool_circQueue *buffer = (etool_circQueue*)((etool_socketConnect*)(sockfd->ptr))->sendBuffer;
+		etool_circQueue *buffer = &(((etool_socketConnect*)(sockfd->ptr))->sendQueue);
 		if (etool_circQueue_empty(buffer)) {
 			ETOOL_SOCKET_IO_INIT(io, ETOOL_SOCKET_SENDTO, length, 0, data);
 			etool_circQueue_enter(buffer, io, etool_socketIo*);
@@ -420,7 +420,7 @@ int etool_socket_recvfrom(etool_socket *sockfd, char *data, int length, const ch
 		io->op = ETOOL_SOCKET_RECVFROM;
 		io->len = length;
 		io->buf = data;
-		etool_circQueue_enter((etool_circQueue*)((etool_socketConnect*)(sockfd->ptr))->recvBuffer, io, etool_socketIo*);
+		etool_circQueue_enter(&(((etool_socketConnect*)(sockfd->ptr))->recvQueue), io, etool_socketIo*);
 		return 0;
 	}
 #endif
@@ -556,14 +556,14 @@ int etool_socket_nonblock(etool_socket *sockfd, etool_select *selectfd, etool_so
 	case ETOOL_SOCKET_SENDTO : {
 		sockfd->ptr = malloc(sizeof(etool_socketConnect));
 		if (sockfd->ptr == 0) { return -1; }
-		etool_circQueue *queue = (etool_circQueue*)(((etool_socketConnect*)(sockfd->ptr))->recvBuffer);
-		queue->data = (unsigned char*)queue + sizeof(etool_circQueue);
+		etool_circQueue *queue = &(((etool_socketConnect*)(sockfd->ptr))->recvQueue);
+		queue->data = ((etool_socketConnect*)(sockfd->ptr))->recvBuffer;
 		queue->front = 0;
 		queue->rear = 0;
 		queue->size = IO_RECV_SIZE;
 		queue->limit = IO_RECV_SIZE - 1;
-		queue = (etool_circQueue*)(((etool_socketConnect*)(sockfd->ptr))->sendBuffer);
-		queue->data = (unsigned char*)queue + sizeof(etool_circQueue);
+		queue = &(((etool_socketConnect*)(sockfd->ptr))->sendQueue);
+		queue->data = ((etool_socketConnect*)(sockfd->ptr))->sendBuffer;
 		queue->front = 0;
 		queue->rear = 0;
 		queue->size = IO_SEND_SIZE;
