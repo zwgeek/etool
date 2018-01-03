@@ -66,6 +66,7 @@ do { \
 do { \
 	free((queue)->data); \
 	free(queue); \
+	queue = 0; \
 } while(0)
 
 /**
@@ -140,7 +141,7 @@ do { \
 	(queue)->rear = (queue)->rear == (queue)->limit ? 0 : (queue)->rear + 1; \
 	((type*)((queue)->data))[(queue)->rear] = value; \
 	if ((queue)->rear == (queue)->front) { ETOOL_CIRCQUEUE_EXTEND(queue, type); } \
-} while (0)
+} while(0)
 
 /**
  * int etool_circQueue_peer_enter(etool_circQueue *queue, const void *value);
@@ -154,7 +155,7 @@ do { \
 	((type*)((queue)->data))[(queue)->front] = value; \
 	(queue)->front = (queue)->front == 0 ? (queue)->limit : (queue)->front - 1; \
 	if ((queue)->front == (queue)->rear) { ETOOL_CIRCQUEUE_EXTEND(queue, type); } \
-} while (0)
+} while(0)
 
 /**
  * int etool_circQueue_exit(etool_circQueue *queue, void *value);
@@ -167,7 +168,7 @@ do { \
 do { \
 	(queue)->front = (queue)->front == (queue)->limit ? 0 : (queue)->front + 1; \
 	value = ((type*)((queue)->data))[(queue)->front]; \
-} while (0)
+} while(0)
 
 /**
  * int etool_circQueue_peer_exit(etool_circQueue *queue, void *value);
@@ -180,7 +181,7 @@ do { \
 do { \
 	value = ((type*)((queue)->data))[(queue)->rear]; \
 	(queue)->rear = (queue)->rear == 0 ? (queue)->limit : (queue)->rear - 1; \
-} while (0)
+} while(0)
 
 /**
  * etool_circQueueIterator* etool_circQueue_iterator(etool_circQueue *queue);
@@ -192,10 +193,10 @@ do { \
 	type *element; \
 	unsigned int num = (queue)->front; \
 	while (num != (queue)->rear) { \
-		num = num == (queue)->limit ? 0: num + 1; \
+		num = num == (queue)->limit ? 0 : num + 1; \
 		element = (type*)((queue)->data) + num; \
 		block \
 	} \
-} while (0)
+} while(0)
 
 #endif //ETOOL_TYPE_CIRCQUEUE
