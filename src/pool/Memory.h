@@ -9,35 +9,33 @@
 
 #include <stdlib.h>
 
-#define ETOOL_MEMORY_MODE_INIT		0
-#define ETOOL_MEMORY_MODE_CREATE	1
 #define ETOOL_MEMORY_EXTEND(memory) \
-int n, size = memory->size / memory->mode * (memory->mode + 1); \
-unsigned char *_data = malloc(memory->typeSize * memory->size / memory->mode); \
+int n, size = memory->size / memory->count * (memory->count + 1); \
+unsigned char *_data = malloc(memory->typeSize * memory->size / memory->count); \
 if (_data == 0) {return 0; } \
-unsigned char **_freeAddr = malloc(sizeof(void*) * (size + memory->mode + 1)); \
+unsigned char **_freeAddr = malloc(sizeof(void*) * (size + memory->count + 1)); \
 if (_freeAddr == 0) { free(_data); return 0; } \
 for (n = 0; n < memory->size; n++) { \
 	_freeAddr[n] = memory->freeAddr[n]; \
 } \
-for (n = 0; n < memory->mode; n++) { \
+for (n = 0; n < memory->count; n++) { \
 	_freeAddr[size + n] = memory->freeAddr[memory->size + n]; \
 } \
-_freeAddr[size + memory->mode] = _data; \
-for (n = 0; n < (memory->size / memory->mode); n++) { \
+_freeAddr[size + memory->count] = _data; \
+for (n = 0; n < (memory->size / memory->count); n++) { \
 	_freeAddr[memory->size + n] = _data + n * memory->typeSize; \
 } \
 free(memory->freeAddr); \
 memory->freeAddr = _freeAddr; \
 memory->size = size; \
-memory->mode++ \
+memory->count++ \
 
 typedef struct _etool_memory {
 	unsigned char **freeAddr;
 	unsigned int typeSize;
 	unsigned int size;
 	unsigned int length;
-	unsigned int mode;
+	unsigned int count;
 } etool_memory;
 
 /**
@@ -54,23 +52,6 @@ etool_memory* etool_memory_create(const unsigned int typeSize, const unsigned in
  * @return      [error code]
  */
 void etool_memory_destroy(etool_memory *memory);
-
-/**
- * 创建一个符合要求的memory需要的字节数
- * @param  typeSize [description]
- * @param  size     [description]
- * @return          [description]
- */
-int etool_memory_size(const unsigned int typeSize, const unsigned int size);
-
-/**
- * 初始化一个memory 并且将一个内存块设入memory模块(静态/动态存储表示),内存块由开发者创建销毁
- * @param  block     [description]
- * @param  typeSize [description]
- * @param  size     [description]
- * @return          [实体]
- */
-etool_memory* etool_memory_init(void *block, const unsigned int typeSize, const unsigned int size);
 
 /**
  * 清空memory

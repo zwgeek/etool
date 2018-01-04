@@ -13,7 +13,6 @@
 typedef struct _etool_linkList {
 	etool_memory *memory;
 	struct _etool_linkNode *next;
-	unsigned int typeSize;
 } etool_linkList;
 
 struct _etool_linkNode {
@@ -28,34 +27,31 @@ typedef struct _etool_linkListIterator {
 
 
 /**
- * 创建list (动态存储表示)
- * @param  typeSize [not null]
- * @param  size   [not null]
+ * 初始化一个list, 并且将一个数据源设入list(动态存储表示),容器数据由开发者创建销毁
+ * @param  block     [not null]
  * @return          [实体]
  */
-etool_linkList* etool_linkList_create(const unsigned int typeSize, const unsigned int size);
+etool_linkList* etool_linkList_init(list, volume, type) \
+do { \
+		list = malloc(sizeof(etool_linkList));
+		if (list != 0) {
+			list->memory = etool_memory_create(sizeof(struct _etool_linkNode) + typeSize, size);
+			if (list->memory != 0) {
+				list->next = 0;
+			} else {
+				free(list);
+				list = 0;
+			}
+		}
+} while(0)
+
 
 /**
  * 销毁list(动态存储表示)
  * @param  list [not null]
  * @return      [error code]
  */
-void etool_linkList_destroy(etool_linkList *list);
-
-/**
- * 获取一个list的总的大小
- * @param  typeSize [not null]
- * @param  size     [not null]
- * @return          [实体]
- */
-int etool_linkList_size(const unsigned int typeSize, const unsigned int size);
-
-/**
- * 初始化一个list, 并且将一个数据源设入list(静态/动态存储表示),容器数据由开发者创建销毁
- * @param  block     [not null]
- * @return          [实体]
- */
-etool_linkList* etool_linkList_init(void *block, const unsigned int typeSize, const unsigned int size);
+void etool_linkList_free(etool_linkList *list);
 
 /**
  * 清空list

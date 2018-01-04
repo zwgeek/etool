@@ -20,6 +20,7 @@ struct _etool_circNode {
 	struct _etool_circNode *next;
 };
 
+
 /**
  * 初始化一个list, 并且将一个数据源设入list(动态存储表示),容器数据由开发者创建销毁
  * @param  list     [not null]

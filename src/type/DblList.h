@@ -20,6 +20,7 @@ struct _etool_dblNode {
 	struct _etool_dblNode *previous, *next;
 };
 
+
 /**
  * etool_dblList* etool_dblList_init(void *block, const unsigned int typeSize, const unsigned int size);
  * 初始化一个list, 并且将一个数据源设入list(动态存储表示),容器数据由开发者创建销毁
@@ -29,9 +30,9 @@ struct _etool_dblNode {
 do { \
 	list = (etool_dblList*)malloc(sizeof(etool_dblList)); \
 	if (list != 0) { \
-		list->memory = etool_memory_create(sizeof(struct _etool_dblNode) + sizeof(type), volume); \
-		if (list->memory != 0) { \
-			list->previous = list->next = (struct _etool_dblNode*)(list); \
+		(list)->memory = etool_memory_create(sizeof(struct _etool_dblNode) + sizeof(type), volume); \
+		if ((list)->memory != 0) { \
+			(list)->previous = (list)->next = (struct _etool_dblNode*)(list); \
 		} else { \
 			free(list); \
 			list = 0; \
@@ -46,7 +47,7 @@ do { \
  */
 #define etool_dblList_free(list) \
 do { \
-	etool_memory_destroy(list->memory); \
+	etool_memory_destroy((list)->memory); \
 	free(list); \
 	list = 0; \
 } while(0)
@@ -58,8 +59,8 @@ do { \
  */
 #define etool_dblList_clear(list) \
 do { \
-	etool_memory_clear(list->memory); \
-	list->previous = list->next = (struct _etool_dblNode*)(list); \
+	etool_memory_clear((list)->memory); \
+	(list)->previous = (list)->next = (struct _etool_dblNode*)(list); \
 } while(0)
 
 /**
@@ -68,7 +69,7 @@ do { \
  * @param  list [description]
  */
 #define etool_dblList_length(list) \
-(list->memory->length)
+((list)->memory->length)
 
 /**
  * int etool_dblList_empty(etool_dblList *list);
@@ -76,7 +77,7 @@ do { \
  * @param  list [description]
  */
 #define etool_dblList_empty(list) \
-(list->next == (struct _etool_dblNode*)(list))
+((list)->next == (struct _etool_dblNode*)(list))
 
 /**
  * int etool_dblList_full(etool_dblList *list);
@@ -84,7 +85,7 @@ do { \
  * @param  list [description]
  */
 #define etool_dblList_full(list) \
-(list->memory->length == list->memory->size)
+((list)->memory->length == (list)->memory->size)
 
 /**
  * void* etool_dblList_find(etool_dblList *list, unsigned int index, int direction);
@@ -96,19 +97,20 @@ do { \
  */
 #define etool_dblList_find(list, index, value, type) \
 do { \
-	if (index >= 0) { \
-		struct _etool_dblNode *node = list->next; \
-		while (index > 0) { \
-			index--; \
+	int _index = index; \
+	if (_index >= 0) { \
+		struct _etool_dblNode *node = (list)->next; \
+		while (_index > 0) { \
+			_index--; \
 			node = node->next; \
 		} \
 		value = *(type*)(node->data); \
 	} else { \
-		struct _etool_dblNode *node = list->previous; \
+		struct _etool_dblNode *node = (list)->previous; \
 		do { \
-			index++; \
+			_index++; \
 			node = node->previous; \
-		} while(index < 0); \
+		} while(_index < 0); \
 		value = *(type*)(node->data); \
 	} \
 } while(0)
@@ -123,8 +125,8 @@ do { \
  */
 #define etool_dblList_locate(list, value, index, type) \
 do { \
-	struct _etool_dblNode *node = list->next; \
-	for(index = 0; node != (struct _etool_dblNode*)list; index++) { \
+	struct _etool_dblNode *node = (list)->next; \
+	for(index = 0; node != (struct _etool_dblNode*)(list); index++) { \
 		if (*(type*)(node->data) == value) { \
 			break; \
 		} \
@@ -142,14 +144,15 @@ do { \
  */
 #define etool_dblList_insert(list, index, value, type) \
 do { \
-	struct _etool_dblNode *newNode = etool_memory_malloc(list->memory); \
-	if (newNode == 0) { \
+	struct _etool_dblNode *newNode = (struct _etool_dblNode*)etool_memory_malloc((list)->memory); \
+	if (newNode != 0) { \
+		int _index = index; \
 		newNode->data = (unsigned char*)newNode + sizeof(struct _etool_dblNode); \
 		*(type*)(newNode->data) = value; \
-		if (index >= 0) { \
-			struct _etool_dblNode *node = list->next; \
-			while (index > 0) { \
-				index--; \
+		if (_index >= 0) { \
+			struct _etool_dblNode *node = (list)->next; \
+			while (_index > 0) { \
+				_index--; \
 				node = node->next; \
 			} \
 			newNode->previous = node->previous; \
@@ -157,10 +160,11 @@ do { \
 			node->previous = newNode; \
 			newNode->previous->next = newNode; \
 		} else { \
+			struct _etool_dblNode *node = (list)->previous; \
 			do { \
-				index++; \
+				_index++; \
 				node = node->previous; \
-			} while(index < 0); \
+			} while(_index < 0); \
 			newNode->next = node->next; \
 			newNode->previous = node; \
 			node->next = newNode; \
@@ -179,26 +183,27 @@ do { \
  */
 #define etool_dblList_erase(list, index, value, type) \
 do { \
-	if (index >= 0) { \
-		struct _etool_dblNode *node = list->next; \
-		while(index > 0) { \
-			index--; \
+	int _index = index; \
+	if (_index >= 0) { \
+		struct _etool_dblNode *node = (list)->next; \
+		while(_index > 0) { \
+			_index--; \
 			node = node->next; \
 		} \
 		node->previous->next = node->next; \
 		node->next->previous = node->previous; \
 		value = *(type*)(node->data); \
-		etool_memory_free(list->memory, node); \
+		etool_memory_free((list)->memory, node); \
 	} else { \
-		struct _etool_dblNode *node = list->previous; \
+		struct _etool_dblNode *node = (list)->previous; \
 		do { \
-			index++; \
+			_index++; \
 			node = node->previous; \
-		} while(index < 0); \
+		} while(_index < 0); \
 		node->previous->next = node->next; \
 		node->next->previous = node->previous; \
 		value = *(type*)(node->data); \
-		etool_memory_free(list->memory, node); \
+		etool_memory_free((list)->memory, node); \
 	} \
 } while(0)
 
@@ -211,23 +216,23 @@ do { \
  */
 #define etool_dblList_copy(srcList, dstList, type) \
 do { \
-	struct _etool_dblNode *srcNode = (struct _etool_dblNode*)(srcList)->next;
-	struct _etool_dblNode *dstNode = (struct _etool_dblNode*)(dstList);
-	etool_memory_clear((dstList)->memory);
-	struct _etool_dblNode *newNode = 0;
-	while (srcNode != (struct _etool_dblNode*)(srcList)) {
-		newNode = etool_memory_malloc((dstList)->memory);
-		if (newNode != 0) {
-			newNode->data = (void*)newNode + sizeof(struct _etool_dblNode);
-			*(type*)(newNode->data) = *(type*)(srcNode->data);
-			newNode->previous = dstNode;
-			dstNode->next = newNode;
-			dstNode = newNode;
-		}
-		srcNode = srcNode->next;
-	}
-	(dstList)->previous = dstNode;
-	dstNode->next = (struct _etool_dblNode*)(dstList);
+	struct _etool_dblNode *srcNode = (struct _etool_dblNode*)(srcList)->next; \
+	struct _etool_dblNode *dstNode = (struct _etool_dblNode*)(dstList); \
+	etool_memory_clear((dstList)->memory); \
+	struct _etool_dblNode *newNode = 0; \
+	while (srcNode != (struct _etool_dblNode*)(srcList)) { \
+		newNode = (struct _etool_dblNode*)etool_memory_malloc((dstList)->memory); \
+		if (newNode != 0) { \
+			newNode->data = (unsigned char*)newNode + sizeof(struct _etool_dblNode); \
+			*(type*)(newNode->data) = *(type*)(srcNode->data); \
+			newNode->previous = dstNode; \
+			dstNode->next = newNode; \
+			dstNode = newNode; \
+		} \
+		srcNode = srcNode->next; \
+	} \
+	(dstList)->previous = dstNode; \
+	dstNode->next = (struct _etool_dblNode*)(dstList); \
 } while(0)
 
 /**
