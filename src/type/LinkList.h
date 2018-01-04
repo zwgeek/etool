@@ -31,18 +31,18 @@ typedef struct _etool_linkListIterator {
  * @param  block     [not null]
  * @return          [实体]
  */
-etool_linkList* etool_linkList_init(list, volume, type) \
+#define etool_linkList_init(list, volume, type) \
 do { \
-		list = malloc(sizeof(etool_linkList));
-		if (list != 0) {
-			list->memory = etool_memory_create(sizeof(struct _etool_linkNode) + typeSize, size);
-			if (list->memory != 0) {
-				list->next = 0;
-			} else {
-				free(list);
-				list = 0;
-			}
-		}
+	list = malloc(sizeof(etool_linkList)); \
+	if (list != 0) { \
+		list->memory = etool_memory_create(sizeof(struct _etool_linkNode) + sizeof(type), size); \
+		if (list->memory != 0) { \
+			list->next = 0; \
+		} else { \
+			free(list); \
+			list = 0; \
+		} \
+	} \
 } while(0)
 
 
@@ -51,34 +51,46 @@ do { \
  * @param  list [not null]
  * @return      [error code]
  */
-void etool_linkList_free(etool_linkList *list);
+#define etool_linkList_free(list) \
+do { \
+	etool_memory_destroy(list->memory); \
+	free(list); \
+	list = 0; \
+} while(0)
 
 /**
  * 清空list
  * @param  list [not null]
  */
-void etool_linkList_clear(etool_linkList *list);
+#define etool_linkList_clear(list) \
+do { \
+	etool_memory_clear(list->memory); \
+	list->next = 0; \
+} while(0)
 
 /**
  * 获得list的有效长度
  * @param  list [description]
  * @return      [description]
  */
-int etool_linkList_length(etool_linkList *list);
+#define etool_linkList_length(list) \
+(list->memory->length)
 
 /**
  * list是否为空
  * @param  list [description]
  * @return      [bool code]
  */
-int etool_linkList_empty(etool_linkList *list);
+#define etool_linkList_empty(list) \
+(list->next == 0)
 
 /**
  * list是否已满
  * @param  list [description]
  * @return      [bool code]
  */
-int etool_linkList_full(etool_linkList *list);
+#define etool_linkList_full(list) \
+(list->memory->length == list->memory->size)
 
 /**
  * 查找list中的节点,O((n+1)/2)
@@ -86,7 +98,17 @@ int etool_linkList_full(etool_linkList *list);
  * @param  index [description]
  * @return      [description]
  */
-void* etool_linkList_find(etool_linkList *list, unsigned int index);
+#define etool_linkList_find(list, index, value, type) \
+do { \
+	if (index >= 0 && index < list->memory->length) {
+		struct _etool_linkNode *node = list->next;
+		while(index > 0) {
+			index--;
+			node = node->next;
+		}
+		value = *(type*)(node->data);
+	}
+} while(0)
 
 /**
  * 定位list中的节点,O((n+1)/2)
