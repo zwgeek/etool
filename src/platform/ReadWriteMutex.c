@@ -64,8 +64,7 @@ int etool_readWriteMutex_trylockRead(etool_readWriteMutex *mutex)
 		mutex->readCount++;
 		etool_mutex_unlock(&(mutex->readMutex));
 		return 0;	
-	}
-	else {
+	} else {
 		return -1;
 	}
 }

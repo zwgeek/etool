@@ -15,10 +15,13 @@ typedef struct _etool_linkList {
 	struct _etool_linkNode *next;
 } etool_linkList;
 
+#ifndef ETOOL_LINKNODE
+#define ETOOL_LINKNODE
 struct _etool_linkNode {
 	unsigned char *data;
 	struct _etool_linkNode *next;
 };
+#endif
 
 
 /**

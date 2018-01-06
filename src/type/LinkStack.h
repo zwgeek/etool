@@ -15,10 +15,13 @@ typedef struct _etool_linkStack {
 	struct _etool_linkNode *top;
 } etool_linkStack;
 
+#ifndef ETOOL_LINKNODE
+#define ETOOL_LINKNODE
 struct _etool_linkNode {
 	unsigned char *data;
 	struct _etool_linkNode *next;
 };
+#endif
 
 typedef struct _etool_linkStackIterator {
 	unsigned char *data;

@@ -100,9 +100,7 @@ int etool_semaphore_trypend(etool_semaphore *semaphore, const int timeOut)
 		ts.tv_sec += ts.tv_nsec / 1000000000;
 		ts.tv_nsec = ts.tv_nsec % 1000000000;
 		return sem_timedwait(&(semaphore->semaphore), &ts);
-	} 
-	else 
-	{
+	} else {
 		return sem_trywait(&(semaphore->semaphore));
 	}
 #endif
@@ -113,9 +111,7 @@ int etool_semaphore_trypend(etool_semaphore *semaphore, const int timeOut)
 	// {
 	// 	mach_timespec_t wait_time = {0, timeOut * 1000000};
 	// 	return semaphore_timedwait(semaphore->semaphore, wait_time);
-	// }
-	// else
-	// {
+	// } else {
 	mach_timespec_t wait_time = {0, (clock_res_t)timeOut * 1000000};
 	return semaphore_timedwait(semaphore->semaphore, wait_time);
 	// }

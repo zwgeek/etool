@@ -114,7 +114,9 @@ do { \
  */
 #define etool_circQueue_head(queue, value, type) \
 do { \
-	value = ((type*)((queue)->data))[(queue)->front == (queue)->limit ? 0 : (queue)->front + 1]; \
+	if ((queue)->rear == (queue)->front) { \
+		value = ((type*)((queue)->data))[(queue)->front == (queue)->limit ? 0 : (queue)->front + 1]; \
+	} \
 } while(0)
 
 /**
@@ -126,7 +128,9 @@ do { \
  */
 #define etool_circQueue_peer_head(queue, value, type) \
 do { \
-	value = ((type*)((queue)->data))[(queue)->rear]; \
+	if ((queue)->rear == (queue)->front) { \
+		value = ((type*)((queue)->data))[(queue)->rear]; \
+	} \
 } while(0)
 
 /**

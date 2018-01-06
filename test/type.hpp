@@ -4,7 +4,7 @@ extern "C" {
 #include "../src/type/CircQueue.h"
 #include "../src/type/DblList.h"
 #include "../src/type/LinkList.h"
-// #include "../src/type/LinkQueue.h"
+#include "../src/type/LinkQueue.h"
 // #include "../src/type/LinkStack.h"
 }
 
@@ -354,73 +354,67 @@ int type_LinkList_test()
 	return 0;
 }
 
-// int type_LinkQueue_test()
-// {
-// 	int i;
-// 	etool_linkQueue *queue = etool_linkQueue_create(sizeof(int));
-// 	for (int i = 0; i < 11; i++) {
-// 		printf("add %d\n", i);
-// 		if (etool_linkQueue_enter(queue, &i) == -1) {
-// 			printf("-1");
-// 			return -1;
-// 		}
-// 	}
-// 	etool_linkQueue_exit(queue, &i);
-// 	printf("exit %d \n", i);
-// 	// etool_linkQueue_clear(queue);
-// 	for (int i = 0; i < 11; i++) {
-// 		printf("add %d\n", i);
-// 		int a = i*2;
-// 		if (etool_linkQueue_enter(queue, &i) == -1) {
-// 			printf("-1");
-// 			return -1;
-// 		}
-// 	}
-// 	// printf("addr : %p, %p\n", list->memory->freeAddr, list);
-// 	// for (int i = 0; i < 44; i++) {
-// 	// 	printf("add %d : %p\n", i, list->memory->freeAddr[i]);
-// 	// }
+int type_LinkQueue_test()
+{
+	int i;
+	etool_linkQueue *queue = 0;
+	etool_linkQueue_init(queue);
+	for (int i = 0; i < 11; i++) {
+		printf("add %d\n", i);
+		etool_linkQueue_enter(queue, i, int);
+	}
+	etool_linkQueue_exit(queue, i, int);
+	printf("exit %d \n", i);
+	// etool_linkQueue_clear(queue);
+	for (int i = 0; i < 11; i++) {
+		printf("add %d\n", i);
+		etool_linkQueue_enter(queue, i, int);
+	}
+	// printf("addr : %p, %p\n", list->memory->freeAddr, list);
+	// for (int i = 0; i < 44; i++) {
+	// 	printf("add %d : %p\n", i, list->memory->freeAddr[i]);
+	// }
 	
-// 	etool_linkQueue_head(queue, &i);
-// 	printf("head %d \n", i);
-// 	etool_linkQueue_exit(queue, &i);
-// 	printf("exit %d \n", i);
-// 	etool_linkQueue_exit(queue, &i);
-// 	printf("exit %d\n", i);
+	etool_linkQueue_head(queue, i, int);
+	printf("head %d \n", i);
+	etool_linkQueue_exit(queue, i, int);
+	printf("exit %d \n", i);
+	etool_linkQueue_exit(queue, i, int);
+	printf("exit %d\n", i);
 
 
-// 	etool_linkQueue_peer_head(queue, &i);
-// 	printf("peer_head %d \n", i);
-// 	etool_linkQueue_peer_exit(queue, &i);
-// 	printf("peer_exit %d \n", i);
-// 	etool_linkQueue_exit(queue, &i);
-// 	printf("exit %d\n", i);
+	etool_linkQueue_peer_head(queue, i, int);
+	printf("peer_head %d \n", i);
+	etool_linkQueue_peer_exit(queue, i, int);
+	printf("peer_exit %d \n", i);
+	etool_linkQueue_exit(queue, i, int);
+	printf("exit %d\n", i);
 
 
-// 	etool_linkQueue_enter(queue, &i);
-// 	printf("enter %d\n", i);
+	etool_linkQueue_enter(queue, i, int);
+	printf("enter %d\n", i);
 
-// 	etool_linkQueue_peer_enter(queue, &i);
-// 	printf("peer_enter %d\n", i);
+	etool_linkQueue_peer_enter(queue, i, int);
+	printf("peer_enter %d\n", i);
 
-// 	// etool_circList_clear(queue);
-// 	// for (int i = 0; i < 31; i++) {
-// 	// 	printf("add %d\n", i);
-// 	// 	int a = i*2;
-// 	// 	if (etool_circList_insert(queue, i, &a) == -1) {
-// 	// 		printf("-1");
-// 	// 		return -1;
-// 	// 	}
-// 	// 	printf("add %d : %p , %p\n", i, queue->memory->freeAddr[i], ((struct _etool_linkNode*)queue->memory->freeAddr[i])->next);
-// 	// }
+	// etool_circList_clear(queue);
+	// for (int i = 0; i < 31; i++) {
+	// 	printf("add %d\n", i);
+	// 	int a = i*2;
+	// 	if (etool_circList_insert(queue, i, &a) == -1) {
+	// 		printf("-1");
+	// 		return -1;
+	// 	}
+	// 	printf("add %d : %p , %p\n", i, queue->memory->freeAddr[i], ((struct _etool_linkNode*)queue->memory->freeAddr[i])->next);
+	// }
 
-// 	printf("queue front : %p\n", queue->front);
-// 	printf("queue rear : %p\n", queue->rear);
-// 	printf("queue length : %d\n", etool_linkQueue_length(queue));
-// 	etool_linkQueueIterator *iterator = etool_linkQueueIterator_init(queue);
-// 	do {
-// 		printf("queue node : %d\n", **(int**)(iterator));
-// 	} while (etool_linkQueueIterator_next(iterator));
-// 	etool_linkQueue_destroy(queue);
-// 	return 0;	
-// }
+	printf("queue front : %p\n", queue->front);
+	printf("queue rear : %p\n", queue->rear);
+	printf("queue length : %d\n", etool_linkQueue_length(queue));
+	
+	etool_linkQueue_iterator(queue, {
+		printf("queue node : %d\n", *data);
+	}, data, int);
+	etool_linkQueue_free(queue);
+	return 0;	
+}
