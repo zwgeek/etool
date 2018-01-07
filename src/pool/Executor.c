@@ -11,7 +11,7 @@ void etool_worker_threadProc(void *this)
 {
 	struct _etool_worker *worker = (struct _etool_worker*)this;
 	struct work_with_param _work;
-	while(etool_thread_loop(&(worker->thread))) {
+	while (etool_thread_loop(&(worker->thread))) {
 		etool_mutexEx_lock(&(worker->mutex));
 		if (etool_circQueue_empty(worker->queue)) {
 			worker->tick = 1;
@@ -28,8 +28,8 @@ void etool_executor_threadProc(void *this)
 	etool_executor *executor = (etool_executor*)this;
 	int index = executor->maxCount;
 	struct _etool_worker *worker;
-	while(etool_thread_loop(&(executor->thread))) {
-		while(index--) {
+	while (etool_thread_loop(&(executor->thread))) {
+		while (index--) {
 			worker = executor->workers[index];
 			etool_mutexEx_lock(&(worker->mutex));
 			if (worker->tick != 0) {
@@ -111,7 +111,7 @@ void etool_executor_destroy(etool_executor *executor)
 {
 	int index = executor->maxCount;
 	struct _etool_worker *worker;
-	while(index--) {
+	while (index--) {
 		worker = executor->workers[index];
 		etool_thread_cancel(&(worker->thread));
 		etool_condition_signal(&(worker->condition));

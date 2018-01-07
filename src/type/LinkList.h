@@ -1,7 +1,6 @@
 /**
  * Copyright 2017, PaPa.  All rights reserved.
  * 基于链表方式的线性表
- * 使用unsigned char(byte)来处理所有的数据类型
  */
 
 #ifndef ETOOL_TYPE_LINKLIST
@@ -106,7 +105,7 @@ do { \
 	if (index >= 0 && index < (list)->memory->length) { \
 		unsigned int _index = index; \
 		struct _etool_linkNode *node = (list)->next; \
-		while(_index > 0) { \
+		while (_index > 0) { \
 			_index--; \
 			node = node->next; \
 		} \
@@ -125,7 +124,7 @@ do { \
 #define etool_linkList_locate(list, value, index, type) \
 do { \
 	struct _etool_linkNode *node = (list)->next; \
-	for(index = 0; node != 0; index++) { \
+	for (index = 0; node != 0; index++) { \
 		if (*(type*)(node->data) == value) { \
 			break; \
 		} \
@@ -150,7 +149,7 @@ do { \
 			newNode->data = (unsigned char*)newNode + sizeof(struct _etool_linkNode); \
 			*(type*)(newNode->data) = value; \
 			struct _etool_linkNode *node = (struct _etool_linkNode*)(list); \
-			while(_index > 0) { \
+			while (_index > 0) { \
 				_index--; \
 				node = node->next; \
 			} \
@@ -173,7 +172,7 @@ do { \
 	if (index >= 0 && index < (list)->memory->length) { \
 		unsigned int _index = index; \
 		struct _etool_linkNode *node = (struct _etool_linkNode*)(list); \
-		while(_index > 0) { \
+		while (_index > 0) { \
 			_index--; \
 			node = node->next; \
 		} \

@@ -1,7 +1,6 @@
 /**
  * Copyright 2017, PaPa.  All rights reserved.
  * 基于链表方式的(支持双端队列)队列(不使用Memory模块)
- * 使用unsigned char(byte)来处理所有的数据类型
  */
 
 #ifndef ETOOL_TYPE_LINKQUEUE
@@ -61,6 +60,7 @@ do { \
 	} \
 	free((queue)->front); \
 	free(queue); \
+	queue = 0; \
 } while(0)
 
 /**

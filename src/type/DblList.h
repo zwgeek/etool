@@ -1,7 +1,6 @@
 /**
  * Copyright 2017, PaPa.  All rights reserved.
  * 基于双循环链表方式的线性表
- * 使用unsigned char(byte)来处理所有的数据类型
  */
 
 #ifndef ETOOL_TYPE_DBLLIST
@@ -126,7 +125,7 @@ do { \
 #define etool_dblList_locate(list, value, index, type) \
 do { \
 	struct _etool_dblNode *node = (list)->next; \
-	for(index = 0; node != (struct _etool_dblNode*)(list); index++) { \
+	for (index = 0; node != (struct _etool_dblNode*)(list); index++) { \
 		if (*(type*)(node->data) == value) { \
 			break; \
 		} \
@@ -186,7 +185,7 @@ do { \
 	int _index = index; \
 	if (_index >= 0) { \
 		struct _etool_dblNode *node = (list)->next; \
-		while(_index > 0) { \
+		while (_index > 0) { \
 			_index--; \
 			node = node->next; \
 		} \

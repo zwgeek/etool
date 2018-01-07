@@ -1,7 +1,6 @@
 /**
  * Copyright 2017, PaPa.  All rights reserved.
  * 基于循环数组方式的(支持双端队列)队列
- * 使用unsigned char(byte)来处理所有的数据类型
  */
 
 #ifndef ETOOL_TYPE_CIRCQUEUE

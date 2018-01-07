@@ -1,7 +1,6 @@
 /**
  * Copyright 2017, PaPa.  All rights reserved.
  * 基于单循环链表方式的线性表
- * 使用unsigned char(byte)来处理所有的数据类型
  */
 
 #ifndef ETOOL_TYPE_CIRCLIST
@@ -169,7 +168,7 @@ do { \
 	if (index >= 0) { \
 		unsigned int _index = index; \
 		struct _etool_circNode *node = (struct _etool_circNode*)(list); \
-		while(_index > 0) { \
+		while (_index > 0) { \
 			_index--; \
 			node = node->next; \
 		} \

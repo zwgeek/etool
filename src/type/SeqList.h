@@ -1,7 +1,6 @@
 /**
  * Copyright 2017, PaPa.  All rights reserved.
  * 基于数组方式的线性表
- * 使用unsigned char(byte)来处理所有的数据类型
  */
 
 #ifndef ETOOL_TYPE_SEQLIST
@@ -9,155 +8,214 @@
 
 #include <stdlib.h>
 
-#define ETOOL_SEQLIST_MODE_INIT		0
-#define ETOOL_SEQLIST_MODE_CREATE	1
-#define ETOOL_SEQLIST_EXTEND(list) \
-int n; \
-unsigned char *_data = malloc(list->typeSize * list->size * 2); \
-for (n = 0; n < list->typeSize * list->size; n++) { \
-	_data[n] = list->data[n]; \
+#define ETOOL_SEQLIST_EXTEND(list, type) \
+unsigned int n; \
+type *_data = (type*)malloc((list)->size << 1 * sizeof(type)); \
+for (n = 0; n < (list)->size; n++) { \
+	_data[n] = ((type*)((list)->data))[n]; \
 } \
-free(list->data); \
-list->data = _data; \
-list->size = list->size * 2
+free((list)->data); \
+(list)->data = (unsigned char*)_data; \
+(list)->size = (list)->size << 1
 
 typedef struct _etool_seqList {
 	unsigned char *data;
-	unsigned int typeSize;
 	unsigned int size;
 	unsigned int length;
-	unsigned int mode;
 } etool_seqList;
 
-typedef struct _etool_seqListIterator {
-	unsigned char *data;
-	struct _etool_seqList *list;
-	unsigned int num;
-} etool_seqListIterator;
-
 
 /**
- * 创建list (动态存储表示)
- * @param  typeSize [not null]
- * @param  size   [not null]
- * @return      [实体]
+ * 初始化一个list, 并且将一个数据源设入list(动态存储表示),容器数据由开发者创建销毁
+ * @param  block     [not null]
+ * @param  volume [not null]
+ * @param  type   [not null]
  */
-etool_seqList* etool_seqList_create(const unsigned int typeSize, const unsigned int size);
+#define etool_seqList_init(list, volume, type) \
+do { \
+	etool_seqList *list = (etool_seqList*)malloc(sizeof(etool_seqList)); \
+	if (list != 0) { \
+		(list)->data = (unsigned char*)malloc(volume * sizeof(type)); \
+		if ((list)->data != 0) { \
+			(list)->size = volume; \
+			(list)->length = 0; \
+		} else { \
+			free(list); \
+			list = 0; \
+		} \
+	} \
+} while(0)
 
 /**
+ * void etool_seqList_destroy(etool_seqList *list);
  * 销毁list(动态存储表示)
  * @param  list [not null]
- * @return      [error code]
  */
-void etool_seqList_destroy(etool_seqList *list);
+#define etool_seqList_free(list) \
+do { \
+	free((list)->data); \
+	free(list); \
+	list = 0; \
+} while(0)
 
 /**
- * 创建一个符合要求的list需要的字节数
- * @param  typeSize [description]
- * @param  size     [description]
- * @return          [description]
- */
-int etool_seqList_size(const unsigned int typeSize, const unsigned int size);
-
-/**
- * 初始化一个list, 并且将一个数据源设入list(静态/动态存储表示),容器数据由开发者创建销毁
- * @param  block     [not null]
- * @param  typeSize [not null]
- * @param  size   [not null]
- * @return      [实体]
- */
-etool_seqList* etool_seqList_init(void *block, const unsigned int typeSize, const unsigned int size);
-
-/**
+ * void etool_seqList_clear(etool_seqList *list);
  * 清空list
  * @param  list [description]
- * @return      [description]
  */
-void etool_seqList_clear(etool_seqList *list);
+#define etool_seqList_clear(list) \
+do { \
+	(list)->length = 0; \
+} while(0)
 
 /**
+ * int etool_seqList_length(etool_seqList *list);
  * 获得list的有效长度
  * @param  list [description]
- * @return      [description]
  */
-int etool_seqList_length(etool_seqList *list);
+#define etool_seqList_length(list) \
+((list)->length)
 
 /**
+ * int etool_seqList_empty(etool_seqList *list);
  * list是否为空
  * @param  list [description]
- * @return      [bool code]
  */
-int etool_seqList_empty(etool_seqList *list);
+#define etool_seqList_empty(list) \
+((list)->length == 0)
 
 /**
+ * int etool_seqList_full(etool_seqList *list);
  * list是否已满
  * @param  list [description]
- * @return      [bool code]
  */
-int etool_seqList_full(etool_seqList *list);
+#define etool_seqList_full(list) \
+((list)->length == (list)->size)
 
 /**
+ * void* etool_seqList_find(etool_seqList *list, const unsigned int index);
  * 查找list中的节点,O(1)
  * @param  list [description]
  * @param  index [description]
- * @return      [description]
+ * @param  value [description]
+ * @param  type [description]
  */
-void* etool_seqList_find(etool_seqList *list, const unsigned int index);
+#define etool_seqList_find(list, index, value, type) \
+do { \
+	if (index >= 0 && index < (list)->length) { \
+		value = ((type*)((list)->data))[index]; \
+	} \
+} while(0)
 
 /**
+ * int etool_seqList_locate(etool_seqList *list, const void *value);
  * 定位list中的节点,O((n+1)/2)
  * @param  list [description]
- * @return      [description]
+ * @param  value [description]
+ * @param  index [description]
+ * @param  type [description]
  */
-int etool_seqList_locate(etool_seqList *list, const void *value);
+#define etool_seqList_locate(list, value, index, type) \
+do { \
+	for (index = 0; index < (list)->length; index++) { \
+		if (((type*)((list)->data))[index] == value) { \
+			break; \
+		} \
+	} \
+} while(0)
 
 /**
+ * int etool_seqList_insert(etool_seqList *list, const unsigned int index, const void *value);
  * 插入节点,O(n/2)
  * @param  list [description]
  * @param  index [description]
  * @param  value [input data]
- * @return      [description]
+ * @param  type [input data]
  */
-int etool_seqList_insert(etool_seqList *list, const unsigned int index, const void *value);
+#define etool_seqList_insert(list, index, value, type) \
+do { \
+	if (index >= 0 && index <= (list)->length) { \
+		if ((list)->length == (list)->size) { \
+			ETOOL_SEQLIST_EXTEND(list); \
+		} \
+		unsigned int _index; \
+		for (_index = (list)->length - 1; _index >= index; _index--) { \
+			((type*)((list)->data))[offset + 1] = ((type*)((list)->data))[offset]; \
+		} \
+		((type*)((list)->data))[index] = value; \
+		(list)->length++; \
+	} \
+} while(0)
 
 /**
+ * int etool_seqList_insertEx(etool_seqList *list, const void *value);
  * 插入节点,插到最后一个O(1)
  * @param  list [description]
  * @param  value [input data]
- * @return      [description]
+ * @param  type [input data]
  */
-int etool_seqList_insertEx(etool_seqList *list, const void *value);
+#define etool_seqList_insertEx(list, value, type) \
+do { \
+	if ((list)->length == (list)->size) { \
+		ETOOL_SEQLIST_EXTEND(list); \
+	} \
+	((type*)((list)->data))[(list)->length] = value; \
+	(list)->length++; \
+} while(0)
 
 /**
+ * int etool_seqList_erase(etool_seqList *list, const unsigned int index, void *value);
  * 删除节点,O((n-1)/2)
  * @param  list [description]
  * @param  index [description]
  * @param  value [output data]
- * @return      [description]
+ * @param  type [output data]
  */
-int etool_seqList_erase(etool_seqList *list, const unsigned int index, void *value);
+#define etool_seqList_erase(list, index, value, type) \
+do { \
+	if (index >= 0 && index < (list)->length) { \
+		(list)->length--; \
+		value = ((type*)((list)->data))[index]; \
+		unsigned int _index; \
+		for (_index = index; _index <= (list)->length; _index++) { \
+			((type*)((list)->data))[_index] = ((type*)((list)->data))[_index + 1]; \
+		} \
+	} \
+} while(0)
 
 /**
+ * int etool_seqList_eraseEx(etool_seqList *list, const unsigned int index, void *value);
  * 删除节点,用最后一个填充删除的位置,不讲究顺序O(1)
  * @param  list [description]
  * @param  index [description]
  * @param  value [output data]
- * @return      [description]
+ * @param  type [output data]
  */
-int etool_seqList_eraseEx(etool_seqList *list, const unsigned int index, void *value);
+#define etool_seqList_eraseEx(list, index, value, type) \
+do { \
+	if (index >= 0 && index < (list)->length) { \
+		(list)->length--; \
+		value = ((type*)((list)->data))[index]; \
+		((type*)((list)->data))[index] = ((type*)((list)->data))[(list)->length]; \
+	} \
+} while(0)
 
 /**
- * 创建迭代器
- * @param  list [description]
- * @return       [description]
- */
-etool_seqListIterator* etool_seqListIterator_init(etool_seqList *list);
-
-/**
+ * etool_seqListIterator* etool_seqListIterator_init(etool_seqList *list);
  * 遍历迭代器
- * @param  iterator [description]
- * @return          [description]
+ * @param  list [description]
+ * @param  block [description]
+ * @param  element [description]
+ * @param  type [description]
  */
-int etool_seqListIterator_next(etool_seqListIterator *iterator);
+#define etool_seqList_iterator(list, block, element, type) \
+do { \
+	type *element; \
+	unsigned int num; \
+	for (num = 0; num < (list)->length; num++) { \
+		element = (type*)((list)->data) + num; \
+		block \
+	} \
+} while(0)
 
 #endif //ETOOL_TYPE_SEQLIST

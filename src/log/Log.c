@@ -5,7 +5,7 @@ void etool_log_threadProc(void *this)
 {
 	etool_log *log = (etool_log*)this;
 	char *msg = 0;
-	while(etool_thread_loop(&(log->thread))) {
+	while (etool_thread_loop(&(log->thread))) {
 		etool_mutexEx_lock(&(log->mutex));
 		if (!etool_circQueue_empty(log->queue)) {
 			etool_circQueue_exit(log->queue, msg, char*);
