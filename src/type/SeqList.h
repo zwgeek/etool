@@ -136,7 +136,7 @@ do { \
 do { \
 	if (index >= 0 && index <= (list)->length) { \
 		if ((list)->length == (list)->size) { \
-			ETOOL_SEQLIST_EXTEND(list); \
+			ETOOL_SEQLIST_EXTEND(list, type); \
 		} \
 		unsigned int _index; \
 		for (_index = (list)->length - 1; _index >= index; _index--) { \
@@ -157,7 +157,7 @@ do { \
 #define etool_seqList_insertEx(list, value, type) \
 do { \
 	if ((list)->length == (list)->size) { \
-		ETOOL_SEQLIST_EXTEND(list); \
+		ETOOL_SEQLIST_EXTEND(list, type); \
 	} \
 	((type*)((list)->data))[(list)->length] = value; \
 	(list)->length++; \
