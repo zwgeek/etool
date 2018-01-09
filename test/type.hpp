@@ -411,61 +411,33 @@ int type_LinkStack_test()
 	etool_linkStack *stack = 0;
 	etool_linkStack_init(stack);
 	for (i = 0; i < 11; i++) {
-		// printf("add %d\n", i);
-		etool_linkStack_push(stack, i, int);
+		 printf("add %d\n", i);
+		 etool_linkStack_push(stack, i, int);
 	}
 	etool_linkStack_pop(stack, i, int);
 	printf("pop %d \n", i);
-	// etool_linkQueue_clear(queue);
+	etool_linkStack_clear(stack);
 	for (unsigned int i = 0; i < 11; i++) {
 		// printf("add %d\n", i);
 		etool_linkStack_push(stack, i, int);
 	}
-	// printf("addr : %p, %p\n", list->memory->freeAddr, list);
-	// for (int i = 0; i < 44; i++) {
-	// 	printf("add %d : %p\n", i, list->memory->freeAddr[i]);
-	// }
-	
-	etool_linkQueue_head(queue, i, int);
-	printf("head %d \n", i);
-	etool_linkQueue_exit(queue, i, int);
-	printf("exit %d \n", i);
-	etool_linkQueue_exit(queue, i, int);
-	printf("exit %d\n", i);
 
+	etool_linkStack_pop(stack, i, int);
+	printf("pop %d \n", i);
+	etool_linkStack_pop(stack, i, int);
+	printf("pop %d\n", i);
 
-	etool_linkQueue_peer_head(queue, i, int);
-	printf("peer_head %d \n", i);
-	etool_linkQueue_peer_exit(queue, i, int);
-	printf("peer_exit %d \n", i);
-	etool_linkQueue_exit(queue, i, int);
-	printf("exit %d\n", i);
-
-
-	etool_linkQueue_enter(queue, i, int);
+	etool_linkStack_push(stack, i, int);
 	printf("enter %d\n", i);
 
-	etool_linkQueue_peer_enter(queue, i, int);
-	printf("peer_enter %d\n", i);
-
-	// etool_circList_clear(queue);
-	// for (int i = 0; i < 31; i++) {
-	// 	printf("add %d\n", i);
-	// 	int a = i*2;
-	// 	if (etool_circList_insert(queue, i, &a) == -1) {
-	// 		printf("-1");
-	// 		return -1;
-	// 	}
-	// 	printf("add %d : %p , %p\n", i, queue->memory->freeAddr[i], ((struct _etool_linkNode*)queue->memory->freeAddr[i])->next);
-	// }
-
-	printf("queue front : %p\n", queue->front);
-	printf("queue rear : %p\n", queue->rear);
-	printf("queue length : %d\n", etool_linkQueue_length(queue));
+	printf("stack top : %p\n", stack->top);
+	printf("stack length : %d\n", etool_linkStack_length(stack));
 	
-	etool_linkQueue_iterator(queue, {
-		printf("queue node : %d\n", *data);
+	etool_linkStack_iterator(stack, {
+		printf("stack node : %d\n", *data);
 	}, data, int);
-	etool_linkQueue_free(queue);
+	etool_linkStack_free(stack);
 	return 0;	
 }
+
+

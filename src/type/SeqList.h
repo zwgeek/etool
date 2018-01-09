@@ -33,7 +33,7 @@ typedef struct _etool_seqList {
  */
 #define etool_seqList_init(list, volume, type) \
 do { \
-	etool_seqList *list = (etool_seqList*)malloc(sizeof(etool_seqList)); \
+	list = (etool_seqList*)malloc(sizeof(etool_seqList)); \
 	if (list != 0) { \
 		(list)->data = (unsigned char*)malloc(volume * sizeof(type)); \
 		if ((list)->data != 0) { \

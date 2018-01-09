@@ -50,7 +50,7 @@ typedef struct _etool_seqStackIterator {
  */
 #define etool_seqStack_init(stack, volume, type) \
 do { \
-	etool_seqStack *stack = (etool_seqStack*)malloc(sizeof(etool_seqStack)); \
+	stack = (etool_seqStack*)malloc(sizeof(etool_seqStack)); \
 	if (stack != 0) { \
 		(stack)->data = (unsigned char*)malloc(volume * sizeof(type)); \
 		if ((stack)->data != 0) { \

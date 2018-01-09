@@ -29,8 +29,8 @@ struct _etool_linkNode {
  */
 #define etool_linkStack_init(stack) \
 do { \
-	etool_linkStack *stack = (etool_linkStack*)malloc(sizeof(etool_linkStack)); \
-	if (stack == 0) { \
+	stack = (etool_linkStack*)malloc(sizeof(etool_linkStack)); \
+	if (stack != 0) { \
 		(stack)->length = 0; \
 		(stack)->top = 0; \
 	} \
@@ -109,8 +109,9 @@ do { \
  */
 #define etool_linkStack_push(stack, value, type) \
 do { \
-	struct _etool_linkNode *node = (struct _etool_linkNode*)malloc(sizeof(struct _etool_linkNode)); \
+	struct _etool_linkNode *node = (struct _etool_linkNode*)malloc(sizeof(struct _etool_linkNode) + sizeof(type)); \
 	if (node != 0) { \
+		node->data = (unsigned char*)node + sizeof(struct _etool_linkNode); \
 		*(type*)(node->data) = value; \
 		node->next = (stack)->top; \
 		(stack)->top = node; \

@@ -18,7 +18,10 @@ int main(int argc, char *argv[])
 	// type_circQueue_test();
 	// type_dblList_test();
 	// type_LinkList_test();
-	type_LinkQueue_test();
+	// type_LinkQueue_test();
+	type_LinkStack_test();
+
+
 	vector <long> v;
 	v.reserve(10000001);
 long start1 = etool_os_clock();
