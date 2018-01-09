@@ -190,8 +190,8 @@ do { \
  */
 #define etool_linkQueue_peer_exit(queue, value, type) \
 do { \
-	if ((queue)->length == 0) { \
-		int n; \
+	if ((queue)->length > 0) { \
+		unsigned int n; \
 		struct _etool_linkNode *node = (queue)->front->next; \
 		for (n = 2; n < (queue)->length; n++) { \
 			node = node->next; \
