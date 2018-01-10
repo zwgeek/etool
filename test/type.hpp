@@ -6,6 +6,8 @@ extern "C" {
 #include "../src/type/LinkList.h"
 #include "../src/type/LinkQueue.h"
 #include "../src/type/LinkStack.h"
+#include "../src/type/SeqList.h"
+#include "../src/type/SeqStack.h"
 }
 
 int type_circList_test()
@@ -440,4 +442,78 @@ int type_LinkStack_test()
 	return 0;	
 }
 
+int type_SeqList_test()
+{
+	unsigned int i= 0;
+	etool_seqList *list = 0;
+	etool_seqList_init(list, 1, int);
+	for (i = 0; i < 11; i++) {
+		 printf("add %d\n", i);
+		 etool_seqList_insertEx(list, i, int);
+	}
+	etool_seqList_eraseEx(list, 0, i, int);
+	printf("erase 0 %d \n", i);
+	etool_seqList_clear(list);
+	for (unsigned int i = 0; i < 11; i++) {
+		// printf("add %d\n", i);
+		etool_seqList_insertEx(list, i, int);
+	}
 
+	unsigned int a, b;
+	etool_seqList_erase(list, 1, a, int);
+	printf("erase 1 %d \n", a);
+	etool_seqList_erase(list, 2, b, int);
+	printf("erase 2 %d\n", b);
+
+	etool_seqList_insert(list, 2, b, int);
+	printf("insert %d\n", b);
+
+	etool_seqList_insert(list, 1, a, int);
+	printf("insert %d\n", a);
+
+	printf("list size : %d\n", list->size);
+	printf("list length : %d\n", etool_seqList_length(list));
+	etool_seqList_locate(list, 0, a, int);
+	printf("list length index = %d : %d\n", 0, a);
+	
+	etool_seqList_iterator(list, {
+		printf("list node : %d\n", *data);
+	}, data, int);
+	etool_seqList_free(list);
+	return 0;	
+}
+
+int type_SeqStack_test()
+{
+	unsigned int i= 0;
+	etool_seqStack *stack = 0;
+	etool_seqStack_init(stack, 1, int);
+	for (i = 0; i < 11; i++) {
+		 printf("add %d\n", i);
+		 etool_seqStack_push(stack, i, int);
+	}
+	etool_seqStack_pop(stack, i, int);
+	printf("pop %d \n", i);
+	etool_seqStack_clear(stack);
+	for (unsigned int i = 0; i < 11; i++) {
+		// printf("add %d\n", i);
+		etool_seqStack_push(stack, i, int);
+	}
+
+	etool_seqStack_pop(stack, i, int);
+	printf("pop %d \n", i);
+	etool_seqStack_pop(stack, i, int);
+	printf("pop %d\n", i);
+
+	etool_seqStack_push(stack, i, int);
+	printf("push %d\n", i);
+
+	printf("stack top : %d\n", stack->top);
+	printf("stack length : %d\n", etool_seqStack_length(stack));
+	
+	etool_seqStack_iterator(stack, {
+		printf("stack node : %d\n", *data);
+	}, data, int);
+	etool_seqStack_free(stack);
+	return 0;	
+}

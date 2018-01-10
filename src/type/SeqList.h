@@ -140,7 +140,7 @@ do { \
 		} \
 		unsigned int _index; \
 		for (_index = (list)->length - 1; _index >= index; _index--) { \
-			((type*)((list)->data))[offset + 1] = ((type*)((list)->data))[offset]; \
+			((type*)((list)->data))[_index + 1] = ((type*)((list)->data))[_index]; \
 		} \
 		((type*)((list)->data))[index] = value; \
 		(list)->length++; \

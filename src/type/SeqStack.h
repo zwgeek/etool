@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 #define ETOOL_SEQSTACK_EXTEND(stack, type) \
-int n, unitSize = (stack)->typeSize * ; \
+unsigned int n; \
 type *_data = (type*)malloc((stack)->size << 1 * sizeof(type)); \
 for (n = 0; n < (stack)->top; n++) { \
 	_data[n] = ((type*)((stack)->data))[n]; \
@@ -43,10 +43,9 @@ typedef struct _etool_seqStackIterator {
 /**
  * etool_seqStack* etool_seqStack_init(void *block, const unsigned int typeSize, const unsigned int size)
  * 初始化一个stack, 并且将一个数据源设入stack(动态存储表示),容器数据由开发者创建销毁
- * @param  block     [not null]
- * @param  typeSize [not null]
- * @param  size   [not null]
- * @return      [实体]
+ * @param  stack     [not null]
+ * @param  volume [not null]
+ * @param  type   [not null]
  */
 #define etool_seqStack_init(stack, volume, type) \
 do { \
@@ -54,9 +53,9 @@ do { \
 	if (stack != 0) { \
 		(stack)->data = (unsigned char*)malloc(volume * sizeof(type)); \
 		if ((stack)->data != 0) { \
-			(stack)->size = size; \
+			(stack)->size = volume; \
 			(stack)->top = 0; \
-			(stack)->bottom = size; \
+			(stack)->bottom = volume; \
 		} else { \
 			free(stack); \
 			stack = 0; \
@@ -68,7 +67,6 @@ do { \
  * void etool_seqStack_destroy(etool_seqStack *stack);
  * 销毁stack(动态存储表示)
  * @param  stack [not null]
- * @return      [error code]
  */
 #define etool_seqStack_free(stack) \
 do { \
@@ -81,7 +79,6 @@ do { \
  * void etool_seqStack_clear(etool_seqStack *stack);
  * 清空stack
  * @param  stack [description]
- * @return      [description]
  */
 #define etool_seqStack_clear(stack) \
 do { \
@@ -93,7 +90,6 @@ do { \
  * int etool_seqStack_length(etool_seqStack *stack);
  * 获得stack的有效长度
  * @param  stack [description]
- * @return      [description]
  */
 #define etool_seqStack_length(stack) \
 ((stack)->top)
@@ -102,7 +98,6 @@ do { \
  * int etool_seqStack_other_length(etool_seqStack *stack);
  * 获得另一个stack的有效长度
  * @param  stack [description]
- * @return      [description]
  */
 #define etool_seqStack_other_length(stack) \
 ((stack)->size - (stack)->bottom)
@@ -111,7 +106,6 @@ do { \
  * int etool_seqStack_empty(etool_seqStack *stack);
  * stack是否为空
  * @param  stack [description]
- * @return      [bool code]
  */
 #define etool_seqStack_empty(stack) \
 ((stack)->top == 0 && (stack)->bottom == (stack)->size)
@@ -120,7 +114,6 @@ do { \
  * int etool_seqStack_full(etool_seqStack *stack);
  * stack是否已满
  * @param  stack [description]
- * @return      [bool code]
  */
 #define etool_seqStack_full(stack) \
 ((stack)->top == (stack)->bottom)
@@ -130,7 +123,7 @@ do { \
  * 获取栈头元素,O(1)
  * @param  stack [description]
  * @param  value [input data]
- * @return      [description]
+ * @param  type [input data]
  */
 #define etool_seqStack_head(stack, value, type) \
 do { \
@@ -144,7 +137,7 @@ do { \
  * 获取另一个栈头元素,O(1)
  * @param  stack [description]
  * @param  value [input data]
- * @return      [description]
+ * @param  type [input data]
  */
 #define etool_seqStack_other_head(stack, value, type) \
 do { \
@@ -158,7 +151,7 @@ do { \
  * stack压入,O(1)
  * @param  stack [description]
  * @param  value [input data]
- * @return      [description]
+ * @param  type [input data]
  */
 #define etool_seqStack_push(stack, value, type) \
 do { \
@@ -174,7 +167,7 @@ do { \
  * 另一个stack压入,O(1)
  * @param  stack [description]
  * @param  value [input data]
- * @return      [description]
+ * @param  type [input data]
  */
 #define etool_seqStack_other_push(stack, value, type) \
 do { \
@@ -189,7 +182,7 @@ do { \
  * stack弹出,O(1)
  * @param  stack [description]
  * @param  value [output data]
- * @return      [description]
+ * @param  type [output data]
  */
 #define etool_seqStack_pop(stack, value, type) \
 do { \
@@ -204,21 +197,23 @@ do { \
  * 另一个stack弹出,O(1)
  * @param  stack [description]
  * @param  value [output data]
- * @return      [description]
+ * @param  type [output data]
  */
 #define etool_seqStack_other_pop(stack, value, type) \
 do { \
 	if ((stack)->bottom < (stack)->size) { \
 		value = ((type*)((stack)->data))[(stack)->bottom]; \
 		(stack)->bottom++; \
-	}
+	} \
 } while(0)
 
 /**
  * etool_seqStackIterator* etool_seqStackIterator_init(etool_seqStack *stack);
  * 遍历迭代器
- * @param  iterator [description]
- * @return          [description]
+ * @param  stack [description]
+ * @param  block [description]
+ * @param  element [description]
+ * @param  type [description]
  */
 #define etool_seqStack_iterator(stack, block, element, type) \
 do { \
@@ -233,8 +228,10 @@ do { \
 /**
  * etool_seqStackIterator* etool_seqStackIterator_other_init(etool_seqStack *stack);
  * 遍历另一个迭代器
- * @param  iterator [description]
- * @return          [description]
+ * @param  stack [description]
+ * @param  block [description]
+ * @param  element [description]
+ * @param  type [description]
  */
 #define etool_seqStack_other_iterator(stack, block, element, type) \
 do { \
