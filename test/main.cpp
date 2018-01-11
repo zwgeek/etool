@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
 	// type_LinkList_test();
 	// type_LinkQueue_test();
 	// type_LinkStack_test();
-	// type_SeqList_test();
-	type_SeqStack_test();
+	 type_SeqList_test();
+	// type_SeqStack_test();
 
 	vector <long> v;
 	v.reserve(10000001);

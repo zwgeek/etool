@@ -15,8 +15,10 @@ type *_data = (type*)malloc((stack)->size << 1 * sizeof(type)); \
 for (n = 0; n < (stack)->top; n++) { \
 	_data[n] = ((type*)((stack)->data))[n]; \
 } \
-for (n = (stack)->size - 1; n >= (stack)->bottom; n--) { \
-	_data[n] = ((type*)((stack)->data))[n]; \
+n = (stack)->size; \
+while (n > (stack)->bottom) { \
+	n--; \
+	_data[(stack)->size + n] = ((type*)((stack)->data))[n]; \
 } \
 free((stack)->data); \
 (stack)->data = (unsigned char*)_data; \
@@ -158,8 +160,7 @@ do { \
 	if ((stack)->top == (stack)->bottom) { \
 		ETOOL_SEQSTACK_EXTEND(stack, type); \
 	} \
-	((type*)((stack)->data))[(stack)->top] = value; \
-	(stack)->top++; \
+	((type*)((stack)->data))[(stack)->top++] = value; \
 } while(0)
 
 /**
@@ -171,10 +172,10 @@ do { \
  */
 #define etool_seqStack_other_push(stack, value, type) \
 do { \
-	if (--(stack)->bottom < (stack)->top) { \
+	if ((stack)->bottom == (stack)->top) { \
 		ETOOL_SEQSTACK_EXTEND(stack, type); \
 	} \
-	((type*)((stack)->data))[(stack)->bottom] = value; \
+	((type*)((stack)->data))[--(stack)->bottom] = value; \
 } while(0)
 
 /**
@@ -187,8 +188,7 @@ do { \
 #define etool_seqStack_pop(stack, value, type) \
 do { \
 	if ((stack)->top > 0) { \
-		(stack)->top--; \
-		value = ((type*)((stack)->data))[(stack)->top]; \
+		value = ((type*)((stack)->data))[--(stack)->top]; \
 	} \
 } while(0)
 
@@ -202,8 +202,7 @@ do { \
 #define etool_seqStack_other_pop(stack, value, type) \
 do { \
 	if ((stack)->bottom < (stack)->size) { \
-		value = ((type*)((stack)->data))[(stack)->bottom]; \
-		(stack)->bottom++; \
+		value = ((type*)((stack)->data))[(stack)->bottom++]; \
 	} \
 } while(0)
 
@@ -218,8 +217,9 @@ do { \
 #define etool_seqStack_iterator(stack, block, element, type) \
 do { \
 	type *element; \
-	unsigned int num; \
-	for (num = 0; num < (stack)->top; num++) { \
+	unsigned int num = (stack)->top; \
+	while (num > 0) { \
+		num--; \
 		element = (type*)((stack)->data) + num; \
 		block \
 	} \
@@ -236,10 +236,11 @@ do { \
 #define etool_seqStack_other_iterator(stack, block, element, type) \
 do { \
 	type *element; \
-	unsigned int num; \
-	for (num = (stack)->size - 1; num >= (stack)->bottom; num--) { \
+	unsigned int num = (stack)->bottom; \
+	while (num < (stack)->size) { \
 		element = (type*)((stack)->data) + num; \
 		block \
+		num++; \
 	} \
 } while(0)
 

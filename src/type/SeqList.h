@@ -138,8 +138,9 @@ do { \
 		if ((list)->length == (list)->size) { \
 			ETOOL_SEQLIST_EXTEND(list, type); \
 		} \
-		unsigned int _index; \
-		for (_index = (list)->length - 1; _index >= index; _index--) { \
+		unsigned int _index = (list)->length; \
+		while (_index > index) { \
+			_index--; \
 			((type*)((list)->data))[_index + 1] = ((type*)((list)->data))[_index]; \
 		} \
 		((type*)((list)->data))[index] = value; \
@@ -211,10 +212,11 @@ do { \
 #define etool_seqList_iterator(list, block, element, type) \
 do { \
 	type *element; \
-	unsigned int num; \
-	for (num = 0; num < (list)->length; num++) { \
+	unsigned int num = 0; \
+	while (num < (list)->length) { \
 		element = (type*)((list)->data) + num; \
 		block \
+		num++; \
 	} \
 } while(0)
 
