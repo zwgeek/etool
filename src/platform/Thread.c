@@ -21,7 +21,7 @@ unsigned long etool_thread_getCurrentID()
 
 etool_thread* etool_thread_create()
 {
-	etool_thread *thread = malloc(sizeof(etool_thread));
+	etool_thread *thread = (etool_thread*)malloc(sizeof(etool_thread));
 	if (thread == 0) { return 0; }
 	thread->loop = 1;
 	return thread;
@@ -51,7 +51,7 @@ short etool_thread_loop(etool_thread *thread)
 
 void etool_thread_start(etool_thread *thread, etool_threadProc *proc, void *param)
 {
-	struct _etool_threadAttr attr = {param, proc};
+	struct _etool_threadAttr attr = {proc, param};
 #if defined(_windows)
 	thread->thread = (HANDLE)_beginthreadex(0, 0, g_threadProc, &attr, 0, 0);
 #endif
