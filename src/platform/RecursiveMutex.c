@@ -3,7 +3,7 @@
 
 etool_recursiveMutex* etool_recursiveMutex_create()
 {
-	etool_recursiveMutex *mutex = malloc(sizeof(etool_recursiveMutex));
+	etool_recursiveMutex *mutex = (etool_recursiveMutex*)malloc(sizeof(etool_recursiveMutex));
 	if (mutex == 0) { return 0; }
 #if defined(_windows)
 	//旋转锁，单cpu不起作用

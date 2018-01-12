@@ -37,6 +37,7 @@ typedef struct _etool_log {
 	struct _etool_thread thread;
 } etool_log;
 
+
 /**
  * 日志模块打开
  * @param path  [not null]

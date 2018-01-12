@@ -3,7 +3,7 @@
 
 etool_mutex* etool_mutex_create()
 {
-	etool_mutex *mutex = malloc(sizeof(etool_mutex));
+	etool_mutex *mutex = (etool_mutex*)malloc(sizeof(etool_mutex));
 	if (mutex == 0) { return 0; }
 #if defined(_windows)
 	//旋转锁，单cpu不起作用

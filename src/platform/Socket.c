@@ -7,7 +7,7 @@
 
 etool_socket* etool_socket_create(const etool_socketType type)
 {
-	etool_socket *sockfd = malloc(sizeof(etool_socket));
+	etool_socket *sockfd = (etool_socket*)malloc(sizeof(etool_socket));
 	if (sockfd == 0) { return 0; }
 #if defined(_windows)
 	if (g_isInit == 0) {
@@ -220,7 +220,7 @@ etool_socket* etool_socket_accept(etool_socket *sockfd, char **ip, short *port, 
 	}
 #endif
 	struct sockaddr_in addr;
-	etool_socket *client = malloc(sizeof(etool_socket));
+	etool_socket *client = (etool_socket*)malloc(sizeof(etool_socket));
 	size_t addrlen = sizeof(struct sockaddr);
 	client->fd = accept(sockfd->fd, (struct sockaddr*)&addr, (socklen_t*)&addrlen);
 	if (client->fd == INVALID_SOCKET) {
@@ -591,7 +591,7 @@ int etool_socket_nonblock(etool_socket *sockfd, etool_select *selectfd, etool_so
 
 etool_socketIo* etool_socketIo_create()
 {
-	return malloc(sizeof(etool_socketIo));
+	return (etool_socketIo*)malloc(sizeof(etool_socketIo));
 }
 
 void etool_socketIo_destroy(etool_socketIo *io)

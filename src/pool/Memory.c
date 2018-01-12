@@ -3,11 +3,11 @@
 
 etool_memory* etool_memory_create(const unsigned int typeSize, const unsigned int size)
 {
-	etool_memory *memory = malloc(sizeof(etool_memory));
+	etool_memory *memory = (etool_memory*)malloc(sizeof(etool_memory));
 	if (memory == 0) { return 0; }
-	unsigned char *data = malloc(typeSize * size);
+	unsigned char *data = (unsigned char*)malloc(typeSize * size);
 	if (data == 0) { free(memory); return 0; }
-	memory->freeAddr = malloc(sizeof(void*) * (size + 1));
+	memory->freeAddr = (unsigned char**)malloc(sizeof(void*) * (size + 1));
 	if (memory->freeAddr == 0) { free(memory); free(data); return 0; }
 	int n;
 	for (n = 0; n < size; n++) {

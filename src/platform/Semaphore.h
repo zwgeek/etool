@@ -32,6 +32,7 @@ typedef struct _etool_semaphore {
 #endif
 } etool_semaphore;
 
+
 /**
  * 创建
  * @param  initNum   [not null]

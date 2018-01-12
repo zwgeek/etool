@@ -3,7 +3,7 @@
 
 etool_select* etool_select_create(const int size)
 {
-	etool_select *selectfd = malloc(sizeof(etool_select));
+	etool_select *selectfd = (etool_select*)malloc(sizeof(etool_select));
 	if (selectfd == 0) { return 0; }
 #if defined(_windows)
 	selectfd->fd = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0, 0);
@@ -255,7 +255,7 @@ void etool_select_wait(etool_select *selectfd, etool_selectCallback *callback, c
 				callback(sockfd, io, io->buf, bytes, io->op);
 			} else {
 				//accept
-				etool_socket *acceptSockfd = malloc(sizeof(etool_socket));
+				etool_socket *acceptSockfd = (etool_socket*)malloc(sizeof(etool_socket));
 				if (acceptSockfd == 0) { continue; }
 				void **_addr = ((etool_socketSingle*)(sockfd->ptr))->_addr;
 				struct sockaddr_in addr;
@@ -318,7 +318,7 @@ void etool_select_wait(etool_select *selectfd, etool_selectCallback *callback, c
 				callback(sockfd, io, io->buf, bytes, io->op);
 			} else {
 				//accept
-				etool_socket *acceptSockfd = malloc(sizeof(etool_socket));
+				etool_socket *acceptSockfd = (etool_socket*)malloc(sizeof(etool_socket));
 				if (acceptSockfd == 0) { continue; }
 				void **_addr = ((etool_socketSingle*)(sockfd->ptr))->_addr;
 				struct sockaddr_in addr;

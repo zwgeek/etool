@@ -48,9 +48,9 @@ void etool_executor_threadProc(void *this)
 
 etool_executor* etool_executor_create(unsigned int minCount, unsigned int maxCount)
 {
-	etool_executor *executor = malloc(sizeof(etool_executor));
+	etool_executor *executor = (etool_executor*)malloc(sizeof(etool_executor));
 	if (executor == 0) { return 0; }
-	executor->workers = malloc(sizeof(struct _etool_worker*) * maxCount);
+	executor->workers = (struct _etool_worker**)malloc(sizeof(struct _etool_worker*) * maxCount);
 	if (executor->workers == 0) { free(executor); return 0; }
 	if (minCount != maxCount) {
 		if (etool_thread_load(&(executor->thread)) != 0) {
@@ -64,7 +64,7 @@ etool_executor* etool_executor_create(unsigned int minCount, unsigned int maxCou
 	executor->maxCount = maxCount;
 	struct _etool_worker *worker;
 	while (maxCount--) {
-		worker = malloc(sizeof(struct _etool_worker));
+		worker = (struct _etool_worker*)malloc(sizeof(struct _etool_worker));
 		if (worker == 0) {
 			etool_executor_destroy(executor);
 			return 0;

@@ -25,7 +25,7 @@ void etool_log_threadProc(void *this)
 
 etool_log* etool_log_create(const char *path, const etool_logLevel level)
 {
-	etool_log *log = malloc(sizeof(etool_log));
+	etool_log *log = (etool_log*)malloc(sizeof(etool_log));
 	if (log == 0) { return 0; }
 	log->file = fopen(path, "rw+");
 	if (log->file == 0) {
@@ -125,7 +125,7 @@ void etool_log_async_printf(etool_log *log, const etool_logLevel level, const ch
 	if (level > log->level) {
 		return;		
 	}
-	char *msg = malloc(sizeof(char) * ETOOL_LOG_MSG_SIZE);
+	char *msg = (char*)malloc(sizeof(char) * ETOOL_LOG_MSG_SIZE);
 	if (msg == 0) { return; }
 	va_list argList;
 	va_start(argList, fmt);

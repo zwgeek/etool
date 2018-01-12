@@ -22,6 +22,7 @@ typedef struct _etool_atomic {
 #endif
 } etool_atomic;
 
+
 /**
  * 创建
  * @return       [实体]

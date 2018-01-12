@@ -3,7 +3,7 @@
 
 etool_condition* etool_condition_create()
 {
-	etool_condition *condition = malloc(sizeof(etool_condition));
+	etool_condition *condition = (etool_condition*)malloc(sizeof(etool_condition));
 	if (condition == 0) { return 0; }
 #if defined(_windows)
 	//default security attributes and unnamed semaphore, _maxNum = 10

@@ -18,6 +18,8 @@
 typedef void etool_threadProc(void *param);
 typedef struct _etool_thread {
 	short loop;
+	etool_threadProc *proc;
+	void *param;
 #if defined(_windows)
 	HANDLE thread;
 #endif
@@ -26,11 +28,6 @@ typedef struct _etool_thread {
 #endif
 } etool_thread;
 
-struct _etool_threadAttr
-{
-	etool_threadProc *proc;
-	void *param;
-};
 
 /**
  * 获取线程ID

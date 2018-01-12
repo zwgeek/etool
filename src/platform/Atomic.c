@@ -3,7 +3,7 @@
 
 etool_atomic* etool_atomic_create(const int count)
 {
-	etool_atomic *atomic = malloc(sizeof(etool_atomic));
+	etool_atomic *atomic = (etool_atomic*)malloc(sizeof(etool_atomic));
 	if (atomic == 0) { return 0; }
 	atomic->count = count;
 	return atomic;

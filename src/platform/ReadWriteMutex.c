@@ -3,7 +3,7 @@
 
 etool_readWriteMutex* etool_readWriteMutex_create()
 {
-	etool_readWriteMutex *mutex = malloc(sizeof(etool_readWriteMutex));
+	etool_readWriteMutex *mutex = (etool_readWriteMutex*)malloc(sizeof(etool_readWriteMutex));
 	if (mutex == 0) { return 0; }
 	mutex->readCount = 0;
 	if (etool_mutex_load(&(mutex->readMutex)) != 0) {

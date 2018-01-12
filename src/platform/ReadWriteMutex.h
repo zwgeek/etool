@@ -16,6 +16,7 @@ typedef struct _etool_readWriteMutex {
 	etool_recursiveMutex    writeMutex;
 } etool_readWriteMutex;
 
+
 /**
  * 创建
  * @return       [实体]

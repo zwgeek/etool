@@ -3,7 +3,7 @@
 
 etool_mutexEx* etool_mutexEx_create()
 {
-	etool_mutexEx *mutex = malloc(sizeof(etool_mutexEx));
+	etool_mutexEx *mutex = (etool_mutexEx*)malloc(sizeof(etool_mutexEx));
 	if (mutex == 0) { return 0; }
 #if defined(_windows)
 	mutex->mutex = CreateMutex(0, FALSE, 0);

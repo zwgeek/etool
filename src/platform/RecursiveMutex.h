@@ -23,6 +23,7 @@ typedef struct _etool_recursiveMutex {
 #endif
 } etool_recursiveMutex;
 
+
 /**
  * 创建
  * @return       [实体]

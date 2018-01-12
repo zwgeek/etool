@@ -27,6 +27,7 @@ typedef struct _etool_condition {
 #endif
 } etool_condition;
 
+
 /**
  * 创建
  * @return           [实体]

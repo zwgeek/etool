@@ -11,9 +11,9 @@
 
 #define ETOOL_MEMORY_EXTEND(memory) \
 int n, size = memory->size / memory->count * (memory->count + 1); \
-unsigned char *_data = malloc(memory->typeSize * memory->size / memory->count); \
+unsigned char *_data = (unsigned char*)malloc(memory->typeSize * memory->size / memory->count); \
 if (_data == 0) {return 0; } \
-unsigned char **_freeAddr = malloc(sizeof(void*) * (size + memory->count + 1)); \
+unsigned char **_freeAddr = (unsigned char**)malloc(sizeof(void*) * (size + memory->count + 1)); \
 if (_freeAddr == 0) { free(_data); return 0; } \
 for (n = 0; n < memory->size; n++) { \
 	_freeAddr[n] = memory->freeAddr[n]; \
@@ -37,6 +37,7 @@ typedef struct _etool_memory {
 	unsigned int length;
 	unsigned int count;
 } etool_memory;
+
 
 /**
  * 创建memory (动态存储表示)

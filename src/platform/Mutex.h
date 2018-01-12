@@ -23,6 +23,7 @@ typedef struct _etool_mutex {
 #endif
 } etool_mutex;
 
+
 /**
  * 创建
  * @return       [实体]

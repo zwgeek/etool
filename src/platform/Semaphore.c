@@ -4,7 +4,7 @@
 //initNum = 1
 etool_semaphore* etool_semaphore_create(const int initNum)
 {
-	etool_semaphore *semaphore = malloc(sizeof(etool_semaphore));
+	etool_semaphore *semaphore = (etool_semaphore*)malloc(sizeof(etool_semaphore));
 	if (semaphore == 0) { return 0; }
 #if defined(_windows)
 	//default security attributes and unnamed semaphore, _maxNum = 10
