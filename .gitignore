@@ -1,5 +1,7 @@
 #Built application files
 *.json
+*.bat
+*.sh
  
 # Generated files
 bin/*

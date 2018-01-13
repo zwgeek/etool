@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "type.h"
 #include "platform.h"
+#include "pool.h"
+#include "log.h"
 
 #include <vector>
 using namespace std;
@@ -66,7 +68,15 @@ int main(int argc, char *argv[])
 
 
 
-	type_thread_test();
+	// platform_thread_test();
+	// platform_readWriteMutex_test();
+	// platform_system_test();
+	// platform_atomic_test();
+	
+	// FILE *file = fopen("a", "rw+");
+	log_log_test();
+
+	// pool_executor_test();
 	return 0;
 }
 

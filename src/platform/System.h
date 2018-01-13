@@ -74,7 +74,7 @@ int etool_dir_exist(const char *path);
 /**
  * 创建文件夹
  * @param  path [not null]
- * @return      [error code]
+ * @return      [error code 0:成功]
  */
 int etool_dir_create(const char *path);
 

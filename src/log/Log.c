@@ -7,10 +7,10 @@ void etool_log_threadProc(void *this)
 	char *msg = 0;
 	while (etool_thread_loop(&(log->thread))) {
 		etool_mutexEx_lock(&(log->mutex));
-		if (!etool_circQueue_empty(log->queue)) {
-			etool_circQueue_exit(log->queue, msg, char*);
+		if (etool_circQueue_empty(log->queue)) {
 			etool_condition_wait(&(log->condition), &(log->mutex));
 		}
+		etool_circQueue_exit(log->queue, msg, char*);
 #ifdef USE_LOG_STDOUT
 		ETOOL_LOG_STDOUT(msg);
 #endif
@@ -27,7 +27,7 @@ etool_log* etool_log_create(const char *path, const etool_logLevel level)
 {
 	etool_log *log = (etool_log*)malloc(sizeof(etool_log));
 	if (log == 0) { return 0; }
-	log->file = fopen(path, "rw+");
+	log->file = fopen(path, "w");
 	if (log->file == 0) {
 		free(log);
 		return 0;
@@ -103,7 +103,7 @@ void etool_log_flush(etool_log *log)
 //const char *fileName, const int lineNum, const char *functionName
 void etool_log_printf(etool_log *log, const etool_logLevel level, const char *fmt, ...)
 {
-	if (level > log->level) {
+	if (level < log->level) {
 		return;		
 	}
 	char msg[ETOOL_LOG_MSG_SIZE];
@@ -122,7 +122,7 @@ void etool_log_printf(etool_log *log, const etool_logLevel level, const char *fm
 
 void etool_log_async_printf(etool_log *log, const etool_logLevel level, const char *fmt, ...)
 {
-	if (level > log->level) {
+	if (level < log->level) {
 		return;		
 	}
 	char *msg = (char*)malloc(sizeof(char) * ETOOL_LOG_MSG_SIZE);

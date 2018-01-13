@@ -67,7 +67,10 @@ void etool_mutex_lock(etool_mutex *mutex)
 int etool_mutex_trylock(etool_mutex *mutex)
 {
 #if defined(_windows)
-	return TryEnterCriticalSection(&(mutex->mutex));
+	if (TryEnterCriticalSection(&(mutex->mutex)) == 0) {
+		mutex->mutex.OwningThread = 0;
+	}
+	return -1;
 #endif
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)

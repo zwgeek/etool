@@ -125,9 +125,9 @@ void etool_executor_destroy(etool_executor *executor)
 	free(executor);
 }
 
-void etool_executor_work(etool_executor *executor, etool_workProc *work, void *param, const int index)
+void etool_executor_work(etool_executor *executor, etool_workProc *work, void *param, const unsigned int index)
 {
-	if (index < 0 || index >= executor->maxCount) {
+	if (index >= executor->maxCount) {
 		int index = executor->maxCount - 1;
 		int _weight, weight = etool_circQueue_length(executor->workers[index]->queue);
 		while (index--) {

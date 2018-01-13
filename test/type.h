@@ -288,7 +288,7 @@ int type_LinkList_test()
 	// for (int i = 0; i < 44; i++) {
 	// 	printf("add %d : %p\n", i, list->memory->freeAddr[i]);
 	// }
-	unsigned int i;
+	unsigned int i = 0;
 	etool_linkList_erase(list, 5, i, int);
 	printf("add %d : %p\n", list->memory->length, list->memory->freeAddr[list->memory->length]);
 	etool_linkList_insert(list, 5, i, int);
@@ -515,8 +515,8 @@ int type_SeqStack_test()
 	// printf("stack bottom : %d\n", stack->bottom);
 	// printf("stack length : %d\n", etool_seqStack_other_length(stack));
 	
-	etool_seqStack_other_iterator(stack, {
-	//etool_seqStack_iterator(stack, {
+	// etool_seqStack_other_iterator(stack, {
+	etool_seqStack_iterator(stack, {
 		printf("stack node : %d\n", *data);
 	}, data, int);
 	etool_seqStack_free(stack);

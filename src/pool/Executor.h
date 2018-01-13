@@ -56,6 +56,6 @@ void etool_executor_destroy(etool_executor *executor);
  * @param  index [大于:随机选择一个线程体]
  * @return       [description]
  */
-void etool_executor_work(etool_executor *executor, etool_workProc *work, void *param, const int index);
+void etool_executor_work(etool_executor *executor, etool_workProc *work, void *param, const unsigned int index);
 
 #endif //ETOOL_POOL_EXECUTOR

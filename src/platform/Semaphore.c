@@ -7,8 +7,8 @@ etool_semaphore* etool_semaphore_create(const int initNum)
 	etool_semaphore *semaphore = (etool_semaphore*)malloc(sizeof(etool_semaphore));
 	if (semaphore == 0) { return 0; }
 #if defined(_windows)
-	//default security attributes and unnamed semaphore, _maxNum = 10
-	semaphore->semaphore = CreateSemaphore(0, initNum, 10, 0);
+	//default security attributes and unnamed semaphore, _maxNum = initNum
+	semaphore->semaphore = CreateSemaphore(0, 0, initNum, 0);
 #endif
 
 #if defined(_linux) || defined(_android)
@@ -24,8 +24,8 @@ etool_semaphore* etool_semaphore_create(const int initNum)
 int etool_semaphore_load(etool_semaphore *semaphore, const int initNum)
 {
 #if defined(_windows)
-	//default security attributes and unnamed semaphore, _maxNum = 10
-	semaphore->semaphore = CreateSemaphore(0, initNum, 10, 0);
+	//default security attributes and unnamed semaphore, _maxNum = initNum
+	semaphore->semaphore = CreateSemaphore(0, 0, initNum, 0);
 #endif
 
 #if defined(_linux) || defined(_android)
