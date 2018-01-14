@@ -74,7 +74,7 @@ int etool_mutex_trylock(etool_mutex *mutex)
 #endif
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
-	return pthread_mutex_trylock(&(mutex->mutex ));
+	return pthread_mutex_trylock(&(mutex->mutex));
 #endif
 }
 

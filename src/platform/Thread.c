@@ -49,6 +49,11 @@ short etool_thread_loop(etool_thread *thread)
 	return thread->loop;
 }
 
+void etool_thread_reset(etool_thread *thread)
+{
+	thread->loop = 0;
+}
+
 void etool_thread_start(etool_thread *thread, etool_threadProc *proc, void *param)
 {
 	thread->proc = proc;

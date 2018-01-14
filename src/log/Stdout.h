@@ -7,7 +7,8 @@
 #define WHITE FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE
 #define YELLOW FOREGROUND_RED | FOREGROUND_GREEN
 #define MAGENTA FOREGROUND_RED | FOREGROUND_BLUE
-const WORD colors[6] = { CYAN, CYAN, WHITE | BOLD, YELLOW | BOLD, RED | BOLD , MAGENTA | BOLD };
+#define COLORS_DEFINE() const WORD colors[6] = { CYAN, CYAN, WHITE | BOLD, YELLOW | BOLD, RED | BOLD , MAGENTA | BOLD }
+extern const WORD colors[6];
 
 #define ETOOL_LOG_STDOUT(msg) \
 fwrite(msg, sizeof(char), strlen(msg), stdout)
@@ -34,7 +35,8 @@ SetConsoleTextAttribute(outHandle, origBufferInfo.wAttributes)
 #define YELLOW_BOLD "\033[33m\033[1m"
 #define MAGENTA "\033[35m"
 #define MAGENTA_BOLD "\033[35m\033[1m"
-const char *colors[6] = { CYAN, CYAN, WHITE_BOLD, YELLOW_BOLD, RED_BOLD,  MAGENTA_BOLD };
+#define COLORS_DEFINE() const char *colors[6] = { CYAN, CYAN, WHITE_BOLD, YELLOW_BOLD, RED_BOLD,  MAGENTA_BOLD }
+extern const char *colors[6];
 
 #define ETOOL_LOG_STDOUT(msg) \
 fwrite(msg, sizeof(char), strlen(msg), stdout)
@@ -47,7 +49,8 @@ fwrite(RESET, sizeof(char), strlen(RESET), stdout)
 
 #if defined(_android)
 #include <android/log.h>
-const android_LogPriority colors[6] = { ANDROID_LOG_VERBOSE, ANDROID_LOG_DEBUG, ANDROID_LOG_INFO, ANDROID_LOG_WARN, ANDROID_LOG_ERROR, ANDROID_LOG_FATAL };
+#define COLORS_DEFINE() const android_LogPriority colors[6] = { ANDROID_LOG_VERBOSE, ANDROID_LOG_DEBUG, ANDROID_LOG_INFO, ANDROID_LOG_WARN, ANDROID_LOG_ERROR, ANDROID_LOG_FATAL }
+extern const android_LogPriority colors[6];
 
 #define ETOOL_LOG_STDOUT(msg) \
 __android_log_write(colors[0], "etool", msg)

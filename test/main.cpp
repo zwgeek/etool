@@ -69,12 +69,12 @@ int main(int argc, char *argv[])
 
 
 	// platform_thread_test();
-	// platform_readWriteMutex_test();
+	platform_readWriteMutex_test();
 	// platform_system_test();
 	// platform_atomic_test();
 	
-	// FILE *file = fopen("a", "rw+");
-	log_log_test();
+	// FILE *file = fopen("a", "w+");
+	// log_log_test();
 
 	// pool_executor_test();
 	return 0;

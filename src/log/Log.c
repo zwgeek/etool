@@ -1,6 +1,7 @@
 #include "Log.h"
 
 
+COLORS_DEFINE();
 void etool_log_threadProc(void *this)
 {
 	etool_log *log = (etool_log*)this;
@@ -9,6 +10,7 @@ void etool_log_threadProc(void *this)
 		etool_mutexEx_lock(&(log->mutex));
 		if (etool_circQueue_empty(log->queue)) {
 			etool_condition_wait(&(log->condition), &(log->mutex));
+			if (etool_circQueue_empty(log->queue)) { continue; }
 		}
 		etool_circQueue_exit(log->queue, msg, char*);
 #ifdef USE_LOG_STDOUT
@@ -67,8 +69,9 @@ etool_log* etool_log_create(const char *path, const etool_logLevel level)
 
 void etool_log_destroy(etool_log *log)
 {
-	etool_thread_cancel(&(log->thread));
+	etool_thread_reset(&(log->thread));
 	etool_condition_signal(&(log->condition));
+	etool_thread_unload(&(log->thread));
 	fclose(log->file);
 	etool_circQueue_free(log->queue);
 	etool_mutexEx_unload(&(log->mutex));

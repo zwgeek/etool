@@ -17,8 +17,9 @@ etool_recursiveMutex *recursiveMutex;
 etool_semaphore *semaphore;
 void testProc(void *self)
 {
-	etool_thread *thread = (etool_thread*)self;
+	etool_thread *thread = (etool_thread*)self;	
 	while (etool_thread_loop(thread)) {
+		// printf("start : %ld\n", etool_thread_getCurrentID());
 		// etool_mutex_lock(mutex);
 		// etool_mutexEx_lock(mutexEx);
 		// etool_recursiveMutex_lock(recursiveMutex);
@@ -27,9 +28,11 @@ void testProc(void *self)
 			printf("curID : %ld, %p\n", etool_thread_getCurrentID(), thread);	
 		}
 		// etool_condition_signal(condition);
+		// etool_mutexEx_unlock(mutexEx);
 	}
 }
 
+// PS mac的信号量要是宿主线程休眠了就会跳出
 int platform_thread_test()
 {
 	mutex = etool_mutex_create();
@@ -59,7 +62,7 @@ int platform_thread_test()
 		// etool_mutex_unlock(mutex);
 		// etool_mutexEx_unlock(mutexEx);
 		// etool_recursiveMutex_unlock(recursiveMutex);
-		// etool_semaphore_post(semaphore);
+		etool_semaphore_post(semaphore);
 		etool_thread_destroy(threads[i]);
 		// etool_thread_cancel(threads[i]);
 
@@ -86,13 +89,14 @@ void readProc(void *self)
 {
 	etool_thread *thread = (etool_thread*)self;
 	while (etool_thread_loop(thread)) {
-		etool_readWriteMutex_lockRead(readWriteMutex);
+		// etool_readWriteMutex_lockRead(readWriteMutex);
 		printf("read, curID : %ld, %p\n", etool_thread_getCurrentID(), thread);
-		etool_readWriteMutex_unlockRead(readWriteMutex);
+		// etool_readWriteMutex_unlockRead(readWriteMutex);
 		etool_os_sleep(100);
 	}
 }
 
+//PS : linux和mac的读写锁 一旦线程拥有者挂起／睡眠,就会释放锁
 void writeProc(void *self)
 {
 	etool_thread *thread = (etool_thread*)self;
@@ -120,7 +124,10 @@ int platform_readWriteMutex_test()
 	printf("create writethread %p\n", threads[5]);
 	etool_thread_start(threads[5], writeProc, threads[5]);
 	system("pause");
-
+	for (;;) {
+		// printf("readCount = %d, %ld\n", readWriteMutex->readCount, etool_thread_getCurrentID());
+		etool_os_sleep(1000);
+	}
 	return 0;
 }
 
@@ -141,22 +148,22 @@ int platform_system_test()
 
 int platform_atomic_test()
 {
-	etool_atomic *atomic = etool_atomic_create(2);
-	printf("%ld\n", *(long*)atomic);
-	etool_atomic_inc(atomic);
-	printf("inc, %ld\n", *(long*)atomic);
-	etool_atomic_dec(atomic);
-	printf("dec, %ld\n", *(long*)atomic);
-	etool_atomic_add(atomic, 4);
-	printf("add 4, %ld\n", *(long*)atomic);
-	etool_atomic_sub(atomic, 4);
-	printf("sub 4, %ld\n", *(long*)atomic);
-	etool_atomic_or(atomic, 4);
-	printf("or 4, %ld\n", *(long*)atomic);
-	etool_atomic_and(atomic, 4);
-	printf("and 4, %ld\n", *(long*)atomic);
-	etool_atomic_xor(atomic, 4);
-	printf("xor 4, %ld\n", *(long*)atomic);
+	// etool_atomic *atomic = etool_atomic_create(2);
+	// printf("%d\n", *atomic);
+	// etool_atomic_inc(atomic);
+	// printf("inc, %d\n", *atomic);
+	// etool_atomic_dec(atomic);
+	// printf("dec, %d\n", *atomic);
+	// etool_atomic_add(atomic, 4);
+	// printf("add 4, %d\n", *atomic);
+	// etool_atomic_sub(atomic, 4);
+	// printf("sub 4, %d\n", *atomic);
+	// etool_atomic_or(atomic, 4);
+	// printf("or 4, %d\n", *atomic);
+	// etool_atomic_and(atomic, 4);
+	// printf("and 4, %d\n", *atomic);
+	// etool_atomic_xor(atomic, 4);
+	// printf("xor 4, %d\n", *atomic);
 
 	return 0;
 }

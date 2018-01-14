@@ -17,12 +17,8 @@ void etool_os_sleep(const unsigned long milliseconds)
 	Sleep(milliseconds);
 #endif
 
-#if defined(_linux) || defined(_android)
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
 	usleep(milliseconds * 1000);
-#endif
-
-#if defined(_mac) || defined(_ios)
-	sleep(milliseconds * 1000);
 #endif
 }
 

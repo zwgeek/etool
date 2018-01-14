@@ -10,7 +10,11 @@ etool_mutexEx* etool_mutexEx_create()
 #endif
 
 #if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
-	pthread_mutex_init(&(mutex->mutex), 0);
+	pthread_mutexattr_t attr; 
+	pthread_mutexattr_init(&attr); 
+	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+	pthread_mutex_init(&(mutex->mutex), &attr);
+	pthread_mutexattr_destroy(&attr);
 #endif
 	return mutex;
 }

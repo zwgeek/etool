@@ -1,6 +1,7 @@
 /**
  * Copyright 2017, PaPa.  All rights reserved.
  * 读写锁(可递归)
+ * (pthread)一旦线程拥有者挂起／睡眠,就会释放锁
  */
 
 #ifndef ETOOL_PLATFORM_READWRITEMUTEX
@@ -11,9 +12,14 @@
 #include "RecursiveMutex.h"
 
 typedef struct _etool_readWriteMutex {
+#if defined(_windows)
 	int                     readCount;
 	etool_mutex             readMutex;
 	etool_recursiveMutex    writeMutex;
+#endif
+#if defined(_linux) || defined(_mac) || defined(_android) || defined(_ios)
+	pthread_rwlock_t mutex;
+#endif
 } etool_readWriteMutex;
 
 

@@ -68,6 +68,12 @@ void etool_thread_destroy(etool_thread *thread);
 short etool_thread_loop(etool_thread *thread);
 
 /**
+ * 复位当前线程运行标志(退出时使用)
+ * @param  thread [not null]
+ */
+void etool_thread_reset(etool_thread *thread);
+
+/**
  * 线程开始运行
  * @param thread [not null]
  * @param proc   [not null]
