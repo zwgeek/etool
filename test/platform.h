@@ -29,6 +29,7 @@ void testProc(void *self)
 		}
 		// etool_condition_signal(condition);
 		// etool_mutexEx_unlock(mutexEx);
+		// etool_os_sleep(10000);
 	}
 }
 
@@ -68,14 +69,14 @@ int platform_thread_test()
 
 	}
 
-	// // condition->waiters++;
-	// // printf("condition is running !\n");
-	// // // etool_mutexEx_unlock(mutexEx);
-	// // // printf("condition is running1 !\n");
-	// // // WaitForSingleObject(condition->cond, INFINITE);
-	// // SignalObjectAndWait(mutexEx->mutex, condition->cond, INFINITE, FALSE);
-	// // printf("condition is running2 !\n");
-	// // WaitForSingleObject(mutexEx->mutex, INFINITE);
+	// condition->waiters++;
+	// printf("condition is running !\n");
+	// // etool_mutexEx_unlock(mutexEx);
+	// // printf("condition is running1 !\n");
+	// // WaitForSingleObject(condition->cond, INFINITE);
+	// SignalObjectAndWait(mutexEx->mutex, condition->cond, INFINITE, FALSE);
+	// printf("condition is running2 !\n");
+	// WaitForSingleObject(mutexEx->mutex, INFINITE);
 	// etool_condition_wait(condition, mutexEx);
 	printf("thread is die!\n");
 

@@ -67,15 +67,16 @@ int main(int argc, char *argv[])
 // printf("%d\n", a);
 
 
-
+	// 还有socket和select没有测试
 	// platform_thread_test();
-	platform_readWriteMutex_test();
+	// platform_readWriteMutex_test();
 	// platform_system_test();
 	// platform_atomic_test();
 	
 	// FILE *file = fopen("a", "w+");
-	// log_log_test();
+	log_log_test();
 
+	// 测试没通过(还有一个socket和select)
 	// pool_executor_test();
 	return 0;
 }

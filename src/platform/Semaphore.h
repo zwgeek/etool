@@ -1,7 +1,7 @@
 /**
  * Copyright 2017, PaPa.  All rights reserved.
  * 信号量 POSIX 无名
- * (MAC/IOS)信号量一旦宿主线程挂起/睡眠,就会释放
+ * (LINUX/MAC/ANDROID/IOS)信号量一旦宿主线程挂起/睡眠,就会释放
  */
 
 #ifndef ETOOL_PLATFORM_SEMAPHORE

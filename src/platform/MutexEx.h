@@ -1,6 +1,7 @@
 /**
  * Copyright 2017, PaPa.  All rights reserved.
  * 递归锁扩展, 支持条件变量使用
+ * (HANDLE)一旦线程拥有者销毁,就会释放锁
  */
 
 #ifndef ETOOL_PLATFORM_MUTEXEX
